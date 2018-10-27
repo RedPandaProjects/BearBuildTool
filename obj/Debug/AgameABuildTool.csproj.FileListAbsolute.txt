@@ -1,0 +1,10 @@
+E:\GameDev\AgameASDK\binaries\net\AgameABuildTool.exe
+E:\GameDev\AgameASDK\binaries\net\AgameABuildTool.pdb
+E:\GameDev\AgameASDK\source\programs\AgameABuildTool\obj\Debug\AgameABuildTool.csprojAssemblyReference.cache
+E:\GameDev\AgameASDK\source\programs\AgameABuildTool\obj\Debug\AgameABuildTool.csproj.CoreCompileInputs.cache
+E:\GameDev\AgameASDK\source\programs\AgameABuildTool\obj\Debug\AgameABuildTool.exe
+E:\GameDev\AgameASDK\source\programs\AgameABuildTool\obj\Debug\AgameABuildTool.pdb
+E:\GameDev\AgameASDK\projects\programs\AgameABuildTool\obj\Debug\AgameABuildTool.csprojAssemblyReference.cache
+E:\GameDev\AgameASDK\projects\programs\AgameABuildTool\obj\Debug\AgameABuildTool.csproj.CoreCompileInputs.cache
+E:\GameDev\AgameASDK\projects\programs\AgameABuildTool\obj\Debug\AgameABuildTool.exe
+E:\GameDev\AgameASDK\projects\programs\AgameABuildTool\obj\Debug\AgameABuildTool.pdb
