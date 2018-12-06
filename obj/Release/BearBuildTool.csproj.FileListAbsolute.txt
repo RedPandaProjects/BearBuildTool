@@ -1,6 +1,0 @@
-E:\GameDev\BearSDK\binaries\net\BearBuildTool.exe
-E:\GameDev\BearSDK\binaries\net\BearBuildTool.pdb
-E:\GameDev\BearSDK\projects\programs\BearBuildTool\obj\Release\BearBuildTool.csproj.CoreCompileInputs.cache
-E:\GameDev\BearSDK\projects\programs\BearBuildTool\obj\Release\BearBuildTool.exe
-E:\GameDev\BearSDK\projects\programs\BearBuildTool\obj\Release\BearBuildTool.pdb
-E:\GameDev\BearSDK\projects\programs\BearBuildTool\obj\Release\BearBuildTool.csprojAssemblyReference.cache
