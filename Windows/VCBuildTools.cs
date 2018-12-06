@@ -399,6 +399,7 @@ namespace BearBuildTool.Windows
                     Arguments += "/EHsc ";
                     break;
                 case Config.Configure.Release:
+                    Arguments += "/EHsc ";
                     Arguments += "/GL ";
                     Arguments += "/Gy ";
                     Arguments += "/Ox ";
@@ -598,9 +599,9 @@ namespace BearBuildTool.Windows
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
             }
         }
-        public override void SetDefines(List<string> LDefines, BuildType buildType)
+        public override void SetDefines(List<string> LDefines,string OutFile, BuildType buildType)
         {
-            base.SetDefines(LDefines, buildType);
+            base.SetDefines(LDefines, OutFile, buildType);
             switch (buildType)
             {
                 case BuildType.ConsoleExecutable:

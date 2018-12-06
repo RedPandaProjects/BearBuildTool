@@ -77,7 +77,19 @@ namespace BearBuildTool.Projects
         }
         private void ProjectBuild(Project project, string name, BuildType buildType)
         {
-            if(project.OnlyAsStatic)
+            project.StartBuild();
+            foreach (string path in project.LibrariesDynamic)
+            {
+                string file = Path.GetFileName(path);
+                string file_new = Path.Combine(Config.Global.BinariesPlatformPath, file);
+                if(!File.Exists(file_new)||File.GetLastWriteTime(file) > File.GetLastWriteTime(file))
+                {
+                    Console.WriteLine(String.Format("Копирование динамической библиотеки {0}", file));
+                    File.Copy(path, file_new, true);
+                }
+
+            }
+            if (project.OnlyAsStatic)
             {
                 if (buildType == BuildType.Executable || buildType == BuildType.ConsoleExecutable)
                     throw new Exception("Невозможно перевсти Executable в StaticLibary");
@@ -125,7 +137,7 @@ namespace BearBuildTool.Projects
             else
                 LLibraries = projectInfo.LibrariesStatic.ToList();
             LDefines.Add(String.Format("{0}_EXPORTS", name.ToUpper()));
-           List<string> LLibrariesPath = projectInfo.LibrariesPath.ToList();
+            List<string> LLibrariesPath = projectInfo.LibrariesPath.ToList();
             string LIntermediate = Path.Combine(Config.Global.IntermediateProjectPath, name);
             if(!Directory.Exists(LIntermediate))
             {
@@ -136,7 +148,7 @@ namespace BearBuildTool.Projects
             string PCHSource = null;
             bool Rebuild = false;
             bool Build = false;
-            Config.Global.BuildTools.SetDefines(LDefines, buildType);
+            Config.Global.BuildTools.SetDefines(LDefines, GetOutFile(name, buildType), buildType);
             DateTime dateTimeLibrary = File.GetLastWriteTime(Config.Global.ProjectsCSFile[name]);
             if (project.PCHFile != null&&project.PCHIncludeFile!= null)
             {

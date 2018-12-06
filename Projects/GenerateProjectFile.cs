@@ -36,6 +36,7 @@ namespace BearBuildTool.Projects
                 info.NameFileInfo = Config.Global.ProjectsCSFile[name];
                 List<string> LIncludeFile = new List<string>();
                 var project = Config.Global.ProjectsMap[name];
+                project.StartBuild();
                 foreach (string i in project.Include.Private)
                 {
                     string[] files = Directory.GetFiles(i, "*.h", SearchOption.AllDirectories);

@@ -1,6 +1,7 @@
 ﻿using BearBuildTool.Projects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 namespace BearBuildTool.Tools
@@ -23,7 +24,7 @@ namespace BearBuildTool.Tools
         {
 
         }
-        public virtual void SetDefines(List<string> LDefines, BuildType buildType)
+        public virtual void SetDefines(List<string> LDefines,string ProjectOutName, BuildType buildType)
         {
             switch (buildType)
             {
@@ -42,6 +43,7 @@ namespace BearBuildTool.Tools
             if (!Config.Global.ANSI)
                 LDefines.Add("UNICODE");
             LDefines.Add(String.Format("MAIN_PROJECT_NAME=\"{0}\"", Config.Global.Project));
+            LDefines.Add(String.Format("PROJECT_OUT=\"{0}\"",Path.GetFileName( ProjectOutName)));
         }
 
         public virtual void SetLibraries(List<string> libs, BuildType buildType)

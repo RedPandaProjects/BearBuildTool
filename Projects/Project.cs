@@ -39,7 +39,7 @@ namespace BearBuildTool.Projects
     }
     public abstract class Project
     {
-     
+
 
         public ProjectListObject Include;
         public ProjectListObject IncludeInProject;
@@ -65,6 +65,10 @@ namespace BearBuildTool.Projects
             LibrariesPath = new ProjectListObject();
             LibrariesStatic = new ProjectListObject();
             IncludeInProject = new ProjectListObject();
+        }
+        public virtual void StartBuild()
+        {
+
         }
         public void AddSourceFiles(string path, bool andInclude = false)
         {
