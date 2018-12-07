@@ -320,15 +320,18 @@ namespace BearBuildTool.Windows
             Arguments += String.Format("/OUT:\"{0}\" ", outStaticLib);
             
             List<string> listObject = new List<string>();
-
+            
             foreach (string obj in objs)
             {
-                Arguments += String.Format("\"{0}\" ", obj);
+                listObject.Add(String.Format("\"{0}\"", obj));
             }
             foreach (string lib in libs)
             {
-                Arguments += String.Format("\"{0}\" ", lib);
+                listObject.Add(String.Format("\"{0}\"", lib));
             }
+            File.WriteAllLines(outStaticLib + ".txt", listObject);
+            Arguments += "@" + outStaticLib + ".txt" + " ";
+
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = LibraryLinker;
             process.StartInfo.Arguments = Arguments;
