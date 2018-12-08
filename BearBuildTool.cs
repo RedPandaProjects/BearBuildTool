@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-
+/// <summary>
+/// test 2
+/// </summary>
 namespace BearBuildTool
 {
     class BearBuildTool
