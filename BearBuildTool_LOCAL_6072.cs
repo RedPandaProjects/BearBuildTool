@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-/// <summary>
-/// test 2
-/// </summary>
+//test
 namespace BearBuildTool
 {
     class BearBuildTool
@@ -165,7 +163,7 @@ namespace BearBuildTool
             else
             {
             }
-
+            
         }
         static bool SetOption(string arg)
         {

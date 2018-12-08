@@ -165,7 +165,7 @@ namespace BearBuildTool
             else
             {
             }
-
+            
         }
         static bool SetOption(string arg)
         {
