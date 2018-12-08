@@ -331,7 +331,7 @@ namespace BearBuildTool.Windows
             }
             File.WriteAllLines(outStaticLib + ".txt", listObject);
             Arguments += "@" + outStaticLib + ".txt" + " ";
-
+            //test
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = LibraryLinker;
             process.StartInfo.Arguments = Arguments;
