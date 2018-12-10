@@ -1,4 +1,5 @@
 ﻿using BearBuildTool.Projects;
+using BearBuildTool.Tools;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,7 @@ namespace BearBuildTool.Windows
             string path;
             if (FindKey("Microsoft\\VisualStudio\\SxS\\VC7", "15.0", out path) == true)
             {
-                if (File.Exists(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")) == false)
+                if (FileSystem.ExistsFile(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")) == false)
                 {
                     throw new Exception("С++ 14.1  неустановлен.");
                 }
@@ -70,7 +71,7 @@ namespace BearBuildTool.Windows
             }
             path=GetVS2017Path();
             path += "VC\\";
-            if(File.Exists(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt"))==false)
+            if(FileSystem.ExistsFile(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt"))==false)
             {
                 throw new Exception("С++ 14.1  неустановлен.");
             }
@@ -160,7 +161,7 @@ namespace BearBuildTool.Windows
                 if (Config.Global.Platform == Config.Platform.Win64)
                 {
                     string testPath = Path.Combine(VCPath, "bin", "HostX64", "x64", "cl.exe");
-                    if (File.Exists(testPath))
+                    if (FileSystem.ExistsFile(testPath))
                     {
                         VCToolPath = testPath;
                     }
@@ -173,7 +174,7 @@ namespace BearBuildTool.Windows
 
 
                     string testPath = Path.Combine(VCPath, "bin", "HostX86", "x86", "cl.exe");
-                    if (File.Exists(testPath))
+                    if (FileSystem.ExistsFile(testPath))
                     {
                         VCToolPath = testPath;
                     }

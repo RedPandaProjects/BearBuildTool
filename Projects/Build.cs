@@ -82,7 +82,7 @@ namespace BearBuildTool.Projects
             {
                 string file = Path.GetFileName(path);
                 string file_new = Path.Combine(Config.Global.BinariesPlatformPath, file);
-                if(!File.Exists(file_new)||File.GetLastWriteTime(file) > File.GetLastWriteTime(file))
+                if(!FileSystem.ExistsFile(file_new)|| FileSystem.GetLastWriteTime(file) > FileSystem.GetLastWriteTime(file))
                 {
                     Console.WriteLine(String.Format("Копирование динамической библиотеки {0}", file));
                     File.Copy(path, file_new, true);
@@ -149,10 +149,10 @@ namespace BearBuildTool.Projects
             bool Rebuild = false;
             bool Build = false;
             Config.Global.BuildTools.SetDefines(LDefines, GetOutFile(name, buildType), buildType);
-            DateTime dateTimeLibrary = File.GetLastWriteTime(Config.Global.ProjectsCSFile[name]);
+            DateTime dateTimeLibrary = FileSystem.GetLastWriteTime(Config.Global.ProjectsCSFile[name]);
             if (project.PCHFile != null&&project.PCHIncludeFile!= null)
             {
-                if (!File.Exists(project.PCHFile))
+                if (!FileSystem.ExistsFile(project.PCHFile))
                 {
                     throw new Exception(String.Format("Не найден файл {0}", project.PCHFile));
                 }
@@ -163,7 +163,7 @@ namespace BearBuildTool.Projects
                 string obj = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(PCHSource) + Config.Global.ObjectExtension);
                 DateTime dateTime = DateTime.MinValue;
                 bool reCreate = SourceFile.CheakSource(LInclude, LIntermediate, PCHSource, ref dateTime);
-                if (Config.Global.Rebuild || !File.Exists(PCH) || !File.Exists(obj) || reCreate || dateTime > File.GetLastWriteTime(obj) || dateTime > File.GetLastWriteTime(PCH)|| dateTimeLibrary> File.GetLastWriteTime(PCH))
+                if (Config.Global.Rebuild || !FileSystem.ExistsFile(PCH) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj) || dateTime > FileSystem.GetLastWriteTime(PCH)|| dateTimeLibrary> FileSystem.GetLastWriteTime(PCH))
                 {
 
                     Console.WriteLine(String.Format("Сборка PCH {0}", Path.GetFileName(PCHSource)));
@@ -184,7 +184,7 @@ namespace BearBuildTool.Projects
                     bool reCreate = SourceFile.CheakSource(LInclude, LIntermediate, source, ref dateTime);
                     bool C = source.Substring(source.Length - 2, 2).ToLower() == ".c";
                     if (dateTimeLibrary < dateTime) dateTimeLibrary = dateTime;
-                    if (Config.Global.Rebuild || (Rebuild && !C) || !File.Exists(obj) || reCreate || dateTime > File.GetLastWriteTime(obj))
+                    if (Config.Global.Rebuild || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
                     {
                         Console.WriteLine(String.Format("Сборка {0}", Path.GetFileName(source)));
 
@@ -217,9 +217,9 @@ namespace BearBuildTool.Projects
                 foreach (string path in LLibrariesPath)
                 {
                     string fullPath = Path.Combine(path, lib);
-                    if(File.Exists(fullPath))
+                    if(FileSystem.ExistsFile(fullPath))
                     {
-                        DateTime dateTime = File.GetLastWriteTime(fullPath);
+                        DateTime dateTime = FileSystem.GetLastWriteTime(fullPath);
                         if (dateTime > dateTimeLibrary) dateTimeLibrary = dateTime;
                     //    find = true;
                         continue;
@@ -235,7 +235,7 @@ namespace BearBuildTool.Projects
             if (project.Sources.Count != 0)
             {
                 projectInfo.LibraryFile = GetOutStaticLibrary(name);
-                if (Config.Global.Rebuild || (Build || !File.Exists(OutFile)) ||  File.GetLastWriteTime(OutFile)<dateTimeLibrary )
+                if (Config.Global.Rebuild || (Build || !FileSystem.ExistsFile(OutFile)) || FileSystem.GetLastWriteTime(OutFile)<dateTimeLibrary )
                 {
 
                     Console.WriteLine(String.Format("Сборка {0}", OutFile));

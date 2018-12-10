@@ -19,7 +19,7 @@ namespace BearBuildTool.Projects
                 throw new Exception("База проектов пуста!!!");
             }
             ListFiles listFiles = new ListFiles(out_name + ".txt");
-            if (!File.Exists(out_name)|| listFiles.TestUpdate(source)|| listFiles.GetFilesMaxDate()>File.GetLastWriteTime(out_name))
+            if (!FileSystem.ExistsFile(out_name)|| listFiles.TestUpdate(source)|| listFiles.GetFilesMaxDate()> FileSystem.GetLastWriteTime(out_name))
             {
                 listFiles.ClearFiles();
                 listFiles.Files.AddRange(source);
@@ -33,7 +33,7 @@ namespace BearBuildTool.Projects
         }
         private static Assembly Compile(string[] source, string out_name)
         {
-            if(File.Exists(out_name)) File.Delete(out_name);
+            if(FileSystem.ExistsFile(out_name)) File.Delete(out_name);
             Console.WriteLine(String.Format("Сборка {0}", out_name));
             if (source == null || source.Length == 0)
             {
