@@ -1,13 +1,16 @@
-﻿using BearBuildTool.Tools;
-using BearBuildTool.Windows;
+﻿using BearBuildTool.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+<<<<<<< HEAD
+//test
+=======
 /// <summary>
 /// test 2
 /// </summary>
+>>>>>>> 2df7af35ad26643fb2f124dde2c14c459bf670bf
 namespace BearBuildTool
 {
     class BearBuildTool
@@ -157,7 +160,7 @@ namespace BearBuildTool
                     Config.Global.IntermediatePath = Path.GetFullPath(Config.Global.IntermediatePath);
                     Directory.Delete(Config.Global.IntermediatePath);
                 }
-                if (FileSystem.ExistsFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Bear.sln")))
+                if (File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Bear.sln")))
                 {
                     File.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Bear.sln"));
                 }
@@ -166,7 +169,7 @@ namespace BearBuildTool
             else
             {
             }
-
+            
         }
         static bool SetOption(string arg)
         {
@@ -221,4 +224,3 @@ namespace BearBuildTool
         }
     }
 }
-//test
