@@ -19,7 +19,7 @@ namespace BearBuildTool.Tools
             if (FileSystem.ExistsFile(Name))
             {
                 Files.AddRange(File.ReadAllLines(Name));
-                Files.Sort();
+              //  Files.Sort();
             }
 
         }
