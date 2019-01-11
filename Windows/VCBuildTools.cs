@@ -376,7 +376,7 @@ namespace BearBuildTool.Windows
             Arguments += "/Zi  ";
             Arguments += "/Gm- ";
             Arguments += "/Zc:inline  ";
-            Arguments += "/fp:precise ";
+            Arguments += "/fp:fast ";
             Arguments += "/errorReport:prompt ";
             Arguments += "/Zc:forScope ";
             Arguments += "/Gd  ";
@@ -421,6 +421,7 @@ namespace BearBuildTool.Windows
                     
                     break;
             };
+     
             Arguments += "/analyze- ";
             Arguments += "/Zc:inline ";
             Arguments += String.Format("\"{0}\" ", source);
