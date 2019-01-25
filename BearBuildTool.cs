@@ -12,7 +12,6 @@ namespace BearBuildTool
 {
     class BearBuildTool
     {
-        static List<string> CreateProjectFile = new List<string>();
         static void Help()
         {
             Console.WriteLine("BearBuildTool [options] ([project][configure][platform])");
@@ -106,16 +105,11 @@ namespace BearBuildTool
                 Console.WriteLine(String.Format("Сборка завершина: количество {0}", Config.Global.CountBuild));
             }
         }
-        static void GenerateProjectFile()
+        static void GenerateProjectFile(string name)
         {
-            if (CreateProjectFile.Count == 0)
-                foreach (var a in Config.Global.ExecutableMap)
-                {
-                    CreateProjectFile.Add(a.Key);
-                }
             Console.WriteLine("Создание проектов трансляторов");
             VCProjectGenerate projectFile = new VCProjectGenerate();
-            projectFile.Generate(CreateProjectFile);
+            projectFile.Generate(name);
         }
         static void ClaenProject()
         {
@@ -142,9 +136,8 @@ namespace BearBuildTool
             if (arg == "-createvisualproject")
             {
                 Initialize();
-                for (; i < args.Length; i++)
-                    CreateProjectFile.Add(args[i]);
-                GenerateProjectFile();
+                if (args.Length  != i + 1) return;
+                GenerateProjectFile(args[i]);
                 System.Environment.Exit(0);
             }
             else if (arg == "-cleanall")

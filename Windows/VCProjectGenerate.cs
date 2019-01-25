@@ -11,7 +11,7 @@ namespace BearBuildTool.Windows
         List<string> SlnLineList=new List<string>();
         List<Guid> Guids=new List<Guid>();
     
-        public void Generate(List<string> projects)
+        public void Generate(string name)
         {
             string SlnGUID = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}";
             string outFileSln = Path.Combine(Config.Global.IntermediatePath, "..", "Bear.sln");
@@ -20,9 +20,16 @@ namespace BearBuildTool.Windows
             SlnLineList.Add("# Visual Studio 15");
             SlnLineList.Add("VisualStudioVersion = 15.0.28010.2036");
             SlnLineList.Add("MinimumVisualStudioVersion = 10.0.40219.1");
+
+            List<string> projects = new List<string>();
+            {
+                Projects.GenerateProjectFile generateProjectFile = new Projects.GenerateProjectFile();
+                generateProjectFile.GetProjects(name,ref projects);
+            }
+            
             foreach(string i in projects)
             {
-                VCProjectFile projectFile = new VCProjectFile(i);
+                VCProjectFile projectFile = new VCProjectFile(i,name);
                 projectFile.Write();
                 Guids.Add(projectFile.Guid);
                 SlnLineList.Add(String.Format("Project(\"{0}\")=\"{1}\",\"{2}\",\"{3}\"", SlnGUID, i,projectFile.File,  projectFile.Guid.ToString("B")));

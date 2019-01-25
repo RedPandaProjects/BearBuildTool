@@ -13,12 +13,14 @@ namespace BearBuildTool.Windows
         GenerateProjectFile GenerateProjectFile;
         string Name;
         public string File;
+        string GeneralName;
         public Guid Guid;
-        public VCProjectFile(string name)
+        public VCProjectFile(string name,string general_name)
         {
             GenerateProjectFile = new GenerateProjectFile();
             GenerateProjectFile.RegisterProject(name);
             Name = name;
+            GeneralName = general_name;
             Guid = Guid.NewGuid();
         }
         
@@ -29,7 +31,12 @@ namespace BearBuildTool.Windows
             {
                 Directory.CreateDirectory(LIntermediate);
             }
-            File = Path.Combine(LIntermediate, Name + ".vcxproj");
+            File = Path.Combine(LIntermediate, GeneralName);
+            if(!Directory.Exists(File))
+            {
+                Directory.CreateDirectory(File);
+            }
+            File = Path.Combine(File, Name + ".vcxproj");
             string FileFilters = File + ".filters";
             string FileUser = File + ".user";
             string command = "";
@@ -92,96 +99,51 @@ namespace BearBuildTool.Windows
             for (int ii = 0; ii < 3; ii++)
             {
                 FileUserListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[ii]));
-                FileUserListLine.Add(String.Format("    <LocalDebuggerWorkingDirectory>..\\..\\binaries\\{0}\\</LocalDebuggerWorkingDirectory>", "win32"));
+                FileUserListLine.Add(String.Format("    <LocalDebuggerWorkingDirectory>..\\..\\..\\binaries\\{0}\\</LocalDebuggerWorkingDirectory>", "win32"));
                 FileUserListLine.Add("    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>");
                 FileUserListLine.Add("  </PropertyGroup>");
             };
             for (int ii = 3; ii < 6; ii++)
             {
                 FileUserListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[ii]));
-                FileUserListLine.Add(String.Format("    <LocalDebuggerWorkingDirectory>..\\..\\binaries\\{0}\\</LocalDebuggerWorkingDirectory>", "win64"));
+                FileUserListLine.Add(String.Format("    <LocalDebuggerWorkingDirectory>..\\..\\..\\binaries\\{0}\\</LocalDebuggerWorkingDirectory>", "win64"));
                 FileUserListLine.Add("    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>");
                 FileUserListLine.Add("  </PropertyGroup>");
             };
             FileUserListLine.Add("</Project>");
-            for (int ii = 0; ii < GenerateProjectFile.MapProjects.Count; ii++)
-            {
-                var i = GenerateProjectFile.MapProjects.ElementAt(ii).Value;
-                string pp = GenerateProjectFile.MapProjects.ElementAt(ii).Key;
-                FiltersListLine.Add(String.Format("		<Filter Include=\"{0}\">", pp));
+                FiltersListLine.Add(String.Format("		<Filter Include=\"include\">"));
                 FiltersListLine.Add(String.Format("			<UniqueIdentifier>{0}</UniqueIdentifier>", Guid.NewGuid().ToString("B")));
                 FiltersListLine.Add("		</Filter>");
-                FiltersListLine.Add(String.Format("		<Filter Include=\"{0}\\include\">", pp));
+                FiltersListLine.Add(String.Format("		<Filter Include=\"source\">"));
                 FiltersListLine.Add(String.Format("			<UniqueIdentifier>{0}</UniqueIdentifier>", Guid.NewGuid().ToString("B")));
                 FiltersListLine.Add("		</Filter>");
-                FiltersListLine.Add(String.Format("		<Filter Include=\"{0}\\source\">", pp));
-                FiltersListLine.Add(String.Format("			<UniqueIdentifier>{0}</UniqueIdentifier>", Guid.NewGuid().ToString("B")));
-                FiltersListLine.Add("		</Filter>");
-                foreach (var ji in i.SourceFile)
+            var i = GenerateProjectFile.MapProjects[Name];
+            foreach (var ji in i.SourceFile)
                 {
                     FiltersListLine.Add(String.Format("		<ClCompile Include=\"{0}\">", ji));
-                    FiltersListLine.Add(String.Format("		  <Filter>{0}\\source</Filter>", pp));
+                    FiltersListLine.Add(String.Format("		  <Filter>source</Filter>"));
                     FiltersListLine.Add("		</ClCompile >");
                     ListLine.Add(String.Format("    <ClCompile Include=\"{0}\">", ji));
-
-                    List<string> LInclude = i.Include.ToList();
-                    List<string> LDefines = i.Defines.ToList();
-                    string SInclude = "    <AdditionalIncludeDirectories Condition=\"{0}\">";
-                    foreach (var ia in LInclude)
-                    {
-                        SInclude += ia + ";";
-                    }
-                    SInclude += "</AdditionalIncludeDirectories>";
-                    string SDefines = "    <PreprocessorDefinitions Condition=\"{0}\">$(NMakePreprocessorDefinitions);";
-                    foreach (var ia in LDefines)
-                    {
-                        SDefines += ia + ";";
-                    }
-                    SDefines += "</PreprocessorDefinitions>";
-                    foreach (string ic in conditions)
-                    {
-                        ListLine.Add(String.Format(SDefines, ic));
-                    }
-                    foreach (string ic in conditions)
-                    {
-                        ListLine.Add(String.Format(SInclude, ic));
-                    }
+               
                     ListLine.Add(String.Format("    </ClCompile>"));
                 }
-            }
+            
             ListLine.Add("  </ItemGroup>");
             ListLine.Add("  <ItemGroup>");
-            for (int ii = 0; ii < GenerateProjectFile.MapProjects.Count; ii++)
-            {
-                var i = GenerateProjectFile.MapProjects.ElementAt(ii).Value;
-                string pp = GenerateProjectFile.MapProjects.ElementAt(ii).Key;
+              
                 foreach (var ji in i.IncludeFile.Keys)
                 {
                     FiltersListLine.Add(String.Format("		<ClInclude Include=\"{0}\">", ji));
-                    FiltersListLine.Add(String.Format("		  <Filter>{0}\\include</Filter>", pp));
+                    FiltersListLine.Add(String.Format("		  <Filter>include</Filter>"));
                     FiltersListLine.Add("		</ClInclude >");
                     ListLine.Add(String.Format("    <ClInclude Include=\"{0}\" />", ji));
                 }
-            }
-            ListLine.Add("  </ItemGroup>");
-            ListLine.Add("  <ItemGroup>");
-            for (int ii = 0; ii < GenerateProjectFile.MapProjects.Count; ii++)
-            {
-                
-                var i = GenerateProjectFile.MapProjects.ElementAt(ii).Value;
-                string pp = GenerateProjectFile.MapProjects.ElementAt(ii).Key;
-                FiltersListLine.Add(String.Format("		<None Include=\"{0}\">", i.NameFileInfo));
-                FiltersListLine.Add(String.Format("		  <Filter>{0}</Filter>", pp));
-                FiltersListLine.Add("		</None >");
-                ListLine.Add(String.Format("    <None Include=\"{0}\" />", i.NameFileInfo));
-
-            }
             ListLine.Add("  </ItemGroup>");
 
             ListLine.Add("  <PropertyGroup Label=\"Globals\">");
             ListLine.Add(String.Format("    <ProjectGuid>{0}</ProjectGuid>", Guid.ToString("B") ));
             ListLine.Add("    <Keyword>Win32Proj</Keyword>");
-            ListLine.Add(String.Format("   <RootNamespace>{0}</RootNamespace>",Name));
+            ListLine.Add(String.Format("   <RootNamespace>{0}</RootNamespace>", GeneralName));
             ListLine.Add("  </PropertyGroup>");
             ListLine.Add("  <Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.Default.props\" />");
             ListLine.Add("  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\" Label=\"Configuration\">");
@@ -239,122 +201,169 @@ namespace BearBuildTool.Windows
             ListLine.Add("  </ImportGroup>");
             ListLine.Add("  <PropertyGroup Label=\"UserMacros\" />");
             ListLine.Add("  <ItemDefinitionGroup/>");
+
+            List<string> LInclude = i.Include.ToList();
+            List<string> LDefines = i.Defines.ToList();
+
+            string SInclude = "";
+
+            foreach (var ia in LInclude)
             {
-                string defines = "_DEBUG;DEBUG;WIN32;X32;WINDOWS;LIB;_LIB";
+                SInclude += ia + ";";
+            }
+
+            {
+                string defines = "_DEBUG;DEBUG;WIN32;X32;WINDOWS;LIB;_LIB;";
+          
                 if (!Config.Global.ANSI)
                 {
-                    defines += ";_UNICODE;";
-                    defines += "UNICODE";
+                    defines += "_UNICODE;";
+                    defines += "UNICODE;";
+                }
+                foreach (var ia in LDefines)
+                {
+                    defines += ia + ";";
                 }
                 ListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[0]));
-                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>","win32",Name,"_debug"));
+                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>","win32",GeneralName,"_debug"));
                 ListLine.Add(String.Format("    <NMakePreprocessorDefinitions>{0}</NMakePreprocessorDefinitions>", defines));
-                ListLine.Add("    <NMakeIncludeSearchPath></NMakeIncludeSearchPath>");
+                ListLine.Add(String.Format("    <NMakeIncludeSearchPath>{0}</NMakeIncludeSearchPath>", SInclude));
+             
        
-                ListLine.Add(String.Format("    <OutDir>..\\..\\binaries\\{0}\\</OutDir>","win32"));
-                ListLine.Add("    <IntDir>..\\..\\binaries\\net\\</IntDir>");
-                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", Name, "Win32", "Debug", command));
-                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe  {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", Name, "Win32", "Debug", command));
-                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe  {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", Name, "Win32", "Debug", command));
+                ListLine.Add(String.Format("    <OutDir>..\\..\\..\\binaries\\{0}\\</OutDir>","win32"));
+                ListLine.Add("    <IntDir>..\\..\\..\\binaries\\net\\</IntDir>");
+                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", GeneralName, "Win32", "Debug", command));
+                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe  {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", GeneralName, "Win32", "Debug", command));
+                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe  {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", GeneralName, "Win32", "Debug", command));
                
                 ListLine.Add("  </PropertyGroup>");
 
             }
             {
-                string defines = "MIXED;DEBUG;WIN32;X32;WINDOWS;LIB;_LIB";
+                string defines = "MIXED;DEBUG;WIN32;X32;WINDOWS;LIB;_LIB;";
+
                 if (!Config.Global.ANSI)
                 {
-                    defines += ";_UNICODE;";
-                    defines += "UNICODE";
+                    defines += "_UNICODE;";
+                    defines += "UNICODE;";
+                }
+                foreach (var ia in LDefines)
+                {
+                    defines += ia + ";";
                 }
                 ListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[1]));
-                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win32", Name, "_mixed"));
+                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win32", GeneralName, "_mixed"));
                 ListLine.Add(String.Format("    <NMakePreprocessorDefinitions>{0}</NMakePreprocessorDefinitions>", defines));
-                ListLine.Add("    <NMakeIncludeSearchPath></NMakeIncludeSearchPath>");
+                ListLine.Add(String.Format("    <NMakeIncludeSearchPath>{0}</NMakeIncludeSearchPath>", SInclude));
+             
 
-                ListLine.Add(String.Format("    <OutDir>..\\..\\binaries\\{0}\\</OutDir>", "win32"));
-                ListLine.Add("    <IntDir>..\\..\\binaries\\net\\</IntDir>");
-                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", Name,"Win32","Mixed", command));
-                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild  {0} {2} {1}</NMakeReBuildCommandLine>", Name, "Win32", "Mixed", command));
-                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", Name, "Win32", "Mixed", command));
+                ListLine.Add(String.Format("    <OutDir>..\\..\\..\\binaries\\{0}\\</OutDir>", "win32"));
+                ListLine.Add("    <IntDir>..\\..\\..\\binaries\\net\\</IntDir>");
+                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", GeneralName, "Win32","Mixed", command));
+                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild  {0} {2} {1}</NMakeReBuildCommandLine>", GeneralName, "Win32", "Mixed", command));
+                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", GeneralName, "Win32", "Mixed", command));
                 ListLine.Add("  </PropertyGroup>");
             }
             {
-                string defines = "NDEBUG;WIN32;X32;WINDOWS;LIB;_LIB";
+                string defines = "NDEBUG;WIN32;X32;WINDOWS;LIB;_LIB;";
+
                 if (!Config.Global.ANSI)
                 {
-                    defines += ";_UNICODE;";
-                    defines += "UNICODE";
+                    defines += "_UNICODE;";
+                    defines += "UNICODE;";
+                }
+                foreach (var ia in LDefines)
+                {
+                    defines += ia + ";";
                 }
                 ListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[2]));
-                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win32", Name, ""));
+                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win32", GeneralName, ""));
                 ListLine.Add(String.Format("    <NMakePreprocessorDefinitions>{0}</NMakePreprocessorDefinitions>", defines));
-                ListLine.Add("    <NMakeIncludeSearchPath></NMakeIncludeSearchPath>");
+                ListLine.Add(String.Format("    <NMakeIncludeSearchPath>{0}</NMakeIncludeSearchPath>", SInclude));
+             
 
-                ListLine.Add(String.Format("    <OutDir>..\\..\\binaries\\{0}\\</OutDir>", "win32"));
-                ListLine.Add("    <IntDir>..\\..\\binaries\\net\\</IntDir>");
-                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", Name, "Win32", "Release", command));
-                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", Name, "Win32", "Release", command));
-                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", Name, "Win32", "Release", command));
+                ListLine.Add(String.Format("    <OutDir>..\\..\\..\\binaries\\{0}\\</OutDir>", "win32"));
+                ListLine.Add("    <IntDir>..\\..\\..\\binaries\\net\\</IntDir>");
+                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", GeneralName, "Win32", "Release", command));
+                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", GeneralName, "Win32", "Release", command));
+                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", GeneralName, "Win32", "Release", command));
                 ListLine.Add("  </PropertyGroup>");
 
             }
             {
-                string defines = "_DEBUG;DEBUG;X64;WINDOWS;LIB;_LIB";
+                string defines = "_DEBUG;DEBUG;X64;WINDOWS;LIB;_LIB;";
+
                 if (!Config.Global.ANSI)
                 {
-                    defines += ";_UNICODE;";
-                    defines += "UNICODE";
+                    defines += "_UNICODE;";
+                    defines += "UNICODE;";
+                }
+                foreach (var ia in LDefines)
+                {
+                    defines += ia + ";";
                 }
                 ListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[3]));
-                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win64", Name, "_debug"));
+                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win64", GeneralName, "_debug"));
                 ListLine.Add(String.Format("    <NMakePreprocessorDefinitions>{0}</NMakePreprocessorDefinitions>", defines));
-                ListLine.Add("    <NMakeIncludeSearchPath></NMakeIncludeSearchPath>");
+                ListLine.Add(String.Format("    <NMakeIncludeSearchPath>{0}</NMakeIncludeSearchPath>", SInclude));
+             
 
-                ListLine.Add(String.Format("    <OutDir>..\\..\\binaries\\{0}\\</OutDir>", "win64"));
-                ListLine.Add("    <IntDir>..\\..\\binaries\\net\\</IntDir>");
-                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", Name, "Win64", "Debug", command));
-                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", Name, "Win64", "Debug", command));
-                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", Name, "Win64", "Debug", command));
+                ListLine.Add(String.Format("    <OutDir>..\\..\\..\\binaries\\{0}\\</OutDir>", "win64"));
+                ListLine.Add("    <IntDir>..\\..\\..\\binaries\\net\\</IntDir>");
+                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", GeneralName, "Win64", "Debug", command));
+                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", GeneralName, "Win64", "Debug", command));
+                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", GeneralName, "Win64", "Debug", command));
                 ListLine.Add("  </PropertyGroup>");
             }
             {
-                string defines = "MIXED;DEBUG;X64;WINDOWS;LIB;_LIB";
+                string defines = "MIXED;DEBUG;X64;WINDOWS;LIB;_LIB;";
+
                 if (!Config.Global.ANSI)
                 {
-                    defines += ";_UNICODE;";
-                    defines += "UNICODE";
+                    defines += "_UNICODE;";
+                    defines += "UNICODE;";
+                }
+                foreach (var ia in LDefines)
+                {
+                    defines += ia + ";";
                 }
                 ListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[4]));
-                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win64", Name, "_mixed"));
+                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win64", GeneralName, "_mixed"));
                 ListLine.Add(String.Format("    <NMakePreprocessorDefinitions>{0}</NMakePreprocessorDefinitions>", defines));
-                ListLine.Add("    <NMakeIncludeSearchPath></NMakeIncludeSearchPath>");
+                ListLine.Add(String.Format("    <NMakeIncludeSearchPath>{0}</NMakeIncludeSearchPath>", SInclude));
+             
 
-                ListLine.Add(String.Format("    <OutDir>..\\..\\binaries\\{0}\\</OutDir>", "win64"));
-                ListLine.Add("    <IntDir>..\\..\\binaries\\net\\</IntDir>");
-                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", Name, "Win64", "Mixed", command));
-                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", Name, "Win64", "Mixed", command));
-                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", Name, "Win64", "Mixed", command));
+                ListLine.Add(String.Format("    <OutDir>..\\..\\..\\binaries\\{0}\\</OutDir>", "win64"));
+                ListLine.Add("    <IntDir>..\\..\\..\\binaries\\net\\</IntDir>");
+                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", GeneralName, "Win64", "Mixed", command));
+                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", GeneralName, "Win64", "Mixed", command));
+                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", GeneralName, "Win64", "Mixed", command));
                 ListLine.Add("  </PropertyGroup>");
             }
             {
-                string defines = "NDEBUG;X64;WINDOWS;LIB;_LIB";
+                string defines = "NDEBUG;X64;WINDOWS;LIB;_LIB;";
+
                 if (!Config.Global.ANSI)
                 {
-                    defines += ";_UNICODE;";
-                    defines += "UNICODE";
+                    defines += "_UNICODE;";
+                    defines += "UNICODE;";
+                }
+                foreach (var ia in LDefines)
+                {
+                    defines += ia + ";";
                 }
                 ListLine.Add(String.Format("  <PropertyGroup Condition=\"{0}\">", conditions[5]));
-                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win64", Name, ""));
+                ListLine.Add(String.Format("    <NMakeOutput>..\\..\\..\\binaries\\{0}\\{1}{2}.exe</NMakeOutput>", "win64", GeneralName, ""));
                 ListLine.Add(String.Format("    <NMakePreprocessorDefinitions>{0}</NMakePreprocessorDefinitions>", defines));
+                ListLine.Add(String.Format("    <NMakeIncludeSearchPath>{0}</NMakeIncludeSearchPath>", SInclude));
 
-                ListLine.Add("    <NMakeIncludeSearchPath></NMakeIncludeSearchPath>");
+             
 
-                ListLine.Add(String.Format("    <OutDir>..\\..\\binaries\\{0}\\</OutDir>", "win64"));
-                ListLine.Add("    <IntDir>..\\..\\binaries\\net\\</IntDir>");
-                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", Name, "Win64", "Release", command));
-                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", Name, "Win64", "Release", command));
-                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", Name, "Win64", "Release", command));
+                ListLine.Add(String.Format("    <OutDir>..\\..\\..\\binaries\\{0}\\</OutDir>", "win64"));
+                ListLine.Add("    <IntDir>..\\..\\..\\binaries\\net\\</IntDir>");
+                ListLine.Add(String.Format("    <NMakeBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}</NMakeBuildCommandLine>", GeneralName, "Win64", "Release", command));
+                ListLine.Add(String.Format("    <NMakeReBuildCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}</NMakeReBuildCommandLine>", GeneralName, "Win64", "Release", command));
+                ListLine.Add(String.Format("    <NMakeCleanCommandLine>..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}</NMakeCleanCommandLine>", GeneralName, "Win64", "Release", command));
                 ListLine.Add("  </PropertyGroup>");
 
             }
