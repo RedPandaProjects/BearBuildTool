@@ -4,6 +4,6 @@
     <StartArguments>-createvisualproject test</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <StartArguments>-createvisualproject test</StartArguments>
+    <StartArguments>stalker Release Win32</StartArguments>
   </PropertyGroup>
 </Project>

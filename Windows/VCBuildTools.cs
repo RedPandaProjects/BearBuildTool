@@ -155,6 +155,7 @@ namespace BearBuildTool.Windows
             string UniversalCRTDir;
             string VerisonCRTDir;
             string WindowsSDKDir;
+            string VCPlatformPath=null;
             VCToolPath = null;
             {
 
@@ -166,20 +167,38 @@ namespace BearBuildTool.Windows
                         VCToolPath = testPath;
                     }
                     else
-                        throw new Exception("Нет x64 битного компилятора");
+                    {
+                        testPath = Path.Combine(VCPath, "bin", "HostX86", "x64", "cl.exe");
+                        if (FileSystem.ExistsFile(testPath))
+                        {
+                            VCToolPath = testPath;
+                            VCPlatformPath = Path.Combine(VCPath, "bin", "HostX86", "x86");
+                        }
+                        else throw new Exception("Нет x64 битного компилятора");
+                    }
+                       
 
                 }
                 else
                 {
 
 
-                    string testPath = Path.Combine(VCPath, "bin", "HostX86", "x86", "cl.exe");
+                    string testPath = Path.Combine(VCPath, "bin", "HostX64", "x86", "cl.exe");
                     if (FileSystem.ExistsFile(testPath))
                     {
                         VCToolPath = testPath;
+                        VCPlatformPath = Path.Combine(VCPath, "bin", "HostX64", "x64");
                     }
                     else
-                        throw new Exception("Нет x86 битного компилятора");
+                    {
+                        testPath = Path.Combine(VCPath, "bin", "HostX86", "x86", "cl.exe");
+                        if (FileSystem.ExistsFile(testPath))
+                        {
+                            VCToolPath = testPath;
+                        }
+                        else throw new Exception("Нет x86 битного компилятора");
+                    }
+                        
 
                 }
             }
@@ -194,7 +213,8 @@ namespace BearBuildTool.Windows
             if (!Paths.Split(';').Any(x => String.Compare(x, VCToolPath, true) == 0))
             {
                 Paths = VCToolPath + ";" + Paths;
-                Environment.SetEnvironmentVariable("PATH", Paths);
+                if (VCPlatformPath != null) Paths = Paths + ";" + VCPlatformPath;
+               Environment.SetEnvironmentVariable("PATH", Paths);
             }
 
             List<string> includes = new List<string>();
@@ -403,7 +423,6 @@ namespace BearBuildTool.Windows
                     Arguments += "/EHsc ";
                     break;
                 case Config.Configure.Release:
-                    Arguments += "/EHsc ";
                     Arguments += "/GL ";
                     Arguments += "/Gy ";
                     Arguments += "/Ox ";
@@ -477,21 +496,29 @@ namespace BearBuildTool.Windows
             Arguments += "/DLL ";
             Arguments += "/MANIFEST:NO ";
             Arguments += "/NOLOGO ";
-            if (Config.Global.Configure != Config.Configure.Release)
-                Arguments += "/DEBUG ";
+            Arguments += "/DEBUG ";
             Arguments += "/errorReport:prompt ";
+            Arguments += "/NXCOMPAT ";
             if (Config.Global.Platform == Config.Platform.Win64)
-                Arguments += "/MACHINE:x64 ";
-            else
-                Arguments += "/MACHINE:x86 ";
-            if (Config.Global.Configure == Config.Configure.Debug)
             {
-                Arguments += "/OPT:NOREF ";
-                Arguments += "/OPT:NOICF ";
+                Arguments += "/MACHINE:x64 ";
             }
             else
             {
+                Arguments += "/MACHINE:x86 ";
+                Arguments += "/LARGEADDRESSAWARE ";
+            }
+            if (Config.Global.Configure == Config.Configure.Release)
+            {
+                Arguments += "/RELEASE ";
+                Arguments += "/OPT:ICF ";
                 Arguments += "/OPT:REF ";
+               
+            }
+            else
+            {
+                Arguments += "/OPT:NOREF ";
+                Arguments += "/OPT:NOICF ";
             }
             Arguments += "/INCREMENTAL:NO ";
             foreach (string libpath in libsPath)
