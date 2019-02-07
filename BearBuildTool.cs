@@ -118,7 +118,14 @@ namespace BearBuildTool
             {
                 Config.Global.OutProjectFileName += "_" + Config.Global.Configure.ToString();
             }
-            Config.Global.BuildTools = new Windows.VCBuildTools();
+            if (Config.Global.Platform == Config.Platform.Linux)
+            {
+                Config.Global.BuildTools = new Linux.LinuxBuildTools();
+            }
+            else
+            {
+                Config.Global.BuildTools = new Windows.VCBuildTools();
+            }
             Projects.Build build = new Projects.Build();
             build.ProjectBuild(Config.Global.Project);
             build.AutonomousProjectsBuild();

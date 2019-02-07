@@ -67,6 +67,15 @@ namespace BearBuildTool.Config
                 PCHExtension = ".pch";
                 Platform = Platform.Win64;
             }
+            else if(str=="linux")
+            {
+                ObjectExtension = ".o";
+                ExecutableExtension = "";
+                StaticLibraryExtension = "";
+                DynamicLibraryExtension = "";
+                PCHExtension = "";
+                Platform = Platform.Linux;
+            }
             else
             {
                 return false;
