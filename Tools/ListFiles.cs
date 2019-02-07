@@ -18,14 +18,16 @@ namespace BearBuildTool.Tools
             Files = new List<string>();
             if (FileSystem.ExistsFile(Name))
             {
+               
                 Files.AddRange(File.ReadAllLines(Name));
-              //  Files.Sort();
+                // Files.Sort();
             }
 
         }
         public void Write()
         {
-            Files.Sort();
+           // Files.Sort();
+            File.Delete(Name);
             File.WriteAllLines(Name, Files);
         }
         public bool TestUpdate()
@@ -51,7 +53,7 @@ namespace BearBuildTool.Tools
             if (TestUpdate()) return true;
             List<string> files = new List<string>();
             files.AddRange(list);
-            files.Sort();
+          //  files.Sort();
             return !Enumerable.SequenceEqual(files, Files);
         }
         public DateTime GetFilesMaxDate()

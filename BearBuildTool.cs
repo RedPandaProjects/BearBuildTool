@@ -58,6 +58,32 @@ namespace BearBuildTool
             Projects.ProjectsReader.Read();
             Projects.ExecutableReader.Read();
         }
+        static void CleanProject()
+        {
+            if (Config.Global.ExecutableMap.ContainsKey(Config.Global.Project) == false)
+            {
+                throw new Exception(String.Format("Приложение {0} не существует!!", Config.Global.Project));
+            }
+
+            Console.WriteLine(String.Format("Начало чистки проекта[{0}] конфигурация[{1}] платформа[{2}]", Config.Global.Project, Config.Global.Configure.ToString(), Config.Global.Platform.ToString()));
+            Config.Global.IntermediateProjectPath = Path.Combine(Config.Global.IntermediatePath, Config.Global.Platform.ToString());
+            if (Directory.Exists(Config.Global.IntermediateProjectPath))
+            {
+                Config.Global.IntermediateProjectPath = Path.Combine(Config.Global.IntermediateProjectPath, Config.Global.Configure.ToString());
+                if (Directory.Exists(Config.Global.IntermediateProjectPath))
+                {
+                    Config.Global.IntermediateProjectPath = Path.Combine(Config.Global.IntermediateProjectPath, Config.Global.Project);
+                    if (Directory.Exists(Config.Global.IntermediateProjectPath))
+                    {
+                        Directory.Delete(Config.Global.IntermediateProjectPath, true);
+                        Console.WriteLine(String.Format("Чистка завершина."));
+                        return;
+                    }
+                }
+              
+            }
+            Console.WriteLine(String.Format("Чистка невозможно ,потому-что проект не найден!"));
+        }
         static void CompileProject()
         {
             if (Config.Global.ExecutableMap.ContainsKey(Config.Global.Project) == false)
@@ -209,8 +235,14 @@ namespace BearBuildTool
                 Help();
             }
             Initialize();
-
-            CompileProject();
+            if (Config.Global.Clean)
+            {
+                CleanProject();
+            }
+            else
+            {
+                CompileProject();
+            }
         }
     }
 }
