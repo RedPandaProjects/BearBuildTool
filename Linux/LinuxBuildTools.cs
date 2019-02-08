@@ -78,7 +78,7 @@ namespace BearBuildTool.Linux
                 Arguments += "-Wno-unused-function ";
                 Arguments += "-Wno-switch ";
                 Arguments += "-Wno-unknown-pragmas ";
-                Arguments += "-Wno-invalid-offsetof ";
+               
                 Arguments += "-Wno-unused-value ";
             }
             else
@@ -89,7 +89,7 @@ namespace BearBuildTool.Linux
             Arguments += "-Wsequence-point ";
             Arguments += "-mmmx -msse -msse2 ";
             Arguments += "-fno-math-errno ";          
-            Arguments += "-fno-rtti ";                    
+                       
             Arguments += "-fno-strict-aliasing ";
             if(buildType==BuildType.DynamicLibrary)
             {
@@ -114,21 +114,26 @@ namespace BearBuildTool.Linux
                     break;
             
             }
-            if(createPCH)
+            if (createPCH)
             {
                 Arguments += "-x c++-header ";
                 Arguments += "-std=c++14 ";
-                Arguments += "-o \"" + pch + ".gch\" ";
+                Arguments += "-o \"" + pch + "\" ";
                 BuildObject(LInclude, LDefines, null, null, false, source, obj, buildType);
             }
-            else if (Path.GetExtension(source).ToLower()==".cpp")
+            else if (Path.GetExtension(source).ToLower() == ".cpp")
             {
                 Arguments += "-x c++ ";
                 Arguments += "-std=c++14 ";
                 Arguments += "-o \"" + obj + "\" ";
-                if(pch!=null)
+                if (pch != null)
                 {
-                    Arguments += "-include  \""+pch+ "\" ";
+                    Arguments += "-include  \"" + Path.Combine(Path.GetDirectoryName(pch), Path.GetFileNameWithoutExtension(pch)) + "\" ";
+                }
+                Arguments += "-fno-rtti ";
+                if (!Config.Global.WithoutWarning)
+                {
+                    Arguments += "-Wno-invalid-offsetof ";
                 }
             }
             else
@@ -155,13 +160,18 @@ namespace BearBuildTool.Linux
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.Start();
-            process.WaitForExit();
+            string OutConsole = "";
+            while(!process.HasExited)
+            {
+                OutConsole += process.StandardError.ReadToEnd();
+                OutConsole += "\n";
+            }
             if (process.ExitCode != 0)
             {
                 System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
-
+                System.Console.WriteLine(process.StandardOutput.ReadToEnd());
+                System.Console.WriteLine(OutConsole);
                 System.Console.WriteLine(process.StandardError.ReadToEnd());
-
                 System.Console.WriteLine("-----------------------------------------------------------------");
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
             }
@@ -183,21 +193,33 @@ namespace BearBuildTool.Linux
             Arguments += "-shared ";
 
             List<string> objlist = new List<string>();
-
+            // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
             foreach (string obj in objs)
             {
                 objlist.Add(string.Format("\"{0}\"", obj));
             }
             foreach (string path in libsPath)
             {
-                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
+                // Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
+                Arguments += string.Format("-L\"{0}\" ", path);
             }
             foreach (string lib in libs)
             {
-                Arguments += string.Format("-L\"{0}\" ", libs);
+                string fullPath = Build.GetLib(lib, ref libsPath);
+                if (Path.GetExtension(fullPath) == ".a")
+                {
+                    objlist.Add(fullPath);
+                }
+                else
+                {
+                    objlist.Add(string.Format(" -l\"{0}\" ", lib));
+                }
+
             }
             File.WriteAllLines(outStaticLib + ".txt", objlist);
             Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
+
+
 
 
 
@@ -210,13 +232,18 @@ namespace BearBuildTool.Linux
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.Start();
-            process.WaitForExit();
+            string OutConsole = "";
+            while (!process.HasExited)
+            {
+                OutConsole += process.StandardError.ReadToEnd();
+                OutConsole += "\n";
+            }
             if (process.ExitCode != 0)
             {
                 System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
-
+                System.Console.WriteLine(process.StandardOutput.ReadToEnd());
+                System.Console.WriteLine(OutConsole);
                 System.Console.WriteLine(process.StandardError.ReadToEnd());
-
                 System.Console.WriteLine("-----------------------------------------------------------------");
                 throw new Exception(String.Format("Ошибка сборки {0}", process.ExitCode));
             }
@@ -238,18 +265,28 @@ namespace BearBuildTool.Linux
             Arguments += "-Wl,--unresolved-symbols=ignore-in-shared-libs ";
 
             List<string> objlist = new List<string>();
-
+           // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
             foreach (string obj in objs)
             {
                 objlist.Add(string.Format("\"{0}\"", obj));
             }
-            foreach(string path in libsPath)
+             foreach(string path in libsPath)
             {
-                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
+               // Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
+                Arguments += string.Format("-L\"{0}\" ", path);
             }
             foreach (string lib in libs)
             {
-                Arguments += string.Format("-L\"{0}\" ", libs);
+                string fullPath = Build.GetLib(lib,ref libsPath);
+                if (Path.GetExtension(fullPath) == ".a")
+                {
+                    objlist.Add(fullPath);
+                }
+                else
+                {
+                    objlist.Add(string.Format(" -l\"{0}\" ", lib));
+                }
+
             }
             File.WriteAllLines(outStaticLib + ".txt", objlist);
             Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
@@ -264,14 +301,19 @@ namespace BearBuildTool.Linux
             process.StartInfo.WorkingDirectory = Path.GetFullPath(".");
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
-           process.Start();
-            process.WaitForExit();
+            process.Start();
+            string OutConsole = "";
+            while (!process.HasExited)
+            {
+                OutConsole += process.StandardError.ReadToEnd();
+                OutConsole += "\n";
+            }
             if (process.ExitCode != 0)
             {
                 System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
-
+                System.Console.WriteLine(process.StandardOutput.ReadToEnd());
+                System.Console.WriteLine(OutConsole);
                 System.Console.WriteLine(process.StandardError.ReadToEnd());
-
                 System.Console.WriteLine("-----------------------------------------------------------------");
                 throw new Exception(String.Format("Ошибка сборки {0}", process.ExitCode));
             }
@@ -281,47 +323,9 @@ namespace BearBuildTool.Linux
             List<string> files = new List<string>();
             foreach (string lib in libs)
             {
-                {
-                    string lib_name = Path.Combine(Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".a");
-                    if (File.Exists(lib_name))
-                    {
-                        files.Add(String.Format("\"{0}\"", lib_name));
-                        continue;
-                    }
-                    bool exist = false;
-                    foreach (string path in libsPath)
-                    {
-                        if (exist) break;
-                        string full = Path.Combine(path, lib_name);
-                        if (File.Exists(full))
-                        {
-                            exist = true;
-                            files.Add(String.Format("\"{0}\"", full));
-                        }
-                    }
-                    if (exist) continue;
-
-                }
-                {
-                    string lib_name = Path.Combine(Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".so");
-                    if (File.Exists(lib_name))
-                    {
-                        files.Add(String.Format("\"{0}\"", lib_name));
-                        continue;
-                    }
-                    bool exist = false;
-                    foreach (string path in libsPath)
-                    {
-                        if (exist) break;
-                        string full = Path.Combine(path, lib_name);
-                        if (File.Exists(full))
-                        {
-                            exist = true;
-                            files.Add(String.Format("\"{0}\"", full));
-                        }
-                    }
-                    if (!exist) throw new Exception(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
-                }
+                string name = Build.GetLib(lib, ref libsPath);
+                if (name==null) throw new Exception(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                files.Add(String.Format("\"{0}\"", name));
 
             }
             foreach (string obj in objs)
@@ -343,13 +347,18 @@ namespace BearBuildTool.Linux
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.Start();
-                process.WaitForExit();
+                string OutConsole = "";
+                while (!process.HasExited)
+                {
+                    OutConsole += process.StandardError.ReadToEnd();
+                    OutConsole += "\n";
+                }
                 if (process.ExitCode != 0)
                 {
                     System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
-
+                    System.Console.WriteLine(process.StandardOutput.ReadToEnd());
+                    System.Console.WriteLine(OutConsole);
                     System.Console.WriteLine(process.StandardError.ReadToEnd());
-
                     System.Console.WriteLine("-----------------------------------------------------------------");
                     throw new Exception(String.Format("Ошибка сборки {0}", process.ExitCode));
                 }

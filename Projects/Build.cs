@@ -196,6 +196,10 @@ namespace BearBuildTool.Projects
                 LObj.Add(obj);
             }
             LLibrariesPath.Add(Config.Global.IntermediateProjectPath);
+            if(Config.Platform.Linux==Config.Global.Platform)
+            {
+                LLibrariesPath.Add(Config.Global.BinariesPlatformPath);
+            }
 #if DEBUG
             Dictionary<string, bool> LibPairs=new Dictionary<string, bool>();
 #endif
@@ -212,30 +216,41 @@ namespace BearBuildTool.Projects
                     continue;
                 }
 #endif
-                //  bool find = false;
-                // if (LLibrariesPath.Count==0) break;
-                foreach (string path in LLibrariesPath)
+
+                string file = GetLib(lib,ref LLibrariesPath);
+                if (file != null)
                 {
-                    string fullPath = Path.Combine(path, lib);
-                    if(FileSystem.ExistsFile(fullPath))
+                    DateTime dateTime = FileSystem.GetLastWriteTime(file);
+                    if (dateTime > dateTimeLibrary) dateTimeLibrary = dateTime;
+                    continue;
+                }
+                else
+                {
+                    if (Config.Platform.Linux == Config.Global.Platform)
                     {
-                        DateTime dateTime = FileSystem.GetLastWriteTime(fullPath);
-                        if (dateTime > dateTimeLibrary) dateTimeLibrary = dateTime;
-                    //    find = true;
-                        continue;
+                        throw new Exception(string.Format("Не найдена библиотека {0}", lib));
                     }
                 }
-               /*if(!find)
-                {
-                    throw new Exception(String.Format("Не найдена библиотека {0}", lib));
-                }*/
             }
             string OutFile = GetOutFile( name, buildType);
-
+            string OutFileTemp = OutFile;
             if (project.Sources.Count != 0)
             {
-                projectInfo.LibraryFile = GetOutStaticLibrary(name);
-                if (Config.Global.Rebuild || (Build || !FileSystem.ExistsFile(OutFile)) || FileSystem.GetLastWriteTime(OutFile)<dateTimeLibrary )
+                projectInfo.LibraryFile = GetOutStaticLibrary(name,buildType);
+                if(Config.Platform.Linux==Config.Global.Platform)
+                {
+                    switch (buildType)
+                    {
+                        case BuildType.StaticLibrary:
+                            OutFileTemp = Path.Combine(Path.GetDirectoryName(OutFile), "lib" + Path.GetFileName(OutFile) + ".a");
+                            break;
+                        case BuildType.DynamicLibrary:
+                            OutFileTemp = Path.Combine(Path.GetDirectoryName(OutFile), "lib" + Path.GetFileName(OutFile) + ".so");
+                            break;
+
+                    }
+                }
+                if (Config.Global.Rebuild || (Build || !FileSystem.ExistsFile(OutFileTemp)) || FileSystem.GetLastWriteTime(OutFileTemp) <dateTimeLibrary )
                 {
 
                     Console.WriteLine(String.Format("Сборка {0}", OutFile));
@@ -273,7 +288,58 @@ namespace BearBuildTool.Projects
                 return BuildType.DynamicLibrary;
         
         }
-     
+        public static string GetLib(string lib, ref List<string> paths)
+        {
+            if (Config.Platform.Linux == Config.Global.Platform)
+            {
+                string fullPath = Path.Combine( Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".a");
+                if (!FileSystem.ExistsFile(fullPath))
+                {
+                    fullPath = Path.Combine( Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".so");
+                }
+                if (FileSystem.ExistsFile(fullPath))
+                {
+                    return fullPath;
+                }
+
+            }
+            else
+            {
+                if (FileSystem.ExistsFile(lib))
+                {
+                    return lib;
+                }
+            }
+
+            foreach (string path in paths)
+            {
+
+                if (Config.Platform.Linux == Config.Global.Platform)
+                {
+                   string fullPath = Path.Combine(path, Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".a");
+                    if (!FileSystem.ExistsFile(fullPath))
+                    {
+                        fullPath = Path.Combine(path, Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".so");
+                    }
+                    if (FileSystem.ExistsFile(fullPath))
+                    {
+                        return fullPath;
+                    }
+
+                    continue;
+                }
+                else
+                {
+                    string fullPath = Path.Combine(path, lib);
+                    if (FileSystem.ExistsFile(fullPath))
+                    {
+                        return fullPath;
+                    }
+
+                }
+            }
+            return null;
+        }
         public static string GetOutFile(string name, BuildType buildType)
         {
             string OutName = "";
@@ -309,6 +375,45 @@ namespace BearBuildTool.Projects
         private static string GetOutStaticLibrary( string name)
         {
             return Path.Combine(Config.Global.IntermediateProjectPath, name + Config.Global.StaticLibraryExtension);
+        }
+        private static string GetOutStaticLibrary(string name, BuildType buildType)
+        {
+            if (Config.Global.Platform == Config.Platform.Linux)
+            {
+                string OutName = "";
+                if (name == Config.Global.Project)
+                    OutName = name;
+                else
+                {
+                    string gname = Config.Global.Project;
+                    if (Config.Global.Project.IndexOf('_') != -1)
+                        gname = Config.Global.Project.Substring(0, Config.Global.Project.IndexOf('_'));
+                    string temp = name;
+                    if (gname.Length < name.Length && temp.Substring(0, gname.Length) == gname)
+                        temp = temp.Substring(gname.Length);
+                    OutName = Config.Global.Project;
+                    if (temp[0] != '_')
+                        OutName += "_";
+                    OutName += temp;
+                }
+                if (Config.Global.Configure != Config.Configure.Release)
+                    OutName += "_" + Config.Global.Configure.ToString().ToLower();
+                switch (buildType)
+                {
+                    case BuildType.Executable:
+                    case BuildType.ConsoleExecutable:
+                        return Path.Combine(Config.Global.BinariesPlatformPath, OutName + Config.Global.ExecutableExtension);
+                    case BuildType.StaticLibrary:
+                        return GetOutStaticLibrary(name);
+                    case BuildType.DynamicLibrary:
+                        return Path.Combine(Config.Global.BinariesPlatformPath, OutName + Config.Global.DynamicLibraryExtension);
+                }
+            }
+            else
+            {
+                return GetOutStaticLibrary(name);
+            }
+            return null;
         }
     }
 

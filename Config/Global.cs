@@ -73,7 +73,7 @@ namespace BearBuildTool.Config
                 ExecutableExtension = "";
                 StaticLibraryExtension = "";
                 DynamicLibraryExtension = "";
-                PCHExtension = "";
+                PCHExtension = ".gch";
                 Platform = Platform.Linux;
             }
             else
