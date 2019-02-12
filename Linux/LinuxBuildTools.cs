@@ -130,7 +130,6 @@ namespace BearBuildTool.Linux
                 {
                     Arguments += "-include  \"" + Path.Combine(Path.GetDirectoryName(pch), Path.GetFileNameWithoutExtension(pch)) + "\" ";
                 }
-                Arguments += "-fno-rtti ";
                 if (!Config.Global.WithoutWarning)
                 {
                     Arguments += "-Wno-invalid-offsetof ";
