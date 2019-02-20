@@ -1,4 +1,5 @@
 ﻿using BearBuildTool.Tools;
+using BearBuildTool.VisualCode;
 using BearBuildTool.Windows;
 using System;
 using System.Collections.Generic;
@@ -138,9 +139,29 @@ namespace BearBuildTool
                 Console.WriteLine(String.Format("Сборка завершина: количество {0}", Config.Global.CountBuild));
             }
         }
-        static void GenerateProjectFile(string name)
+        static void GenerateProjectFileVS(string name)
         {
-            Console.WriteLine("Создание проектов трансляторов");
+            Console.WriteLine("Создание проектов трансляторов для VisaulStudio 2017");
+            VSProjectGenerate projectFile = new VSProjectGenerate();
+            projectFile.Generate(name);
+        }
+        static void GenerateProjectFileVC(string name,string platform)
+        {
+            if(platform.ToLower()=="linux")
+            {
+                Config.Global.Platform = Config.Platform.Linux;
+            }
+            else
+            {
+                throw new Exception(String.Format("Не поддерживает {0}", platform));
+
+            }
+            Config.Global.BinariesPlatformPath = Path.Combine(Config.Global.BinariesPath, Config.Global.Platform.ToString());
+            if (!Directory.Exists(Config.Global.BinariesPlatformPath))
+            {
+                Directory.CreateDirectory(Config.Global.BinariesPlatformPath);
+            }
+            Console.WriteLine("Создание проектов трансляторов для VisaulCode");
             VCProjectGenerate projectFile = new VCProjectGenerate();
             projectFile.Generate(name);
         }
@@ -170,10 +191,19 @@ namespace BearBuildTool
             {
                 Initialize();
                 if (args.Length  != i + 1) return;
-                GenerateProjectFile(args[i]);
+                GenerateProjectFileVS(args[i]);
                 System.Environment.Exit(0);
             }
-            else if (arg == "-cleanall")
+            else
+             if (arg == "-createvcproject")
+            {
+                Initialize();
+                if (args.Length != i + 2) return;
+                GenerateProjectFileVC(args[i], args[i+1]);
+                System.Environment.Exit(0);
+            }
+            else
+             if (arg == "-cleanall")
             {
                 Console.WriteLine("Полная чистка");
                 Config.Global.IntermediatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", Config.Global.IntermediatePath);

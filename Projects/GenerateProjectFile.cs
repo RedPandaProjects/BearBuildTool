@@ -18,6 +18,7 @@ namespace BearBuildTool.Projects
         public List<string> SourceFile;
         public Dictionary<string, bool> IncludeFile;
         public string NameFileInfo;
+        public string ProjectPath;
     };
     class GenerateProjectFile
     {
@@ -132,6 +133,7 @@ namespace BearBuildTool.Projects
                 {
                     info.SourceFile.AddRange(project.Sources);
                 }
+                info.ProjectPath = project.ProjectPath;
                 MapProjects.Add(name, info);
             }
         }

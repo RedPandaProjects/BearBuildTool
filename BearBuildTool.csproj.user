@@ -8,6 +8,6 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
     <StartAction>Project</StartAction>
-    <StartArguments>testLinux Debug Linux</StartArguments>
+    <StartArguments>-createvcproject testLinux Linux</StartArguments>
   </PropertyGroup>
 </Project>

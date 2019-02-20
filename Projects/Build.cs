@@ -82,7 +82,7 @@ namespace BearBuildTool.Projects
             {
                 string file = Path.GetFileName(path);
                 string file_new = Path.Combine(Config.Global.BinariesPlatformPath, file);
-                if(!FileSystem.ExistsFile(file_new)|| FileSystem.GetLastWriteTime(file) > FileSystem.GetLastWriteTime(file))
+                if(!FileSystem.ExistsFile(file_new)|| FileSystem.GetLastWriteTime(file) > FileSystem.GetLastWriteTime(file_new))
                 {
                     Console.WriteLine(String.Format("Копирование динамической библиотеки {0}", file));
                     File.Copy(path, file_new, true);

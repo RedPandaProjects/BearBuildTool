@@ -23,6 +23,7 @@ namespace BearBuildTool.Projects
                 Executable executable = Activator.CreateInstance(asm.GetType(name), Path.GetDirectoryName(file)) as Executable;
                 Config.Global.ExecutableMap.Add(name, executable);
                 Config.Global.ProjectsMap.Add(name, executable);
+                if (executable.ProjectPath == null) executable.ProjectPath = Path.GetDirectoryName(file);
             }
         }
     }

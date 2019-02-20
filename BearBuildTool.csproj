@@ -55,13 +55,16 @@
     <Compile Include="Tools\SourceFile.cs" />
     <Compile Include="Tools\ListFiles.cs" />
     <Compile Include="Windows\VCBuildTools.cs" />
-    <Compile Include="Windows\VCProjectFile.cs" />
-    <Compile Include="Windows\VCProjectGenerate.cs" />
+    <Compile Include="Windows\VSProjectFile.cs" />
+    <Compile Include="Windows\VSProjectGenerate.cs" />
     <Compile Include="Linux\LinuxBuildTools.cs" />
+    <Compile Include="VisualCode\VCProjectFile.cs" />
+    <Compile Include="VisualCode\VCProjectGenerate.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Linux\" />
+    <Folder Include="VisualCode\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

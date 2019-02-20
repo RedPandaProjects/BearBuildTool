@@ -21,7 +21,9 @@ namespace BearBuildTool.Projects
                 string name = Path.GetFileName(file);
                 name = name.Substring(0, name.Length - 11);
                 Config.Global.ProjectsCSFile.Add(name, file);
-                Config.Global.ProjectsMap.Add(name, (Project)Activator.CreateInstance(asm.GetType(name), Path.GetDirectoryName(file)));
+                var projects = (Project)Activator.CreateInstance(asm.GetType(name), Path.GetDirectoryName(file));
+                Config.Global.ProjectsMap.Add(name, projects);
+                if (projects.ProjectPath == null) projects.ProjectPath = Path.GetDirectoryName(file);
             }
         }
     }

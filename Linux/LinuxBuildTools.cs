@@ -98,11 +98,13 @@ namespace BearBuildTool.Linux
             switch (Config.Global.Configure)
             {
                 case Config.Configure.Debug:
+                    Arguments += "-g ";
                     Arguments += "-O0 ";
                   // Arguments += "-gline-tables-only ";
                     Arguments += "-fno-inline " ;
                     break;
                 case Config.Configure.Mixed:
+                    Arguments += "-g ";
                     Arguments += "-O2 ";
                     Arguments += "-gline-tables-only ";
                     break;
@@ -148,7 +150,7 @@ namespace BearBuildTool.Linux
             {
                 Arguments += String.Format("-I\"{0}\" ", include);
             }
-            Arguments += source;
+            Arguments += String.Format("\"{0}\"",source);
             //
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = GCCPath;
