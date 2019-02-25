@@ -91,7 +91,7 @@ namespace BearBuildTool.Linux
             Arguments += "-fno-math-errno ";          
                        
             Arguments += "-fno-strict-aliasing ";
-            if(buildType==BuildType.DynamicLibrary)
+            if (buildType == BuildType.DynamicLibrary)
             {
                 Arguments += "-fPIC ";
             }
@@ -106,7 +106,7 @@ namespace BearBuildTool.Linux
                 case Config.Configure.Mixed:
                     Arguments += "-g ";
                     Arguments += "-O2 ";
-                    Arguments += "-gline-tables-only ";
+                  //  Arguments += "-gline-tables-only ";
                     break;
                 case Config.Configure.Release:
                     Arguments += "-O2 ";
@@ -206,15 +206,7 @@ namespace BearBuildTool.Linux
             }
             foreach (string lib in libs)
             {
-                string fullPath = Build.GetLib(lib, ref libsPath);
-                if (Path.GetExtension(fullPath) == ".a")
-                {
-                    objlist.Add(fullPath);
-                }
-                else
-                {
-                    objlist.Add(string.Format(" -l\"{0}\" ", lib));
-                }
+                Arguments += string.Format(" -l\"{0}\" ", lib);
 
             }
             File.WriteAllLines(outStaticLib + ".txt", objlist);
@@ -278,16 +270,7 @@ namespace BearBuildTool.Linux
             }
             foreach (string lib in libs)
             {
-                string fullPath = Build.GetLib(lib,ref libsPath);
-                if (Path.GetExtension(fullPath) == ".a")
-                {
-                    objlist.Add(fullPath);
-                }
-                else
-                {
-                    objlist.Add(string.Format(" -l\"{0}\" ", lib));
-                }
-
+                Arguments += string.Format(" -l\"{0}\" ", lib);
             }
             File.WriteAllLines(outStaticLib + ".txt", objlist);
             Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
@@ -341,6 +324,35 @@ namespace BearBuildTool.Linux
                 Arguments += String.Format("@\"{0}\"", outStaticLib + ".txt");
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 process.StartInfo.FileName = ArPath;
+                process.StartInfo.Arguments = Arguments;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = false;
+                process.StartInfo.WorkingDirectory = Path.GetFullPath(".");
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.Start();
+                string OutConsole = "";
+                while (!process.HasExited)
+                {
+                    OutConsole += process.StandardError.ReadToEnd();
+                    OutConsole += "\n";
+                }
+                if (process.ExitCode != 0)
+                {
+                    System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
+                    System.Console.WriteLine(process.StandardOutput.ReadToEnd());
+                    System.Console.WriteLine(OutConsole);
+                    System.Console.WriteLine(process.StandardError.ReadToEnd());
+                    System.Console.WriteLine("-----------------------------------------------------------------");
+                    throw new Exception(String.Format("Ошибка сборки {0}", process.ExitCode));
+                }
+            }
+            {
+
+                string Arguments = " ";
+                Arguments += String.Format("\"{0}\" ", Path.Combine(Path.GetDirectoryName(outStaticLib), "lib" + Path.GetFileName(outStaticLib) + ".a"));
+                System.Diagnostics.Process process = new System.Diagnostics.Process();
+                process.StartInfo.FileName = RanlibPath;
                 process.StartInfo.Arguments = Arguments;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = false;
