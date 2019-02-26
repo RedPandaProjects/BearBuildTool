@@ -107,7 +107,13 @@ namespace BearBuildTool.VisualCode
             projectFile.Add("\t\t\t\"args\": [],");
             projectFile.Add("\t\t\t\"stopAtEntry\": false,");
             projectFile.Add(String.Format("\t\t\t\"cwd\": \"{0}\",", Config.Global.BinariesPlatformPath));
-            projectFile.Add("\t\t\t\"environment\": [],");
+            projectFile.Add("\t\t\t\"environment\":");
+            projectFile.Add("\t\t\t[");
+            projectFile.Add("\t\t{");
+            projectFile.Add("\t\t\t\t\t\t\"Name\":  \"LD_LIBRARY_PATH\",");
+            projectFile.Add(String.Format("\t\t\t\t\t\t\"Value\": \"{0}\",", Config.Global.BinariesPlatformPath));
+            projectFile.Add("\t\t\t\t}");
+            projectFile.Add("\t\t\t],");
             projectFile.Add("\t\t\t\"externalConsole\": true,");
             projectFile.Add("\t\t\t\"MIMode\": \"gdb\",");
             projectFile.Add("\t\t\t\"miDebuggerPath\": \"/usr/bin/gdb\",");

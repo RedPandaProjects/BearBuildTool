@@ -57,8 +57,12 @@ namespace BearBuildTool.Linux
         public override void BuildObject(List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
             
-            string Arguments = "";
+            string Arguments = " ";
             /////////////////////////
+            if (buildType == BuildType.DynamicLibrary||buildType== BuildType.StaticLibrary)
+            {
+                Arguments += "-fPIC ";
+            }
             Arguments += " -c ";
             Arguments += "-pipe ";
             /////////////////////////
@@ -91,10 +95,7 @@ namespace BearBuildTool.Linux
             Arguments += "-fno-math-errno ";          
                        
             Arguments += "-fno-strict-aliasing ";
-            if (buildType == BuildType.DynamicLibrary)
-            {
-                Arguments += "-fPIC ";
-            }
+          
             switch (Config.Global.Configure)
             {
                 case Config.Configure.Debug:
@@ -180,6 +181,7 @@ namespace BearBuildTool.Linux
         public override void BuildDynamicLibrary(List<string> objs, List<string> libs, List<string> libsPath, string outDynamicLib, string outStaticLib)
         {
             string Arguments = " ";
+            Arguments += "-shared ";
             Arguments += string.Format("-o \"{0}\" ", Path.Combine(Path.GetDirectoryName(outDynamicLib), "lib" + Path.GetFileName(outDynamicLib) + ".so"));
 
             if (Config.Global.Configure != Config.Configure.Release)
@@ -191,7 +193,7 @@ namespace BearBuildTool.Linux
                 Arguments += "-s ";
             }
 
-            Arguments += "-shared ";
+      
 
             List<string> objlist = new List<string>();
             // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
@@ -201,21 +203,16 @@ namespace BearBuildTool.Linux
             }
             foreach (string path in libsPath)
             {
-                // Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
+                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
                 Arguments += string.Format("-L\"{0}\" ", path);
             }
+            File.WriteAllLines(outStaticLib + ".txt", objlist);
+            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
             foreach (string lib in libs)
             {
                 Arguments += string.Format(" -l\"{0}\" ", lib);
 
             }
-            File.WriteAllLines(outStaticLib + ".txt", objlist);
-            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
-
-
-
-
-
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = GCCPath;
             process.StartInfo.Arguments = Arguments;
@@ -247,15 +244,15 @@ namespace BearBuildTool.Linux
             Arguments += string.Format("-o \"{0}\" ", Executable);
 
             if (Config.Global.Configure!=Config.Configure.Release)
-            {
-                Arguments += "-rdynamic ";   
+            {   
+              Arguments += "-rdynamic ";   
             }
             else
             {
                 Arguments += "-s "; 
             }
 
-            Arguments += "-Wl,--unresolved-symbols=ignore-in-shared-libs ";
+           // Arguments += "-Wl,--unresolved-symbols=ignore-in-shared-libs ";
 
             List<string> objlist = new List<string>();
            // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
@@ -265,17 +262,17 @@ namespace BearBuildTool.Linux
             }
              foreach(string path in libsPath)
             {
-               // Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
+                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
                 Arguments += string.Format("-L\"{0}\" ", path);
             }
+           
+            File.WriteAllLines(outStaticLib + ".txt", objlist);
+            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
+
             foreach (string lib in libs)
             {
                 Arguments += string.Format(" -l\"{0}\" ", lib);
             }
-            File.WriteAllLines(outStaticLib + ".txt", objlist);
-            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
-
-       
 
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = GCCPath;
@@ -375,6 +372,14 @@ namespace BearBuildTool.Linux
                     System.Console.WriteLine("-----------------------------------------------------------------");
                     throw new Exception(String.Format("Ошибка сборки {0}", process.ExitCode));
                 }
+            }
+        }
+        public override void SetLibraries(List<string> libs, BuildType buildType)
+        {
+            if(buildType==BuildType.Executable|| buildType == BuildType.ConsoleExecutable)
+            {
+                libs.Add("pthread");
+                libs.Add("dl");
             }
         }
         public override void SetDefines(List<string> LDefines, string OutFile, BuildType buildType)
