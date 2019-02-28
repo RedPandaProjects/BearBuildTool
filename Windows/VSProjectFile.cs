@@ -40,7 +40,7 @@ namespace BearBuildTool.Windows
             string FileFilters = File + ".filters";
             string FileUser = File + ".user";
             string command = "";
-            if (Config.Global.ANSI)
+            if (!Config.Global.UNICODE)
             {
                 command += "-ansi ";
             }
@@ -215,7 +215,7 @@ namespace BearBuildTool.Windows
             {
                 string defines = "_DEBUG;DEBUG;WIN32;X32;WINDOWS;LIB;_LIB;";
           
-                if (!Config.Global.ANSI)
+                if (Config.Global.UNICODE)
                 {
                     defines += "_UNICODE;";
                     defines += "UNICODE;";
@@ -242,7 +242,7 @@ namespace BearBuildTool.Windows
             {
                 string defines = "MIXED;DEBUG;WIN32;X32;WINDOWS;LIB;_LIB;";
 
-                if (!Config.Global.ANSI)
+                if (Config.Global.UNICODE)
                 {
                     defines += "_UNICODE;";
                     defines += "UNICODE;";
@@ -267,7 +267,7 @@ namespace BearBuildTool.Windows
             {
                 string defines = "NDEBUG;WIN32;X32;WINDOWS;LIB;_LIB;";
 
-                if (!Config.Global.ANSI)
+                if (Config.Global.UNICODE)
                 {
                     defines += "_UNICODE;";
                     defines += "UNICODE;";
@@ -293,7 +293,7 @@ namespace BearBuildTool.Windows
             {
                 string defines = "_DEBUG;DEBUG;X64;WINDOWS;LIB;_LIB;";
 
-                if (!Config.Global.ANSI)
+                if (Config.Global.UNICODE)
                 {
                     defines += "_UNICODE;";
                     defines += "UNICODE;";
@@ -318,7 +318,7 @@ namespace BearBuildTool.Windows
             {
                 string defines = "MIXED;DEBUG;X64;WINDOWS;LIB;_LIB;";
 
-                if (!Config.Global.ANSI)
+                if (Config.Global.UNICODE)
                 {
                     defines += "_UNICODE;";
                     defines += "UNICODE;";
@@ -343,7 +343,7 @@ namespace BearBuildTool.Windows
             {
                 string defines = "NDEBUG;X64;WINDOWS;LIB;_LIB;";
 
-                if (!Config.Global.ANSI)
+                if (Config.Global.UNICODE)
                 {
                     defines += "_UNICODE;";
                     defines += "UNICODE;";

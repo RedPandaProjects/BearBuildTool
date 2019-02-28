@@ -416,9 +416,10 @@ namespace BearBuildTool.Linux
                     LDefines.Add("LINUX");
                     LDefines.Add("_LINUX64");
                     LDefines.Add("X64");
+                    LDefines.Add("UNIX");
                     break;
             }
-            if (Config.Global.ANSI)
+            if (!Config.Global.UNICODE)
             {
                 LDefines.Add("UTF_8");
             }

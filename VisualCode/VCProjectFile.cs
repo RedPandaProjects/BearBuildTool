@@ -56,7 +56,7 @@ namespace BearBuildTool.VisualCode
                 int i = 1;
                 List<string> list = project.Defines.ToList();
                 list.AddRange(dop_defines);
-                if (!Config.Global.ANSI)
+                if (!Config.Global.UNICODE)
                 {
                     list.Add("_UNICODE");
                     list.Add("UNICODE");

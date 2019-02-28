@@ -234,7 +234,7 @@ namespace BearBuildTool
             }
             if (arg == "-ansi")
             {
-                Config.Global.ANSI = true;
+                Config.Global.UNICODE = false;
                 return true;
             }
             if (arg == "-clean")

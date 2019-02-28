@@ -41,7 +41,7 @@ namespace BearBuildTool.Config
         public static BuildTools BuildTools;
         public static UInt64 CountBuild = 0;
         public static bool WithoutWarning = false;
-        public static bool ANSI = false;
+        public static bool UNICODE = true;
 
         public static bool Clean { get; internal set; }
         public static bool Rebuild { get; internal set; }

@@ -38,9 +38,9 @@ namespace BearBuildTool.Tools
                     LDefines.Add("DYNL");
                     break;
             }
-            if (!Config.Global.ANSI)
+            if (Config.Global.UNICODE)
                 LDefines.Add("_UNICODE");
-            if (!Config.Global.ANSI)
+            if (Config.Global.UNICODE)
                 LDefines.Add("UNICODE");
             LDefines.Add(String.Format("MAIN_PROJECT_NAME=\"{0}\"", Config.Global.Project));
             LDefines.Add(String.Format("PROJECT_OUT=\"{0}\"",Path.GetFileName( ProjectOutName)));
