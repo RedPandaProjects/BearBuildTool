@@ -418,7 +418,10 @@ namespace BearBuildTool.Linux
                     LDefines.Add("X64");
                     break;
             }
-
+            if (Config.Global.ANSI)
+            {
+                LDefines.Add("UTF_8");
+            }
         }
     }
 
