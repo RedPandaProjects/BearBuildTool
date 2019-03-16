@@ -662,6 +662,7 @@ namespace BearBuildTool.Windows
                     break;
                 case Config.Configure.Release:
                     LDefines.Add("NDEBUG");
+                    LDefines.Add("_HAS_EXCEPTIONS=0");
                     break;
             }
             switch (Config.Global.Platform)

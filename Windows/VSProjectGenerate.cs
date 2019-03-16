@@ -14,7 +14,7 @@ namespace BearBuildTool.Windows
         public void Generate(string name)
         {
             string SlnGUID = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}";
-            string outFileSln = Path.Combine(Config.Global.IntermediatePath, "..", "Bear.sln");
+            string outFileSln = Path.Combine(Config.Global.IntermediatePath, "..", name+".sln");
             SlnLineList.Add("");
             SlnLineList.Add("Microsoft Visual Studio Solution File, Format Version 12.00");
             SlnLineList.Add("# Visual Studio 15");
