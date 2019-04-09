@@ -832,7 +832,7 @@ namespace BearBuildTool.Windows
         {
             if (!String.IsNullOrEmpty(e.Data))
             {
-                 System.Console.WriteLine(ConsoleOut);
+                ConsoleOut += e.Data;
             }
         }
     }
