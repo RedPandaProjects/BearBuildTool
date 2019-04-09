@@ -11,13 +11,15 @@ using static BearBuildTool.Projects.Build;
 
 namespace BearBuildTool.Windows
 {
-    class VCBuildTools:Tools.BuildTools
+    class VCBuildTools : Tools.BuildTools
     {
         string VCToolPath;
         string CCompiler;
         string Linker;
         string LibraryLinker;
         string ConsoleOut;
+
+
         static bool FindKey(string key, string val, out string path)
         {
             string str = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\" + key, val, null) as string;
@@ -50,7 +52,7 @@ namespace BearBuildTool.Windows
         private string GetVS2017Path()
         {
             string path;
-            if(FindKey("Microsoft\\VisualStudio\\SxS\\VS7", "15.0",out path)==false)
+            if (FindKey("Microsoft\\VisualStudio\\SxS\\VS7", "15.0", out path) == false)
             {
                 throw new Exception("Visual Studio 2017 неустановлена.");
             }
@@ -67,17 +69,17 @@ namespace BearBuildTool.Windows
                 }
                 string version1 = File.ReadAllText(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")).Trim();
                 return Path.Combine(path, "Tools", "MSVC", version1);
-                
+
             }
-            path=GetVS2017Path();
+            path = GetVS2017Path();
             path += "VC\\";
-            if(FileSystem.ExistsFile(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt"))==false)
+            if (FileSystem.ExistsFile(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")) == false)
             {
                 throw new Exception("С++ 14.1  неустановлен.");
             }
             string version = File.ReadAllText(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")).Trim();
             return Path.Combine(path, "Tools", "MSVC", version);
-            
+
         }
         private void FindUniversalCRT(out string UniversalCRTDir, out string UniversalCRTVersion)
         {
@@ -155,7 +157,7 @@ namespace BearBuildTool.Windows
             string UniversalCRTDir;
             string VerisonCRTDir;
             string WindowsSDKDir;
-            string VCPlatformPath=null;
+            string VCPlatformPath = null;
             VCToolPath = null;
             {
 
@@ -176,7 +178,7 @@ namespace BearBuildTool.Windows
                         }
                         else throw new Exception("Нет x64 битного компилятора");
                     }
-                       
+
 
                 }
                 else
@@ -198,7 +200,7 @@ namespace BearBuildTool.Windows
                         }
                         else throw new Exception("Нет x86 битного компилятора");
                     }
-                        
+
 
                 }
             }
@@ -207,14 +209,14 @@ namespace BearBuildTool.Windows
             Linker = Path.Combine(VCToolPath, "link.exe");
             LibraryLinker = Path.Combine(VCToolPath, "lib.exe");
             WindowsSDKDir = FindWindowsSDKInstallationFolder();
-            FindUniversalCRT(out UniversalCRTDir,out VerisonCRTDir);
+            FindUniversalCRT(out UniversalCRTDir, out VerisonCRTDir);
 
             string Paths = Environment.GetEnvironmentVariable("PATH") ?? "";
             if (!Paths.Split(';').Any(x => String.Compare(x, VCToolPath, true) == 0))
             {
                 Paths = VCToolPath + ";" + Paths;
                 if (VCPlatformPath != null) Paths = Paths + ";" + VCPlatformPath;
-               Environment.SetEnvironmentVariable("PATH", Paths);
+                Environment.SetEnvironmentVariable("PATH", Paths);
             }
 
             List<string> includes = new List<string>();
@@ -223,12 +225,12 @@ namespace BearBuildTool.Windows
             {
                 includes.Add(path);
             }
-            path = Path.Combine(VCPath, "atlmfc", "include") ;
+            path = Path.Combine(VCPath, "atlmfc", "include");
             if (Directory.Exists(path))
             {
                 includes.Add(path);
             }
-            path = Path.Combine(VCPath, "atlmfc", "include") ;
+            path = Path.Combine(VCPath, "atlmfc", "include");
             if (Directory.Exists(path))
             {
                 includes.Add(path);
@@ -259,7 +261,7 @@ namespace BearBuildTool.Windows
             {
 
                 string StdLibraryDir = Path.Combine(VCPath, "lib", "x86");
-                if (Directory.Exists( StdLibraryDir))
+                if (Directory.Exists(StdLibraryDir))
                 {
                     LibraryPaths.Add(StdLibraryDir);
                 }
@@ -339,9 +341,9 @@ namespace BearBuildTool.Windows
                 Arguments += String.Format("/LIBPATH:\"{0}\" ", libpath);
             }
             Arguments += String.Format("/OUT:\"{0}\" ", outStaticLib);
-            
+
             List<string> listObject = new List<string>();
-            
+
             foreach (string obj in objs)
             {
                 listObject.Add(String.Format("\"{0}\"", obj));
@@ -378,9 +380,21 @@ namespace BearBuildTool.Windows
         }
         public override void BuildObject(List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
-           
+
             string Arguments = "";
             Arguments += "/c ";
+            if (pch != null)
+            {
+                if (createPCH)
+                {
+                    Arguments += String.Format("/Yc\"{0}\" ", pchH);
+                }
+                else
+                {
+                    Arguments += String.Format("/Yu\"{0}\" ", pchH);
+                }
+                Arguments += String.Format("/Fp\"{0}\" ", pch);
+            }
             Arguments += "/GS ";
             if (!Config.Global.WithoutWarning)
             {
@@ -404,8 +418,8 @@ namespace BearBuildTool.Windows
             Arguments += "/nologo ";
             Arguments += "/diagnostics:classic  ";
             Arguments += "/sdl- ";
-            
- 
+
+
             switch (Config.Global.Configure)
             {
                 case Config.Configure.Debug:
@@ -432,15 +446,15 @@ namespace BearBuildTool.Windows
                     Arguments += "/Oi ";
                     Arguments += "/MD ";
                     Arguments += "/Ot ";
-     
+
                     Arguments += "/Gd ";
                     Arguments += "/Oi ";
                     Arguments += "/Oi ";
                     Arguments += "/Ot ";
-                    
+
                     break;
             };
-     
+
             Arguments += "/analyze- ";
             Arguments += "/Zc:inline ";
             Arguments += String.Format("\"{0}\" ", source);
@@ -453,19 +467,9 @@ namespace BearBuildTool.Windows
                 Arguments += String.Format("/I\"{0}\" ", include);
             }
             Arguments += String.Format("/Fo\"{0}\" ", obj);
-            Arguments += String.Format("/Fd\"{0}\" ", Path.Combine( Path.GetDirectoryName(obj), "vc141.pdb"));
-            if (pch != null)
-            {
-                if (createPCH)
-                {
-                    Arguments += String.Format("/Yc\"{0}\" ", pchH);
-                }
-                else
-                {
-                    Arguments += String.Format("/Yu\"{0}\" ", pchH);
-                }
-                Arguments += String.Format("/Fp\"{0}\" ", pch);
-            }
+
+           
+            Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(Path.GetDirectoryName(obj), "vc141.pdb"));
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = CCompiler;
             process.StartInfo.Arguments = Arguments;
@@ -478,18 +482,148 @@ namespace BearBuildTool.Windows
             process.Start();
             process.BeginOutputReadLine();
 
-            process.OutputDataReceived +=Process_OutputDataReceived;
+            process.OutputDataReceived += Process2_OutputDataReceived;
             process.WaitForExit();
             if (process.ExitCode != 0)
             {
-                System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
-
-                System.Console.WriteLine(ConsoleOut);
-
-                System.Console.WriteLine("-----------------------------------------------------------------");
+               
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
             }
         }
+
+        private void Process2_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+          if(!String.IsNullOrEmpty( e.Data))System.Console.WriteLine(e.Data);
+        }
+
+        List<string> Source = new List<string>();
+        public override void BuildObjectsEnd()
+        {
+            if (Source.Count == 0) return;
+            string Arguments = "";
+            Arguments += "/c ";
+            if (BuildObjects_pch != null)
+            {
+                Arguments += String.Format("/Yu\"{0}\" ", BuildObjects_pchH);
+                Arguments += String.Format("/Fp\"{0}\" ", BuildObjects_pch);
+            }
+            Arguments += "/GS ";
+            if (!Config.Global.WithoutWarning)
+            {
+                Arguments += "/W4 ";
+                Arguments += "/WX ";
+            }
+            else
+            {
+                Arguments += "/W0 ";
+                Arguments += "/WX- ";
+            }
+            Arguments += "/Zc:wchar_t  ";
+            Arguments += "/Zi  ";
+            Arguments += "/Gm- ";
+            Arguments += "/Zc:inline  ";
+            Arguments += "/fp:fast ";
+            Arguments += "/errorReport:prompt ";
+            Arguments += "/Zc:forScope ";
+            Arguments += "/Gd  ";
+            Arguments += "/FC   ";
+            Arguments += "/nologo ";
+            Arguments += "/diagnostics:classic  ";
+            Arguments += "/sdl- ";
+            //Arguments += "/FS ";
+
+            switch (Config.Global.Configure)
+            {
+                case Config.Configure.Debug:
+                    Arguments += "/JMC ";
+                    Arguments += "/Od ";
+                    Arguments += "/RTC1 ";
+                    Arguments += "/MDd  ";
+                    Arguments += "/EHsc ";
+                    break;
+                case Config.Configure.Mixed:
+                    Arguments += "/Gy ";
+                    Arguments += "/O2 ";
+                    Arguments += "/Oy- ";
+                    Arguments += "/MD ";
+                    Arguments += "/EHsc ";
+                    break;
+                case Config.Configure.Release:
+                    Arguments += "/GL ";
+                    Arguments += "/Gy ";
+                    Arguments += "/Ox ";
+                    Arguments += "/Ob2 ";
+                    Arguments += "/GT ";
+                    Arguments += "/Oy ";
+                    Arguments += "/Oi ";
+                    Arguments += "/MD ";
+                    Arguments += "/Ot ";
+
+                    Arguments += "/Gd ";
+                    Arguments += "/Oi ";
+                    Arguments += "/Oi ";
+                    Arguments += "/Ot ";
+
+                    break;
+            };
+
+            Arguments += "/analyze- ";
+            Arguments += "/Zc:inline ";
+          /*  foreach (string source in Source)
+            {
+                Arguments += String.Format("\"{0}\" ", source);
+            }*/
+            File.WriteAllLines(Path.Combine(BuildObjects_objs_out ,"compile"+ ".txt"), Source);
+            Arguments += "@" + Path.Combine(BuildObjects_objs_out, "compile" + ".txt") + " ";
+            foreach (string define in BuildObjects_LDefines)
+            {
+                Arguments += String.Format("/D \"{0}\" ", define);
+            }
+            foreach (string include in BuildObjects_LInclude)
+            {
+                Arguments += String.Format("/I\"{0}\" ", include);
+            }
+            //  Arguments += String.Format("/Fo\"{0}\" ", obj);
+
+            
+            Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(BuildObjects_objs_out, "vc141.pdb"));
+            Process process = new Process();
+            process.StartInfo.FileName = CCompiler;
+            process.StartInfo.Arguments = Arguments;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.WorkingDirectory = BuildObjects_objs_out;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            ConsoleOut = "";
+    
+            process.OutputDataReceived += Process2_OutputDataReceived;
+            process.Start();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+            {
+                throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
+            }
+            base.BuildObjectsEnd();
+        }
+
+        public override void BuildObjectPush( string source)
+        {
+            Source.Add(source);
+           
+        }
+
+        public override void BuildObjectsStart(List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
+        {
+            base.BuildObjectsStart(LInclude, LDefines, pch, pchH, objs_out, buildType);
+            Source = new List<string>();
+        }
+
+
+
+
+
         public override void BuildDynamicLibrary(List<string> objs, List<string> libs, List<string> libsPath, string outDynamicLib, string outStaticLib)
         {
             string Arguments = "";
@@ -698,7 +832,7 @@ namespace BearBuildTool.Windows
         {
             if (!String.IsNullOrEmpty(e.Data))
             {
-                ConsoleOut+=e.Data+"\n";
+                 System.Console.WriteLine(ConsoleOut);
             }
         }
     }

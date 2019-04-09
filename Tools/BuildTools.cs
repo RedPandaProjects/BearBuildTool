@@ -8,6 +8,36 @@ namespace BearBuildTool.Tools
 {
     public class BuildTools
     {
+        protected List<string> BuildObjects_LInclude = null;
+        protected List<string> BuildObjects_LDefines = null;
+        protected string BuildObjects_pch = null;
+        protected string BuildObjects_pchH = null;
+        protected string BuildObjects_objs_out = null;
+        protected BuildType BuildObjects_buildType = BuildType.StaticLibrary;
+        public virtual void BuildObjectsStart(List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
+        {
+            BuildObjects_LInclude = LInclude;
+            BuildObjects_LDefines = LDefines;
+            BuildObjects_pch = pch;
+            BuildObjects_pchH = pchH;
+            BuildObjects_objs_out = objs_out;
+            BuildObjects_buildType = buildType;
+        }
+        public virtual void BuildObjectsEnd()
+        {
+            BuildObjects_LInclude = null;
+            BuildObjects_LDefines = null;
+            BuildObjects_pch = null;
+            BuildObjects_pchH = null;
+            BuildObjects_objs_out = null;
+            BuildObjects_buildType = BuildType.StaticLibrary;
+        }
+        public virtual void BuildObjectPush(string source)
+        {
+            Console.WriteLine(String.Format("Сборка {0}", Path.GetFileName(source)));
+            BuildObject(BuildObjects_LInclude, BuildObjects_LDefines, BuildObjects_pch, BuildObjects_pchH, false, source, Path.Combine(BuildObjects_objs_out, Path.GetFileNameWithoutExtension(source) + Config.Global.ObjectExtension), BuildObjects_buildType);
+        }
+
         public virtual void BuildObject(List<string> LInclude, List<string> LDefines, string pch,string pchH,bool createPCH, string source, string obj,BuildType buildType)
         {
 

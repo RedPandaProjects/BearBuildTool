@@ -43,6 +43,8 @@ namespace BearBuildTool.Config
         public static bool WithoutWarning = false;
         public static bool UNICODE = true;
 
+        public static int CountThreads = 8;
+
         public static bool Clean { get; internal set; }
         public static bool Rebuild { get; internal set; }
 

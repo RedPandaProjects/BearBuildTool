@@ -173,28 +173,51 @@ namespace BearBuildTool.Projects
                 }
                 LObj.Add(obj);
             }
-           
+            Config.Global.BuildTools.BuildObjectsStart(LInclude, LDefines,PCH, PCHH, LIntermediate, buildType);
             foreach (string source in project.Sources)
             {
+                bool C = source.Substring(source.Length - 2, 2).ToLower() == ".c";
+                if (C) continue;
                 if (project.PCHFile != null && project.PCHIncludeFile != null && source.ToLower() == project.PCHFile.ToLower())
                     continue;
                 string obj = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(source) + Config.Global.ObjectExtension);
                 {
                     DateTime dateTime = DateTime.MinValue;
                     bool reCreate = SourceFile.CheakSource(LInclude, LIntermediate, source, ref dateTime);
-                    bool C = source.Substring(source.Length - 2, 2).ToLower() == ".c";
                     if (dateTimeLibrary < dateTime) dateTimeLibrary = dateTime;
                     if (Config.Global.Rebuild || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
                     {
-                        Console.WriteLine(String.Format("Сборка {0}", Path.GetFileName(source)));
+                 
 
-                        Config.Global.BuildTools.BuildObject(LInclude, LDefines, C ? null : PCH, PCHH, false, source, obj, buildType);
+                        Config.Global.BuildTools.BuildObjectPush( source);
 
                         Build = true;
                     }
                 }
                 LObj.Add(obj);
             }
+            Config.Global.BuildTools.BuildObjectsEnd();
+            Config.Global.BuildTools.BuildObjectsStart(LInclude, LDefines, null, null, LIntermediate, buildType);
+            foreach (string source in project.Sources)
+            {
+                bool C = source.Substring(source.Length - 2, 2).ToLower() == ".c";
+                if (!C) continue;
+                if (project.PCHFile != null && project.PCHIncludeFile != null && source.ToLower() == project.PCHFile.ToLower())
+                    continue;
+                string obj = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(source) + Config.Global.ObjectExtension);
+                {
+                    DateTime dateTime = DateTime.MinValue;
+                    bool reCreate = SourceFile.CheakSource(LInclude, LIntermediate, source, ref dateTime);
+                    if (dateTimeLibrary < dateTime) dateTimeLibrary = dateTime;
+                    if (Config.Global.Rebuild || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
+                    {
+                        Config.Global.BuildTools.BuildObjectPush(source);
+                        Build = true;
+                    }
+                }
+                LObj.Add(obj);
+            }
+            Config.Global.BuildTools.BuildObjectsEnd();
             LLibrariesPath.Add(Config.Global.IntermediateProjectPath);
             if(Config.Platform.Linux==Config.Global.Platform)
             {
