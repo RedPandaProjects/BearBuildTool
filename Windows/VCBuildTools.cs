@@ -580,6 +580,7 @@ namespace BearBuildTool.Windows
                 Arguments += String.Format("/D \"{0}\" ", define);
             }
             foreach (string include in BuildObjects_LInclude)
+
             {
                 Arguments += String.Format("/I\"{0}\" ", include);
             }
@@ -610,7 +611,7 @@ namespace BearBuildTool.Windows
 
         public override void BuildObjectPush( string source)
         {
-            Source.Add(source);
+            Source.Add(String.Format("\"{0}\"", source));
            
         }
 
