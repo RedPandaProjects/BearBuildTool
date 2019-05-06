@@ -46,6 +46,10 @@ namespace BearBuildTool.Tools
         {
 
         }
+        public virtual void BuildResource(List<string> LInclude, List<string> LDefines, string source, string obj, BuildType buildType)
+        {
+
+        }
         public virtual void BuildExecutable(List<string> objs, List<string> libs, List<string> libsPath, string Executable, string outStaticLib, bool Console)
         {
 

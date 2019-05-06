@@ -150,6 +150,19 @@ namespace BearBuildTool.Projects
             bool Build = false;
             Config.Global.BuildTools.SetDefines(LDefines, GetOutFile(name, buildType), buildType);
             DateTime dateTimeLibrary = FileSystem.GetLastWriteTime(Config.Global.ProjectsCSFile[name]);
+
+            if (! String.IsNullOrEmpty( project.ResourceFile))
+            {
+                string obj = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(project.ResourceFile) + Config.Global.ObjectExtension);
+                if (Config.Global.Rebuild || !FileSystem.ExistsFile(obj) || FileSystem.GetLastWriteTime(project.ResourceFile) > FileSystem.GetLastWriteTime(obj))
+                {
+                    Console.WriteLine(String.Format("Сборка RES {0}", Path.GetFileName(project.ResourceFile)));
+                    Config.Global.BuildTools.BuildResource(LInclude, LDefines, project.ResourceFile, obj, buildType);
+                    Build = true;
+                }
+                LObj.Add(obj);
+            }
+
             if (project.PCHFile != null&&project.PCHIncludeFile!= null)
             {
                 if (!FileSystem.ExistsFile(project.PCHFile))

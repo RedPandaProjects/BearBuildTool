@@ -18,7 +18,7 @@ namespace BearBuildTool.Windows
         string Linker;
         string LibraryLinker;
         string ConsoleOut;
-
+        string ResourceBuilder;
 
         static bool FindKey(string key, string val, out string path)
         {
@@ -325,6 +325,64 @@ namespace BearBuildTool.Windows
             Environment.SetEnvironmentVariable("LIB", String.Join(";", LibraryPaths));
 
 
+            if (Config.Global.Platform == Config.Platform.Win64)
+            {
+                ResourceBuilder =  Path.Combine(WindowsSDKDir, "bin","x64","rc.exe");
+            }
+          
+            else
+            {
+                ResourceBuilder = Path.Combine(WindowsSDKDir, "bin", "x86", "rc.exe");
+            }
+
+        }
+        public override void BuildResource(List<string> LInclude, List<string> LDefines, string source, string obj, BuildType buildType)
+        {
+
+            string cmdLine = "";
+            if (Config.Global.Platform == Config.Platform.Win64)
+            {
+                cmdLine += " /D _WIN64";
+            }
+            
+            cmdLine += " /l 0x409";
+            
+            foreach (string include in LInclude)
+            {
+                cmdLine += String.Format(" /i \"{0}\"", include);
+            }
+
+            foreach (string define in LDefines)
+            {
+                cmdLine += String.Format(" /d \"{0}\"", define);
+            }
+            cmdLine += String.Format(" /fo \"{0}\"", obj);
+            cmdLine += String.Format(" \"{0}\"", source);
+
+
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            process.StartInfo.FileName = ResourceBuilder;
+            process.StartInfo.Arguments = cmdLine;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = false;
+            process.StartInfo.WorkingDirectory = Path.GetFullPath(".");
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.RedirectStandardOutput = true;
+            ConsoleOut = "";
+            process.Start();
+            process.BeginOutputReadLine();
+            process.OutputDataReceived += Process_OutputDataReceived;
+            process.WaitForExit();
+            if (process.ExitCode != 0)
+            {
+                System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
+
+                System.Console.WriteLine(ConsoleOut);
+
+                System.Console.WriteLine("-----------------------------------------------------------------");
+                throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
+            }
+
         }
         public override void BuildStaticLibrary(List<string> objs, List<string> libs, List<string> libsPath, string outStaticLib)
         {
@@ -623,7 +681,7 @@ namespace BearBuildTool.Windows
 
 
 
-
+   
 
         public override void BuildDynamicLibrary(List<string> objs, List<string> libs, List<string> libsPath, string outDynamicLib, string outStaticLib)
         {
@@ -648,14 +706,16 @@ namespace BearBuildTool.Windows
                 Arguments += "/RELEASE ";
                 Arguments += "/OPT:ICF ";
                 Arguments += "/OPT:REF ";
-               
+                Arguments += "/INCREMENTAL:NO ";
             }
             else
             {
                 Arguments += "/OPT:NOREF ";
                 Arguments += "/OPT:NOICF ";
+                Arguments += "/INCREMENTAL ";
             }
-            Arguments += "/INCREMENTAL:NO ";
+
+      
             foreach (string libpath in libsPath)
             {
                 Arguments += String.Format("/LIBPATH:\"{0}\" ", libpath);
@@ -718,12 +778,14 @@ namespace BearBuildTool.Windows
             {
                 Arguments += "/OPT:NOREF ";
                 Arguments += "/OPT:NOICF ";
+                Arguments += "/INCREMENTAL:NO ";
             }
             else
             {
                 Arguments += "/OPT:REF ";
+                Arguments += "/INCREMENTAL ";
             }
-            Arguments += "/INCREMENTAL:NO ";
+       
             foreach (string libpath in libsPath)
             {
                 Arguments += String.Format("/LIBPATH:\"{0}\" ", libpath);
