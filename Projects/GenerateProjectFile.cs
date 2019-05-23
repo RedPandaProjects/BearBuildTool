@@ -12,12 +12,14 @@ namespace BearBuildTool.Projects
             Defines = new ProjectListObject();
             SourceFile = new List<string>();
             IncludeFile = new Dictionary<string, bool>();
+            ResourceFile = String.Empty;
         }
         public ProjectListObject Include;
         public ProjectListObject Defines;
         public List<string> SourceFile;
         public Dictionary<string, bool> IncludeFile;
-        public string NameFileInfo;
+        public string PathFileInfo;
+        public string ResourceFile;
         public string ProjectPath;
     };
     class GenerateProjectFile
@@ -62,11 +64,12 @@ namespace BearBuildTool.Projects
             {
            
                 ProjectFileInfo info = new ProjectFileInfo();
-                info.NameFileInfo = Config.Global.ProjectsCSFile[name];
+                info.PathFileInfo = Config.Global.ProjectsCSFile[name];
+            
                 List<string> LIncludeFile = new List<string>();
                 var project = Config.Global.ProjectsMap[name];
                 project.StartBuild();
-               
+                info.ResourceFile = project.ResourceFile;
                     foreach (string i in project.Include.Private)
                 {
                     if (source_code)

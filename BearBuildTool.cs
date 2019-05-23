@@ -187,23 +187,30 @@ namespace BearBuildTool
         }
         static void CallAction(string arg,string[] args,int i)
         {
-            if (arg == "-createvisualproject")
+            if (arg == "-createfilters")
             {
                 Initialize();
-                if (args.Length  != i + 1) return;
+                if (args.Length != i + 2) return;
+                Windows.VisualProject.VisualProject.CreateFilters(args[i], args[i+1]);
+                System.Environment.Exit(0);
+            }
+            else if (arg == "-createvisualproject")
+            {
+                Initialize();
+                if (args.Length != i + 1) return;
                 GenerateProjectFileVS(args[i]);
                 System.Environment.Exit(0);
             }
             else
-             if (arg == "-createvcproject")
+          if (arg == "-createvcproject")
             {
                 Initialize();
                 if (args.Length != i + 2) return;
-                GenerateProjectFileVC(args[i], args[i+1]);
+                GenerateProjectFileVC(args[i], args[i + 1]);
                 System.Environment.Exit(0);
             }
             else
-             if (arg == "-cleanall")
+          if (arg == "-cleanall")
             {
                 Console.WriteLine("Полная чистка");
                 Config.Global.IntermediatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", Config.Global.IntermediatePath);

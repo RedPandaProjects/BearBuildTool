@@ -29,10 +29,13 @@ namespace BearBuildTool.Windows
             
             foreach(string i in projects)
             {
-                VSProjectFile projectFile = new VSProjectFile(i,name);
+                VisualProject.VisualProject visualProject = new VisualProject.VisualProject(i,name);
+                visualProject.Build();
+
+               /* VSProjectFile projectFile = new VSProjectFile(i,name);
                 projectFile.Write();
-                Guids.Add(projectFile.Guid);
-                SlnLineList.Add(String.Format("Project(\"{0}\")=\"{1}\",\"{2}\",\"{3}\"", SlnGUID, i,projectFile.File,  projectFile.Guid.ToString("B")));
+                Guids.Add(projectFile.Guid);*/
+                SlnLineList.Add(String.Format("Project(\"{0}\")=\"{1}\",\"{2}\",\"{3}\"", SlnGUID, i, visualProject.FileVcxproj, visualProject.Guid.ToString("B")));
                 SlnLineList.Add("EndProject");
             }
             SlnLineList.Add("Global");

@@ -52,19 +52,36 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\BuildTools.cs" />
     <Compile Include="Tools\FileSystem.cs" />
+    <Compile Include="Tools\Scanning.cs" />
     <Compile Include="Tools\SourceFile.cs" />
     <Compile Include="Tools\ListFiles.cs" />
     <Compile Include="Windows\VCBuildTools.cs" />
-    <Compile Include="Windows\VSProjectFile.cs" />
+    <Compile Include="Windows\VisualProject\Filters\ClCompile.cs" />
+    <Compile Include="Windows\VisualProject\Filters\ClInclude.cs" />
+    <Compile Include="Windows\VisualProject\Filters\Filter.cs" />
+    <Compile Include="Windows\VisualProject\Filters\ItemGroup.cs" />
+    <Compile Include="Windows\VisualProject\Filters\None.cs" />
+    <Compile Include="Windows\VisualProject\Filters\Project.cs" />
+    <Compile Include="Windows\VisualProject\User\Project.cs" />
+    <Compile Include="Windows\VisualProject\User\PropertyGroup.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\Files\ClCompile.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\Files\ClInclude.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\Import.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\ImportGroup.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\ItemGroup.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\Files\None.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\Project.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\ProjectConfiguration.cs" />
+    <Compile Include="Windows\VisualProject\Vcxproj\PropertyGroup.cs" />
+    <Compile Include="Windows\VisualProject\VisualProject.cs" />
+    <Compile Include="Windows\VisualProject\XmlObject.cs" />
+    <Compile Include="Windows\VisualProject\XmlProject.cs" />
     <Compile Include="Windows\VSProjectGenerate.cs" />
     <Compile Include="Linux\LinuxBuildTools.cs" />
     <Compile Include="VisualCode\VCProjectFile.cs" />
     <Compile Include="VisualCode\VCProjectGenerate.cs" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Linux\" />
-    <Folder Include="VisualCode\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
