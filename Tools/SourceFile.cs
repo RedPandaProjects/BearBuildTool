@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace BearBuildTool.Tools
 {
     class SourceFile
     {
-
+      //  static Mutex mutex = new Mutex();
         public static bool CheakSource(List<string> LInclude, string LIntermediate, string file, ref DateTime dateTime)
         {
             string listFile = Path.Combine(LIntermediate, Path.GetFileName(file) + ".txt");
@@ -16,6 +17,7 @@ namespace BearBuildTool.Tools
         }
         private static bool CheaklcudeInfo(List<string> LInclude, string source, string listFileName,ref DateTime dateTime)
         {
+          //  mutex.WaitOne();
             ListFiles listFile = new ListFiles(listFileName);
             DateTime dateTime1 = DateTime.MinValue;
             DateTime dateTime2 = FileSystem.GetLastWriteTime(listFileName);
@@ -25,9 +27,11 @@ namespace BearBuildTool.Tools
             {
                  CreateInlcudeInfo(LInclude,source, listFileName);
                 dateTime = dateTime3;
+              //  mutex.ReleaseMutex();
                 return true;
             }
             dateTime= dateTime3;
+          //  mutex.ReleaseMutex();
             return false;
         }
         private static void CreateInlcudeInfo(List<string> LInclude, string source,string listFileName)

@@ -10,6 +10,10 @@ namespace BearBuildTool.Linux
 {
     class LinuxBuildTools : Tools.BuildTools
     {
+        public override Tools.BuildTools Create()
+        {
+            return new LinuxBuildTools();
+        }
         private string GCCPath = null;
         private string ArPath = null;
         private string RanlibPath = null;
@@ -54,7 +58,7 @@ namespace BearBuildTool.Linux
 
             return;
         }
-        public override void BuildObject(List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
+        public override void BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
             
             string Arguments = " ";
@@ -122,7 +126,7 @@ namespace BearBuildTool.Linux
                 Arguments += "-x c++-header ";
                 Arguments += "-std=c++14 ";
                 Arguments += "-o \"" + pch + "\" ";
-                BuildObject(LInclude, LDefines, null, null, false, source, obj, buildType);
+                BuildObject( PN,LInclude, LDefines, null, null, false, source, obj, buildType);
             }
             else if (Path.GetExtension(source).ToLower() == ".cpp")
             {

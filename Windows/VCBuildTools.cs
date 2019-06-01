@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using static BearBuildTool.Projects.Build;
 
 namespace BearBuildTool.Windows
 {
@@ -19,7 +17,10 @@ namespace BearBuildTool.Windows
         string LibraryLinker;
         string ConsoleOut;
         string ResourceBuilder;
-
+        public override BuildTools Create()
+        {
+            return new VCBuildTools();
+        }
         static bool FindKey(string key, string val, out string path)
         {
             string str = Registry.GetValue("HKEY_CURRENT_USER\\SOFTWARE\\" + key, val, null) as string;
@@ -372,7 +373,7 @@ namespace BearBuildTool.Windows
             process.Start();
             process.BeginOutputReadLine();
             process.OutputDataReceived += Process_OutputDataReceived;
-            process.WaitForExit();
+            while (process.HasExited == false) { }
             if (process.ExitCode != 0)
             {
                 System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
@@ -425,7 +426,7 @@ namespace BearBuildTool.Windows
             process.Start();
             process.BeginOutputReadLine();
             process.OutputDataReceived += Process_OutputDataReceived;
-            process.WaitForExit();
+            while (process.HasExited == false) { }
             if (process.ExitCode != 0)
             {
                 System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
@@ -436,7 +437,7 @@ namespace BearBuildTool.Windows
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
             }
         }
-        public override void BuildObject(List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
+        public override void BuildObject(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
 
             string Arguments = "";
@@ -475,8 +476,10 @@ namespace BearBuildTool.Windows
             Arguments += "/FC   ";
             Arguments += "/nologo ";
             Arguments += "/diagnostics:classic  ";
-            Arguments += "/sdl- ";
-
+            if(pch!=null)
+                Arguments += "/sdl- ";
+            else
+                Arguments += "/sdl- ";
 
             switch (Config.Global.Configure)
             {
@@ -541,7 +544,7 @@ namespace BearBuildTool.Windows
             process.BeginOutputReadLine();
 
             process.OutputDataReceived += Process2_OutputDataReceived;
-            process.WaitForExit();
+            while (process.HasExited == false) { }
             if (process.ExitCode != 0)
             {
                
@@ -551,7 +554,7 @@ namespace BearBuildTool.Windows
 
         private void Process2_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-          if(!String.IsNullOrEmpty( e.Data))System.Console.WriteLine(e.Data);
+          if(!String.IsNullOrEmpty( e.Data))System.Console.WriteLine( e.Data);
         }
 
         List<string> Source = new List<string>();
@@ -659,7 +662,7 @@ namespace BearBuildTool.Windows
             process.OutputDataReceived += Process2_OutputDataReceived;
             process.Start();
             process.BeginOutputReadLine();
-            process.WaitForExit();
+            while (process.HasExited == false) { }
             if (process.ExitCode != 0)
             {
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
@@ -673,9 +676,9 @@ namespace BearBuildTool.Windows
            
         }
 
-        public override void BuildObjectsStart(List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
+        public override void BuildObjectsStart(string PN, List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
         {
-            base.BuildObjectsStart(LInclude, LDefines, pch, pchH, objs_out, buildType);
+            base.BuildObjectsStart(PN,LInclude, LDefines, pch, pchH, objs_out, buildType);
             Source = new List<string>();
         }
 
@@ -747,7 +750,7 @@ namespace BearBuildTool.Windows
             process.Start();
             process.BeginOutputReadLine();
             process.OutputDataReceived += Process_OutputDataReceived;
-            process.WaitForExit();
+            while (process.HasExited == false) { }
             if (process.ExitCode != 0)
             {
                 System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
@@ -817,7 +820,7 @@ namespace BearBuildTool.Windows
             process.Start();
             process.BeginOutputReadLine();
             process.OutputDataReceived += Process_OutputDataReceived;
-            process.WaitForExit();
+            while (process.HasExited == false) { }
             if (process.ExitCode != 0)
             {
                 System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
@@ -895,7 +898,7 @@ namespace BearBuildTool.Windows
         {
             if (!String.IsNullOrEmpty(e.Data))
             {
-                ConsoleOut += e.Data;
+                ConsoleOut +=  e.Data ;
             }
         }
     }
