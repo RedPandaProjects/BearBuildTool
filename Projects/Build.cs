@@ -212,7 +212,9 @@ namespace BearBuildTool.Projects
             {
                 var projectInfo = ProjectsInfo[name];
                 Tools.BuildTools buildTools = Config.Global.BuildTools.Create();
-                Console.WriteLine(String.Format("Сборка проекта {0}", name));
+
+                
+           
                 List<string> LObj = new List<string>();
                 List<string> LInclude = projectInfo.Include.ToList();
 
@@ -233,6 +235,7 @@ namespace BearBuildTool.Projects
                 string PCHSource = null;
                 bool Rebuild = false;
                 bool Build = false;
+                bool Message = false;
                 buildTools.SetDefines(LDefines, GetOutFile(name, buildType), buildType);
                 DateTime dateTimeLibrary = FileSystem.GetLastWriteTime(Config.Global.ProjectsCSFile[name]);
 
@@ -241,6 +244,11 @@ namespace BearBuildTool.Projects
                     string obj = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(project.ResourceFile) + Config.Global.ObjectExtension);
                     if (Config.Global.Rebuild || !FileSystem.ExistsFile(obj) || FileSystem.GetLastWriteTime(project.ResourceFile) > FileSystem.GetLastWriteTime(obj))
                     {
+                        if (Message == false)
+                        {
+                            Console.WriteLine(String.Format("Сборка проекта {0}", name));
+                            Message = true;
+                        }
                         Console.WriteLine(String.Format("Сборка RES {0}", Path.GetFileName(project.ResourceFile)));
                         buildTools.BuildResource(LInclude, LDefines, project.ResourceFile, obj, buildType);
                         Build = true;
@@ -264,6 +272,11 @@ namespace BearBuildTool.Projects
                     if (Config.Global.Rebuild || !FileSystem.ExistsFile(PCH) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj) || dateTime > FileSystem.GetLastWriteTime(PCH) || dateTimeLibrary > FileSystem.GetLastWriteTime(PCH))
                     {
 
+                        if ( Message == false)
+                        {
+                            Console.WriteLine(String.Format("Сборка проекта {0}", name));
+                            Message = true;
+                        }
                         Console.WriteLine(String.Format("Сборка PCH {0}", Path.GetFileName(PCHSource)));
                         buildTools.BuildObject(name, LInclude, LDefines, PCH, PCHH, true, PCHSource, obj, buildType);
                         Rebuild = true;
@@ -271,6 +284,7 @@ namespace BearBuildTool.Projects
                     }
                     LObj.Add(obj);
                 }
+            
                 buildTools.BuildObjectsStart(name, LInclude, LDefines, PCH, PCHH, LIntermediate, buildType);
                 foreach (string source in project.Sources)
                 {
@@ -286,7 +300,11 @@ namespace BearBuildTool.Projects
                         if (Config.Global.Rebuild || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
                         {
 
-
+                            if ( Message == false)
+                            {
+                                Console.WriteLine(String.Format("Сборка проекта {0}", name));
+                                Message = true;
+                            }
                             buildTools.BuildObjectPush(source);
 
                             Build = true;
@@ -294,6 +312,7 @@ namespace BearBuildTool.Projects
                     }
                     LObj.Add(obj);
                 }
+             
                 buildTools.BuildObjectsEnd();
                 buildTools.BuildObjectsStart(name, LInclude, LDefines, null, null, LIntermediate, buildType);
                 foreach (string source in project.Sources)
@@ -309,6 +328,11 @@ namespace BearBuildTool.Projects
                         if (dateTimeLibrary < dateTime) dateTimeLibrary = dateTime;
                         if (Config.Global.Rebuild || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
                         {
+                            if (Message == false)
+                            {
+                                Console.WriteLine(String.Format("Сборка проекта {0}", name));
+                                Message = true;
+                            }
                             buildTools.BuildObjectPush(source);
                             Build = true;
                         }

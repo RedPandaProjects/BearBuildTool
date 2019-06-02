@@ -93,6 +93,7 @@ namespace BearBuildTool
             }
 
             Console.WriteLine(String.Format("Начало сборки проекта[{0}] конфигурация[{1}] платформа[{2}]", Config.Global.Project, Config.Global.Configure.ToString(), Config.Global.Platform.ToString()));
+            var time = DateTime.Now.TimeOfDay;
             Config.Global.IntermediateProjectPath = Path.Combine(Config.Global.IntermediatePath, Config.Global.Platform.ToString());
             if (!Directory.Exists(Config.Global.IntermediateProjectPath))
             {
@@ -136,7 +137,8 @@ namespace BearBuildTool
             }
             else
             {
-                Console.WriteLine(String.Format("Сборка завершина: количество {0}", Config.Global.CountBuild));
+                time = DateTime.Now.TimeOfDay-time;
+                Console.WriteLine(String.Format("Сборка завершина: количество {0} Врямя потраченно {1}", Config.Global.CountBuild,time.ToString()));
             }
         }
         static void GenerateProjectFileVS(string name)
