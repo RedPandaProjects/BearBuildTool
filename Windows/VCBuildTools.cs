@@ -536,7 +536,7 @@ namespace BearBuildTool.Windows
             process.StartInfo.Arguments = Arguments;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = false;
-            process.StartInfo.WorkingDirectory = VCToolPath;
+            process.StartInfo.WorkingDirectory = Path.Combine(Path.GetDirectoryName(obj));
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
             ConsoleOut = "";

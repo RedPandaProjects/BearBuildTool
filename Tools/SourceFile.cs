@@ -9,42 +9,70 @@ namespace BearBuildTool.Tools
 {
     class SourceFile
     {
-      //  static Mutex mutex = new Mutex();
-        public static bool CheakSource(List<string> LInclude, string LIntermediate, string file, ref DateTime dateTime)
+        //  static Mutex mutex = new Mutex();
+        List<string> Includes;
+        Dictionary<string, List<string>> TreeInclude = new Dictionary<string, List<string>>();
+
+        public bool CheakSource(ref List<string> LInclude, string LIntermediate, string file, ref DateTime dateTime)
         {
+            Includes = LInclude;
             string listFile = Path.Combine(LIntermediate, Path.GetFileName(file) + ".txt");
-            return CheaklcudeInfo(LInclude,file, listFile,ref  dateTime);
+            return CheaklcudeInfo(file, listFile, ref dateTime);
         }
-        private static bool CheaklcudeInfo(List<string> LInclude, string source, string listFileName,ref DateTime dateTime)
+        private bool CheaklcudeInfo(string source, string listFileName, ref DateTime dateTime)
         {
-          //  mutex.WaitOne();
+            //  mutex.WaitOne();
             ListFiles listFile = new ListFiles(listFileName);
             DateTime dateTime1 = DateTime.MinValue;
             DateTime dateTime2 = FileSystem.GetLastWriteTime(listFileName);
             DateTime dateTime3 = FileSystem.GetLastWriteTime(source);
             bool ReCreate = !listFile.GetFilesMaxDate(ref dateTime1);
-            if (!FileSystem.ExistsFile(listFileName) || ReCreate || dateTime1 > dateTime2 || dateTime3>dateTime2)
+            if (!FileSystem.ExistsFile(listFileName) || ReCreate || dateTime1 > dateTime2 || dateTime3 > dateTime2)
             {
-                 CreateInlcudeInfo(LInclude,source, listFileName);
+                CreateInlcudeInfo(source, listFileName);
                 dateTime = dateTime3;
-              //  mutex.ReleaseMutex();
+                //  mutex.ReleaseMutex();
                 return true;
             }
-            dateTime= dateTime3;
-          //  mutex.ReleaseMutex();
+            dateTime = dateTime3;
+            //  mutex.ReleaseMutex();
             return false;
         }
-        private static void CreateInlcudeInfo(List<string> LInclude, string source,string listFileName)
+        private void CreateInlcudeInfo(string source, string listFileName)
         {
             ListFiles listFile = new ListFiles(listFileName);
-            includeMap = new Dictionary<string, bool>();
+
             listFile.ClearFiles();
-            WriteIncludeInfo(LInclude, ref listFile, source);
+
+            List<string> list = null;
+            Dictionary<string, bool> NoNincludeMap = new Dictionary<string, bool>();
+            WriteIncludeInfo(out list, source, ref NoNincludeMap);
+            listFile.Files.AddRange(list);
             listFile.Write();
         }
-        private static Dictionary<string, bool> includeMap;
-        private static void WriteIncludeInfo(List<string> LInclude, ref ListFiles listFile, string infile)
+        private void WriteIncludeInfo(out List<string> listFile, string infile, ref Dictionary<string, bool> NoNincludeMap)
         {
+            listFile = new List<string>();
+            if (NoNincludeMap.ContainsKey(infile)) { return; }
+            NoNincludeMap.Add(infile, true);
+            Dictionary<string, bool> includeMap = new Dictionary<string, bool>();
+            if (TreeInclude.ContainsKey(infile))
+            {
+                listFile = TreeInclude[infile];
+                return;
+            }
+
+            {
+                bool add = true; string file_path = Path.GetDirectoryName(infile);
+                foreach (string path in Includes)
+                {
+                    if (path == file_path) add = false;
+                }
+                if (add)
+                {
+                    Includes.Add(file_path);
+                }
+            }
             string text = File.ReadAllText(infile);
             int index = 0;
             for (string inc = ReadIncludeInText(text, ref index); index != -1; inc = ReadIncludeInText(text, ref index))
@@ -53,22 +81,32 @@ namespace BearBuildTool.Tools
                 {
                     bool find = false;
                     string filename = inc;
-                    if (filename.IndexOf('\n') !=-1) continue;
+                    if (filename.IndexOf('\n') != -1) continue;
                     if (filename.IndexOf('\r') != -1) continue;
-                    foreach (string path in LInclude)
+                    foreach (string path in Includes)
                     {
-                        if (FileSystem.ExistsFile(Path.Combine(path  , filename)))
+                        if (FileSystem.ExistsFile(Path.Combine(path, filename)))
                         {
-                            string file =Path.GetFullPath( Path.Combine(path, filename));
+                            string file = Path.GetFullPath(Path.Combine(path, filename));
                             if (!includeMap.ContainsKey(file))
                             {
                                 includeMap.Add(file, true);
-                                listFile.Files.Add(file);
-                                WriteIncludeInfo(LInclude, ref listFile, Path.Combine(path, filename));
-                             
+                                listFile.Add(file);
+                                List<string> vs = new List<string>();
+                                WriteIncludeInfo(out vs, Path.Combine(path, filename), ref NoNincludeMap);
+                                foreach (string v in vs)
+                                {
+                                    if (!includeMap.ContainsKey(v))
+                                    {
+                                        includeMap.Add(v, true);
+                                        listFile.Add(v);
+                                    }
+                                }
+
+
                             }
-                            
-                          
+
+
                             find = true;
                             break;
                         }
@@ -81,14 +119,24 @@ namespace BearBuildTool.Tools
                             if (!includeMap.ContainsKey(file))
                             {
                                 includeMap.Add(file, true);
-                                listFile.Files.Add(file);
-                                WriteIncludeInfo(LInclude, ref listFile, Path.Combine(path, filename));
+                                listFile.Add(file);
+                                List<string> vs = new List<string>();
+                                WriteIncludeInfo(out vs, Path.Combine(path, filename), ref NoNincludeMap);
+                                foreach (string v in vs)
+                                {
+                                    if (!includeMap.ContainsKey(v))
+                                    {
+                                        includeMap.Add(v, true);
+                                        listFile.Add(v);
+                                    }
+                                }
                             }
-                           
+
                         }
                     }
                 }
             }
+            TreeInclude.Add(infile, listFile);
         }
         static string ReadIncludeInText(string text, ref int index)
         {

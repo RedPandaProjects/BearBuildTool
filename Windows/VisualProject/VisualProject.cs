@@ -271,7 +271,7 @@ namespace BearBuildTool.Windows.VisualProject
                     bool remove = false;
                     foreach (var item in project.SourceFile)
                     {
-                        if (filters.itemGroup.ClCompilers[i].Include == item)
+                        if (filters.itemGroup.ClCompilers[i].Include.ToLower() == item.ToLower())
                         {
                             remove = true; break;
                         }
@@ -287,14 +287,14 @@ namespace BearBuildTool.Windows.VisualProject
                     bool remove = false;
                     foreach (var item in project.IncludeFile)
                     {
-                        if (filters.itemGroup.ClIncludes[i].Include == item.Key)
+                        if (filters.itemGroup.ClIncludes[i].Include.ToLower() == item.Key.ToLower())
                         {
                             remove = true; break;
                         }
                     }
                     if (remove == false)
                     {
-                        filters.itemGroup.ClCompilers.RemoveAt(i);
+                        filters.itemGroup.ClIncludes.RemoveAt(i);
                         i = 0;
                     }
                 }
