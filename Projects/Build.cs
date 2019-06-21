@@ -64,6 +64,7 @@ namespace BearBuildTool.Projects
             {
                 return;
             }
+            while (CountThread == Config.Global.CountThreads) ;
             CountThread++;
             MakeProject(ref project, name,ref buildType);
             Task t = Task.Run(async () => await ProjectBuild(project, name, buildType));
@@ -142,7 +143,7 @@ namespace BearBuildTool.Projects
                 List<string> vs = MakeListBuild(name);
                 for (int i= vs.Count-1;i>=0;i--)
                 {
-                    while (CountThread == Config.Global.CountThreads) ;
+   
                     StartBuildProject(Config.Global.ProjectsMap[vs[i]], vs[i], GetBuildType(vs[i]));
                 }
          
@@ -191,7 +192,7 @@ namespace BearBuildTool.Projects
                 {
                     projectInfo.AppendInPrivate(ProjectsInfo[projectName]);
                 }
-            }
+            } 
             foreach (string projectName in project.IncludeInProject.Public)
             {
                 projectInfo.Include.Append(Config.Global.ProjectsMap[projectName].Include);
@@ -287,6 +288,7 @@ namespace BearBuildTool.Projects
                 }
             
                 buildTools.BuildObjectsStart(name, LInclude, LDefines, PCH, PCHH, LIntermediate, buildType);
+            
                 foreach (string source in project.Sources)
                 {
                     bool C = source.Substring(source.Length - 2, 2).ToLower() == ".c";

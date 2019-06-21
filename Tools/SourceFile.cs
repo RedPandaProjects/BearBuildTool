@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 
 namespace BearBuildTool.Tools
 {
     class SourceFile
     {
         //  static Mutex mutex = new Mutex();
-        List<string> Includes;
+        List<string> Includes; 
         Dictionary<string, List<string>> TreeInclude = new Dictionary<string, List<string>>();
 
         public bool CheakSource(ref List<string> LInclude, string LIntermediate, string file, ref DateTime dateTime)
@@ -23,7 +20,7 @@ namespace BearBuildTool.Tools
         {
             //  mutex.WaitOne();
             ListFiles listFile = new ListFiles(listFileName);
-            DateTime dateTime1 = DateTime.MinValue;
+            DateTime dateTime1 = DateTime.MinValue; 
             DateTime dateTime2 = FileSystem.GetLastWriteTime(listFileName);
             DateTime dateTime3 = FileSystem.GetLastWriteTime(source);
             bool ReCreate = !listFile.GetFilesMaxDate(ref dateTime1);
@@ -62,7 +59,7 @@ namespace BearBuildTool.Tools
                 return;
             }
 
-            {
+       /*     {
                 bool add = true; string file_path = Path.GetDirectoryName(infile);
                 foreach (string path in Includes)
                 {
@@ -72,7 +69,7 @@ namespace BearBuildTool.Tools
                 {
                     Includes.Add(file_path);
                 }
-            }
+            }*/
             string text = File.ReadAllText(infile);
             int index = 0;
             for (string inc = ReadIncludeInText(text, ref index); index != -1; inc = ReadIncludeInText(text, ref index))
@@ -83,8 +80,9 @@ namespace BearBuildTool.Tools
                     string filename = inc;
                     if (filename.IndexOf('\n') != -1) continue;
                     if (filename.IndexOf('\r') != -1) continue;
-                    foreach (string path in Includes)
+                   for(int i=0;i<Includes.Count;i++)
                     {
+                        string path = Includes[i];
                         if (FileSystem.ExistsFile(Path.Combine(path, filename)))
                         {
                             string file = Path.GetFullPath(Path.Combine(path, filename));

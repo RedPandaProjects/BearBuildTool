@@ -168,6 +168,7 @@ namespace BearBuildTool.Windows
                     if (FileSystem.ExistsFile(testPath))
                     {
                         VCToolPath = testPath;
+
                     }
                     else
                     {
@@ -215,8 +216,9 @@ namespace BearBuildTool.Windows
             string Paths = Environment.GetEnvironmentVariable("PATH") ?? "";
             if (!Paths.Split(';').Any(x => String.Compare(x, VCToolPath, true) == 0))
             {
-                Paths = VCToolPath + ";" + Paths;
-                if (VCPlatformPath != null) Paths = Paths + ";" + VCPlatformPath;
+   
+                if (VCPlatformPath != null) Paths = VCToolPath + ";" + VCPlatformPath+";"+ Paths;
+                else Paths = VCToolPath + ";" + Paths;
                 Environment.SetEnvironmentVariable("PATH", Paths);
             }
 

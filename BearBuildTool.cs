@@ -128,7 +128,12 @@ namespace BearBuildTool
             {
                 Config.Global.BuildTools = new Windows.VCBuildTools();
             }
-            Projects.Build build = new Projects.Build();
+        //    SourceFile file = new SourceFile();
+      /*      List<string> Linclude = new List<string>();
+            Linclude.AddRange( File.ReadAllLines(@"E:\list.txt"));
+            DateTime dateTime = DateTime.MinValue;
+            file.CheakSource(ref Linclude, @"E:\GameDev\BearSDK\intermediate\Win32\Debug\stalker\stalkercop_script", @"E:\GameDev\BearSDK\projects\engine\stalker\stalkercop\source_script\pch_script.cpp", ref dateTime);
+         */  Projects.Build build = new Projects.Build();
             build.ProjectBuild(Config.Global.Project);
             build.AutonomousProjectsBuild();
             if (Config.Global.CountBuild == 0)
