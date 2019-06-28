@@ -517,7 +517,7 @@ namespace BearBuildTool.Windows
 
                     break;
             };
-
+            Arguments += "/MP ";
             Arguments += "/analyze- ";
             Arguments += "/Zc:inline ";
             Arguments += String.Format("\"{0}\" ", source);
@@ -593,6 +593,7 @@ namespace BearBuildTool.Windows
             Arguments += "/nologo ";
             Arguments += "/diagnostics:classic  ";
             Arguments += "/sdl- ";
+
             //Arguments += "/FS ";
 
             switch (Config.Global.Configure)
@@ -603,6 +604,7 @@ namespace BearBuildTool.Windows
                     Arguments += "/RTC1 ";
                     Arguments += "/MDd  ";
                     Arguments += "/EHsc ";
+       
                     break;
                 case Config.Configure.Mixed:
                     Arguments += "/Gy ";
@@ -629,7 +631,7 @@ namespace BearBuildTool.Windows
 
                     break;
             };
-
+            Arguments += "/MP ";
             Arguments += "/analyze- ";
             Arguments += "/Zc:inline ";
           /*  foreach (string source in Source)

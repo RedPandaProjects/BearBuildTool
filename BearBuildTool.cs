@@ -194,6 +194,7 @@ namespace BearBuildTool
         }
         static void CallAction(string arg,string[] args,int i)
         {
+         
             if (arg == "-createfilters")
             {
                 Initialize();
@@ -244,6 +245,11 @@ namespace BearBuildTool
             if (arg == "-withoutwarning")
             {
                 Config.Global.WithoutWarning = true;
+                return true;
+            } 
+            if (arg == "-one_thread")
+            {
+                Config.Global.CountThreads = 1;
                 return true;
             }
             if (arg == "-ansi")

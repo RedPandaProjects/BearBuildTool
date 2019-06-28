@@ -27,11 +27,18 @@ namespace BearBuildTool.Tools
             if (!FileSystem.ExistsFile(listFileName) || ReCreate || dateTime1 > dateTime2 || dateTime3 > dateTime2)
             {
                 CreateInlcudeInfo(source, listFileName);
-                dateTime = dateTime3;
+                dateTime = dateTime1;
                 //  mutex.ReleaseMutex();
                 return true;
             }
-            dateTime = dateTime3;
+            if(dateTime2>dateTime3)
+            {
+                dateTime = dateTime2;
+            }
+            else
+            {
+                dateTime = dateTime3;
+            } 
             //  mutex.ReleaseMutex();
             return false;
         }
@@ -59,7 +66,7 @@ namespace BearBuildTool.Tools
                 return;
             }
 
-       /*     {
+            {
                 bool add = true; string file_path = Path.GetDirectoryName(infile);
                 foreach (string path in Includes)
                 {
@@ -69,7 +76,7 @@ namespace BearBuildTool.Tools
                 {
                     Includes.Add(file_path);
                 }
-            }*/
+            }
             string text = File.ReadAllText(infile);
             int index = 0;
             for (string inc = ReadIncludeInText(text, ref index); index != -1; inc = ReadIncludeInText(text, ref index))

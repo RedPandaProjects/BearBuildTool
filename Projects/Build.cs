@@ -73,11 +73,11 @@ namespace BearBuildTool.Projects
             TProject.Add(name, t);
             MutexHasProject.ReleaseMutex();
         }
-        private bool IsCompleted(string name)
+        private bool IsCompleted(string name,bool bex=true)
         {
             MutexHasProject.WaitOne();
             bool result = TProject[name].IsCompleted;
-            if(TProject[name].IsFaulted)
+            if(TProject[name].IsFaulted&&bex)
             {
                 Exception ex =  TProject[name].Exception;
                 MutexHasProject.ReleaseMutex();
@@ -106,6 +106,10 @@ namespace BearBuildTool.Projects
                         StartBuildProject(Config.Global.ProjectsMap[vs[i]], vs[i], GetBuildType(vs[i]));
                     }
                 }
+            }
+            foreach (string name in IncludeAutonomousProjects)
+            {
+                while (!IsCompleted(name,false)) { }
             }
             foreach (string name in IncludeAutonomousProjects)
             {
@@ -146,7 +150,10 @@ namespace BearBuildTool.Projects
    
                     StartBuildProject(Config.Global.ProjectsMap[vs[i]], vs[i], GetBuildType(vs[i]));
                 }
-         
+                for (int i = vs.Count - 1; i >= 0; i--)
+                {
+                    while (!IsCompleted(vs[i], false)) { }
+                }
             }
             while (!IsCompleted(name)) { }
         }
@@ -288,7 +295,7 @@ namespace BearBuildTool.Projects
                 }
             
                 buildTools.BuildObjectsStart(name, LInclude, LDefines, PCH, PCHH, LIntermediate, buildType);
-            
+             
                 foreach (string source in project.Sources)
                 {
                     bool C = source.Substring(source.Length - 2, 2).ToLower() == ".c";

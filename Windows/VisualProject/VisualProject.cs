@@ -264,7 +264,7 @@ namespace BearBuildTool.Windows.VisualProject
         {
             Filters.Project filters = new Filters.Project();
             filters.Load(FileFilters);
-            var project = GenerateProjectFile.MapProjects[Name];
+            /*var project = GenerateProjectFile.MapProjects[Name];
             {
                 for (int i = 0; i < filters.itemGroup.ClCompilers.Count; i++)
                 {
@@ -299,7 +299,7 @@ namespace BearBuildTool.Windows.VisualProject
                     }
                 }
 
-            }
+            }*/
             filters.Save(FileFilters);
         }
         void BuildFilters()
