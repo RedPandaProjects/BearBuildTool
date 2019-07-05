@@ -143,7 +143,7 @@ namespace BearBuildTool
             else
             {
                 time = DateTime.Now.TimeOfDay-time;
-                Console.WriteLine(String.Format("Сборка завершина: количество {0} Врямя потраченно {1}", Config.Global.CountBuild,time.ToString()));
+                Console.WriteLine(String.Format("Сборка завершена: количество {0} Время потрачено {1}", Config.Global.CountBuild,time.ToString()));
             }
         }
         static void GenerateProjectFileVS(string name)
