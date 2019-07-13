@@ -70,7 +70,7 @@ namespace BearBuildTool.Projects
                 var project = Config.Global.ProjectsMap[name];
                 project.StartBuild();
                 info.ResourceFile = project.ResourceFile;
-                    foreach (string i in project.Include.Private)
+                foreach (string i in project.Include.Private)
                 {
                     if (source_code)
                     {
@@ -85,9 +85,10 @@ namespace BearBuildTool.Projects
                             if (!info.IncludeFile.ContainsKey(f)) info.IncludeFile.Add(f, true);
                         }
                     }
-                        info.Include.Private.AddRange(project.Include.Private);
-                        info.Defines.Private.AddRange(project.Defines.Private);
-                    }
+                
+                }
+                info.Include.Private.AddRange(project.Include.Private);
+                info.Defines.Private.AddRange(project.Defines.Private);
                 foreach (string i in project.Include.Public)
                 {
                     if (source_code)
@@ -103,10 +104,10 @@ namespace BearBuildTool.Projects
                             if (!info.IncludeFile.ContainsKey(f)) info.IncludeFile.Add(f, true);
                         }
                     }
-                    info.Include.Public.AddRange(project.Include.Public);
-                    info.Defines.Public.AddRange(project.Defines.Public);
+                    
                 }
-                
+                info.Include.Public.AddRange(project.Include.Public);
+                info.Defines.Public.AddRange(project.Defines.Public);
                 foreach (string i in project.Projects.Public)
                 {
                     RegisterProject(i,false);

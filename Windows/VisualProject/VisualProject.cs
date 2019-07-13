@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace BearBuildTool.Windows.VisualProject
 {
@@ -264,42 +262,20 @@ namespace BearBuildTool.Windows.VisualProject
         {
             Filters.Project filters = new Filters.Project();
             filters.Load(FileFilters);
-            /*var project = GenerateProjectFile.MapProjects[Name];
+            var project = GenerateProjectFile.MapProjects[Name];
             {
                 for (int i = 0; i < filters.itemGroup.ClCompilers.Count; i++)
                 {
-                    bool remove = false;
-                    foreach (var item in project.SourceFile)
-                    {
-                        if (filters.itemGroup.ClCompilers[i].Include.ToLower() == item.ToLower())
-                        {
-                            remove = true; break;
-                        }
-                    }
-                    if (remove == false)
-                    {
-                        filters.itemGroup.ClCompilers.RemoveAt(i);
-                        i = 0;
-                    }
+                    if (File.Exists(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileFilters), filters.itemGroup.ClCompilers[i].Include))))
+                        filters.itemGroup.ClCompilers[i].Include = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileFilters), filters.itemGroup.ClCompilers[i].Include));
                 }
                 for (int i = 0; i < filters.itemGroup.ClIncludes.Count; i++)
                 {
-                    bool remove = false;
-                    foreach (var item in project.IncludeFile)
-                    {
-                        if (filters.itemGroup.ClIncludes[i].Include.ToLower() == item.Key.ToLower())
-                        {
-                            remove = true; break;
-                        }
-                    }
-                    if (remove == false)
-                    {
-                        filters.itemGroup.ClIncludes.RemoveAt(i);
-                        i = 0;
-                    }
+                    if (File.Exists(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileFilters), filters.itemGroup.ClIncludes[i].Include))))
+                        filters.itemGroup.ClIncludes[i].Include = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileFilters), filters.itemGroup.ClIncludes[i].Include));
                 }
 
-            }*/
+            }
             filters.Save(FileFilters);
         }
         void BuildFilters()
