@@ -2,6 +2,7 @@
 using BearBuildTool.Tools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -104,6 +105,37 @@ namespace BearBuildTool.Config
                 return false;
             }
             return true;
+        }
+        public static string Windows10SDK = String.Empty;
+        public static bool Windows10SDKUsing = true;
+        private static int VersionConfig = 1;
+        public static void SaveConfig()
+        {
+            string name = Path.Combine(IntermediatePath, "config.bin");
+            try
+            {
+                BinaryWriter writer = new BinaryWriter(File.Open(name, FileMode.Create));
+                {
+                    writer.Write(VersionConfig);
+                    writer.Write(Windows10SDK);
+                    writer.Write(Windows10SDKUsing);
+                }
+            }
+            catch { }
+        }
+        public static void LoadConfig()
+        {
+            string name = Path.Combine(IntermediatePath, "config.bin");
+            try
+            {
+                BinaryReader reader = new BinaryReader(File.Open(name, FileMode.Open));
+                if (VersionConfig == reader.ReadInt32())
+                {
+                    Windows10SDK = reader.ReadString();
+                    Windows10SDKUsing = reader.ReadBoolean();
+                }
+            }
+            catch { }
         }
     }
 }

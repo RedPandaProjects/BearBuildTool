@@ -37,7 +37,7 @@ namespace BearBuildTool
         static void Initialize()
         {
             Config.Global.IntermediatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", Config.Global.IntermediatePath);
-
+            Config.Global.LoadConfig();
             if (!Directory.Exists(Config.Global.IntermediatePath))
             {
                 Directory.CreateDirectory(Config.Global.IntermediatePath);
@@ -59,7 +59,7 @@ namespace BearBuildTool
             Projects.ProjectsReader.Read();
             Projects.ExecutableReader.Read();
         }
-        static void CleanProject()
+        public static void CleanProject()
         {
             if (Config.Global.ExecutableMap.ContainsKey(Config.Global.Project) == false)
             {
@@ -85,7 +85,7 @@ namespace BearBuildTool
             }
             Console.WriteLine(String.Format("Чистка невозможно ,потому-что проект не найден!"));
         }
-        static void CompileProject()
+        public static void CompileProject()
         {
             if (Config.Global.ExecutableMap.ContainsKey(Config.Global.Project) == false)
             {
@@ -127,13 +127,20 @@ namespace BearBuildTool
             else
             {
                 Config.Global.BuildTools = new Windows.VCBuildTools();
+                if (Config.Global.Windows10SDKUsing)
+                {
+                    Console.WriteLine("Windows 10 SDK:{0}", VCBuildTools.GetWindows10SDKVersion(VCBuildTools.FindWindowsSDKInstallationFolder()));
+                }
             }
-        //    SourceFile file = new SourceFile();
-      /*      List<string> Linclude = new List<string>();
-            Linclude.AddRange( File.ReadAllLines(@"E:\list.txt"));
-            DateTime dateTime = DateTime.MinValue;
-            file.CheakSource(ref Linclude, @"E:\GameDev\BearSDK\intermediate\Win32\Debug\stalker\stalkercop_script", @"E:\GameDev\BearSDK\projects\engine\stalker\stalkercop\source_script\pch_script.cpp", ref dateTime);
-         */  Projects.Build build = new Projects.Build();
+
+           
+            //    SourceFile file = new SourceFile();
+            /*      List<string> Linclude = new List<string>();
+                  Linclude.AddRange( File.ReadAllLines(@"E:\list.txt"));
+                  DateTime dateTime = DateTime.MinValue;
+                  file.CheakSource(ref Linclude, @"E:\GameDev\BearSDK\intermediate\Win32\Debug\stalker\stalkercop_script", @"E:\GameDev\BearSDK\projects\engine\stalker\stalkercop\source_script\pch_script.cpp", ref dateTime);
+               */
+            Projects.Build build = new Projects.Build();
             build.ProjectBuild(Config.Global.Project);
             build.AutonomousProjectsBuild();
             if (Config.Global.CountBuild == 0)
@@ -146,13 +153,13 @@ namespace BearBuildTool
                 Console.WriteLine(String.Format("Сборка завершена: количество {0} Время потрачено {1}", Config.Global.CountBuild,time.ToString()));
             }
         }
-        static void GenerateProjectFileVS(string name)
+        public static void GenerateProjectFileVS(string name)
         {
             Console.WriteLine("Создание проектов трансляторов для VisaulStudio 2017");
             VSProjectGenerate projectFile = new VSProjectGenerate();
             projectFile.Generate(name);
         }
-        static void GenerateProjectFileVC(string name,string platform)
+        public static void GenerateProjectFileVC(string name,string platform)
         {
             if(platform.ToLower()=="linux")
             {
@@ -172,7 +179,7 @@ namespace BearBuildTool
             VCProjectGenerate projectFile = new VCProjectGenerate();
             projectFile.Generate(name);
         }
-        static void ClaenProject()
+        public static void ClaenProject()
         {
             Console.WriteLine(String.Format("Начало очистки проекта[{0}] конфигурация[{1}] платформа[{2}]", Config.Global.Project, Config.Global.Configure.ToString(), Config.Global.Platform.ToString()));
 
@@ -275,8 +282,12 @@ namespace BearBuildTool
             }
             return false;
         }
+        [STAThread]
         static void Main(string[] args)
         {
+            if (args.Length == 0) { RunMainForm(); Config.Global.SaveConfig(); return; }
+
+
             int i = 0;
             for (; i < args.Length; i++)
             {
@@ -300,6 +311,13 @@ namespace BearBuildTool
             {
                 CompileProject();
             }
+        }
+
+        private static void RunMainForm()
+        {
+            UI.MainForm mainForm = new UI.MainForm();
+            Initialize();
+            mainForm.ShowDialog();
         }
     }
 }

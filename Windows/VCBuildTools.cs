@@ -136,11 +136,11 @@ namespace BearBuildTool.Windows
 
             return string.Empty;
         }
-        private static string FindWindowsSDKInstallationFolder()
+        public static string FindWindowsSDKInstallationFolder()
         {
             string Version = "v8.1";
-
-            var Result =
+            if (Config.Global.Windows10SDKUsing) Version = "v10.0";
+             var Result =
                     Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null)
                 ?? Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null)
                 ?? Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null);
@@ -152,12 +152,162 @@ namespace BearBuildTool.Windows
 
             return (string)Result;
         }
+        public static string FindWindows10SDKInstallationFolder()
+        {
+            string  Version = "v10.0";
+            var Result =
+                   Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null)
+               ?? Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null)
+               ?? Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null);
+
+            if (Result == null)
+            {
+                throw new Exception(String.Format("Windows SDK {0} неустановлен.", Version));
+            }
+
+            return (string)Result;
+        }
+        private static string GetWindowsSDKInstallationLibFolder(string WindowsSDKDir)
+        {
+            if (Config.Global.Windows10SDKUsing)
+            {
+                return Windows10SDKVersion;
+            }
+            return "winv6.3";
+        }
+
+        private static string FindWindowsSDKExtensionFolder(string WindowsSDKDir)
+        {
+            if (Config.Global.Windows10SDKUsing)
+            {
+                string Version = "v10.0";
+                // Based on VCVarsQueryRegistry
+                string FinalResult = null;
+                {
+                    object Result = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows SDKs\" + Version, "InstallationFolder", null)
+                              ?? Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows SDKs\" + Version, "InstallationFolder", null);
+                    if (Result == null)
+                    {
+                        Result = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null)
+                              ?? Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\" + Version, "InstallationFolder", null);
+                    }
+                    if (Result != null)
+                    {
+                        FinalResult = ((string)Result).TrimEnd('\\');
+                    }
+
+                }
+                if (FinalResult == null)
+                {
+                    FinalResult = string.Empty;
+                }
+            }
+
+            return WindowsSDKDir;
+        }
+        public static string Windows10SDKVersion = null;
+        private static string GetWindowsSDKIncludePath(string WindowsSDKDir,string IncludePath)
+        {
+            if (Config.Global.Windows10SDKUsing)
+            {
+                DirectoryInfo IncludeDir = new DirectoryInfo(Path.Combine(WindowsSDKDir, "include", Windows10SDKVersion, IncludePath));
+                if (!IncludeDir.Exists)
+                {
+                    throw new Exception(String.Format("Папка [{0}] для Windows 10 SDK  не найдена", IncludeDir.FullName));
+                }
+
+
+                return Path.Combine(WindowsSDKDir, "include", Windows10SDKVersion, IncludePath);
+            }
+            return Path.Combine(WindowsSDKDir, "include", IncludePath);
+        }
+        public static IEnumerable<string> GetWindows10SDKs(string WindowsSDKDir)
+        {
+            DirectoryInfo IncludeDir = new DirectoryInfo(Path.Combine(WindowsSDKDir, "include"));
+            if (!IncludeDir.Exists)
+            {
+                throw new Exception(String.Format("Папка [{0}] для Windows 10 SDK  не найдена", IncludeDir.FullName));
+            }
+
+            var LatestIncludeDir = IncludeDir.EnumerateDirectories();
+            List<Version> Versions = new List<Version>();
+            foreach (var Dir in LatestIncludeDir)
+            {
+                Version version;
+                if (Version.TryParse(Dir.Name, out version))
+                {
+                    if (Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "ucrt")) &&
+                        Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "um")) &&
+                        Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "winrt")) &&
+                        Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "shared")))
+                        Versions.Add(version);
+                }
+
+            }
+            Versions.Sort();
+
+            if (Versions.Count == 0)
+            {
+                throw new Exception(String.Format("Windows 10 SDK  не найден", IncludeDir.FullName));
+            }
+
+            List<string> SVersions = new List<string>();
+            foreach (var ver in Versions)
+            {
+                SVersions.Add(ver.ToString());
+            }
+            return SVersions;
+        }
+        public static string GetWindows10SDKVersion(string WindowsSDKDir)
+        {
+            if (Config.Global.Windows10SDKUsing)
+            {
+                DirectoryInfo IncludeDir = new DirectoryInfo(Path.Combine(WindowsSDKDir, "include"));
+                if (!IncludeDir.Exists)
+                {
+                    throw new Exception(String.Format("Папка [{0}] для Windows 10 SDK  не найдена", IncludeDir.FullName));
+                }
+            
+                var LatestIncludeDir = IncludeDir.EnumerateDirectories();
+                List<Version> Versions = new List<Version>();
+                foreach (var Dir in LatestIncludeDir)
+                {
+                    Version version;
+                    if (Version.TryParse(Dir.Name, out version))
+                    {
+                        if (Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "ucrt")) &&
+                            Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "um")) &&
+                            Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "winrt")) &&
+                            Directory.Exists(Path.Combine(WindowsSDKDir, "include", Dir.Name, "shared")))
+                        {
+                            Versions.Add(version);
+                            if (version.ToString() == Config.Global.Windows10SDK)
+                            {
+                                Windows10SDKVersion = version.ToString();
+                                return Windows10SDKVersion;
+                            }
+                        }
+                    }
+                }
+                Versions.Sort();
+
+                if (Versions.Count==0)
+                {
+                    throw new Exception(String.Format("Папка [{0}] для Windows 10 SDK  не найдена", IncludeDir.FullName));
+                }
+
+                   Windows10SDKVersion  = Versions.Last().ToString();
+                return Windows10SDKVersion;
+            }
+            return String.Empty; ;
+        }
         public VCBuildTools()
         {
             string VCPath = GetVC2017Path();
             string UniversalCRTDir;
             string VerisonCRTDir;
             string WindowsSDKDir;
+            string WindowsSDKDirExtension;
             string VCPlatformPath = null;
             VCToolPath = null;
             {
@@ -210,8 +360,11 @@ namespace BearBuildTool.Windows
             CCompiler = Path.Combine(VCToolPath, "cl.exe");
             Linker = Path.Combine(VCToolPath, "link.exe");
             LibraryLinker = Path.Combine(VCToolPath, "lib.exe");
+
             WindowsSDKDir = FindWindowsSDKInstallationFolder();
+            WindowsSDKDirExtension = FindWindowsSDKExtensionFolder(WindowsSDKDir);
             FindUniversalCRT(out UniversalCRTDir, out VerisonCRTDir);
+            if (Config.Global.Windows10SDKUsing) GetWindows10SDKVersion(WindowsSDKDir);
 
             string Paths = Environment.GetEnvironmentVariable("PATH") ?? "";
             if (!Paths.Split(';').Any(x => String.Compare(x, VCToolPath, true) == 0))
@@ -247,9 +400,9 @@ namespace BearBuildTool.Windows
             {
                 includes.Add(Path.Combine(NetFxSDKExtensionDir, "include", "um")); // 2015
             }
-            includes.Add(Path.Combine(WindowsSDKDir, "include", "shared")); // 2015
-            includes.Add(Path.Combine(WindowsSDKDir, "include", "um")); // 2015
-            includes.Add(Path.Combine(WindowsSDKDir, "include", "winrt")); // 2015
+            includes.Add(GetWindowsSDKIncludePath(WindowsSDKDir, "shared")); // 2015
+            includes.Add(GetWindowsSDKIncludePath(WindowsSDKDir, "um")); // 2015
+            includes.Add(GetWindowsSDKIncludePath(WindowsSDKDir, "winrt")); // 2015
             string ExistingIncludePaths = Environment.GetEnvironmentVariable("INCLUDE");
             if (ExistingIncludePaths != null)
             {
@@ -301,11 +454,11 @@ namespace BearBuildTool.Windows
             }
             if (Config.Global.Platform == Config.Platform.Win32)
             {
-                LibraryPaths.Add(Path.Combine(WindowsSDKDir, "lib", "winv6.3", "um", "x86"));
+                LibraryPaths.Add(Path.Combine(WindowsSDKDir, "lib", GetWindowsSDKInstallationLibFolder(WindowsSDKDir), "um", "x86"));
             }
             else
             {
-                LibraryPaths.Add(Path.Combine(WindowsSDKDir, "lib", "winv6.3", "um", "x64"));
+                LibraryPaths.Add(Path.Combine(WindowsSDKDir, "lib", GetWindowsSDKInstallationLibFolder(WindowsSDKDir), "um", "x64"));
 
             }
             if (!String.IsNullOrEmpty(UniversalCRTDir) && !String.IsNullOrEmpty(VerisonCRTDir))
@@ -330,12 +483,12 @@ namespace BearBuildTool.Windows
 
             if (Config.Global.Platform == Config.Platform.Win64)
             {
-                ResourceBuilder =  Path.Combine(WindowsSDKDir, "bin","x64","rc.exe");
+                ResourceBuilder =  Path.Combine(WindowsSDKDirExtension, "bin","x64","rc.exe");
             }
           
             else
             {
-                ResourceBuilder = Path.Combine(WindowsSDKDir, "bin", "x86", "rc.exe");
+                ResourceBuilder = Path.Combine(WindowsSDKDirExtension, "bin", "x86", "rc.exe");
             }
 
         }

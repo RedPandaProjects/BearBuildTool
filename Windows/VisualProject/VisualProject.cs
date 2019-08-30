@@ -124,6 +124,31 @@ namespace BearBuildTool.Windows.VisualProject
 
             }
         }
+
+        internal static void SaveFilters(string name, string sub_name)
+        {
+            string CurrentFilters = String.Empty;
+            {
+                string LIntermediate = Path.Combine(Config.Global.IntermediatePath, "VCProjects");
+                if (!Directory.Exists(LIntermediate))
+                {
+                    Directory.CreateDirectory(LIntermediate);
+                }
+                string FullPath = Path.Combine(LIntermediate, name);
+                if (!Directory.Exists(FullPath))
+                {
+                    Directory.CreateDirectory(FullPath);
+                }
+                CurrentFilters = sub_name + ".vcxproj.filters";
+            }
+            string ProjectsFilters = String.Empty;
+            {
+                var projectFileInfo = Config.Global.ProjectsCSFile[sub_name];
+                string path = Path.GetDirectoryName(projectFileInfo);
+                ProjectsFilters = Path.Combine(path, sub_name + ".vcxproj.filters");
+            }
+        }
+
         private void AddFile()
         {
             {
@@ -242,6 +267,7 @@ namespace BearBuildTool.Windows.VisualProject
                 }
             user.Save(FileUser);
         }
+      
         void BuildNewFilters()
         {
             Filters.Project filters = new Filters.Project();
@@ -258,10 +284,10 @@ namespace BearBuildTool.Windows.VisualProject
             }
             filters.Save(FileFilters);
         }
-        private void ReBuildFilters()
+        private void ReBuildFilters(string outfile)
         {
             Filters.Project filters = new Filters.Project();
-            filters.Load(FileFilters);
+            filters.Load(outfile);
             var project = GenerateProjectFile.MapProjects[Name];
             {
                 for (int i = 0; i < filters.itemGroup.ClCompilers.Count; i++)
@@ -274,7 +300,6 @@ namespace BearBuildTool.Windows.VisualProject
                     if (File.Exists(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileFilters), filters.itemGroup.ClIncludes[i].Include))))
                         filters.itemGroup.ClIncludes[i].Include = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileFilters), filters.itemGroup.ClIncludes[i].Include));
                 }
-
             }
             filters.Save(FileFilters);
         }
@@ -286,20 +311,13 @@ namespace BearBuildTool.Windows.VisualProject
                 string path = Path.GetDirectoryName(project.PathFileInfo);
                 FiltersInProject = Path.Combine(path, Name + ".vcxproj.filters");
             }
-            if (File.Exists(FileFilters)&&(!File.Exists(FiltersInProject)||File.GetLastWriteTime(FiltersInProject) <= File.GetLastWriteTime(FileFilters)))
+            if (File.Exists(FileFilters)&&(!File.Exists(FiltersInProject)||File.GetLastWriteTime(FiltersInProject) > File.GetLastWriteTime(FileFilters)))
             {
-                ReBuildFilters();
+                ReBuildFilters(FiltersInProject);
             }
             else
-            {
-                if (File.Exists(FiltersInProject))
-                {
-                    CreateFilters(FiltersInProject, Name);
-                    if (File.Exists(FileFilters)) File.Delete(FileFilters);
-                    File.Copy(FiltersInProject, FileFilters,true);
-                }
-                else
-                    BuildNewFilters();
+            { 
+                BuildNewFilters();
             }
             
         }

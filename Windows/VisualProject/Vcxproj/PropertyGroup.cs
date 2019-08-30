@@ -25,10 +25,12 @@ namespace BearBuildTool.Windows.VisualProject.Vcxproj
                 ProjectGuid = Guid.NewGuid();
                 Keyword = "Win32Proj";
                 RootNamespace = String.Empty;
+                WindowsTargetPlatformVersion = VCBuildTools.GetWindows10SDKVersion(VCBuildTools.FindWindowsSDKInstallationFolder());
             }
             public Guid ProjectGuid;
             public string Keyword;
             public string RootNamespace;
+            public string WindowsTargetPlatformVersion;
         };
         public SGlobals Globals = new SGlobals();
         /*Makefile*/
@@ -130,6 +132,8 @@ namespace BearBuildTool.Windows.VisualProject.Vcxproj
                         AppendNode(ref xmlDocument, ref parent, "ProjectGuid", Globals.ProjectGuid.ToString("B"));
                         AppendNode(ref xmlDocument, ref parent, "Keyword", Globals.Keyword);
                         AppendNode(ref xmlDocument, ref parent, "RootNamespace", Globals.RootNamespace);
+                        if(String.IsNullOrEmpty(Globals.WindowsTargetPlatformVersion)!=true)
+                        AppendNode(ref xmlDocument, ref parent, "WindowsTargetPlatformVersion", Globals.WindowsTargetPlatformVersion);
                     }
                     break;
                 case ELabel.EL_Configuration:
