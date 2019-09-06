@@ -311,7 +311,7 @@ namespace BearBuildTool.Windows.VisualProject
                 string path = Path.GetDirectoryName(project.PathFileInfo);
                 FiltersInProject = Path.Combine(path, Name + ".vcxproj.filters");
             }
-            if (File.Exists(FileFilters)&&(!File.Exists(FiltersInProject)||File.GetLastWriteTime(FiltersInProject) > File.GetLastWriteTime(FileFilters)))
+            if (File.Exists(FileFilters)&& File.Exists(FiltersInProject) && (File.GetLastWriteTime(FiltersInProject) > File.GetLastWriteTime(FileFilters)))
             {
                 ReBuildFilters(FiltersInProject);
             }
