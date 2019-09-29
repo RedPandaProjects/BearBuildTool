@@ -140,6 +140,7 @@ namespace BearBuildTool.Windows.VisualProject
                     Directory.CreateDirectory(FullPath);
                 }
                 CurrentFilters = sub_name + ".vcxproj.filters";
+                CurrentFilters = Path.Combine(FullPath, CurrentFilters);
             }
             string ProjectsFilters = String.Empty;
             {
@@ -147,6 +148,11 @@ namespace BearBuildTool.Windows.VisualProject
                 string path = Path.GetDirectoryName(projectFileInfo);
                 ProjectsFilters = Path.Combine(path, sub_name + ".vcxproj.filters");
             }
+            try
+            {
+                File.Copy(CurrentFilters, ProjectsFilters);
+            }
+            catch { Console.WriteLine("Ошибка не удалось копировать {0} в {1}", CurrentFilters, ProjectsFilters); }
         }
 
         private void AddFile()

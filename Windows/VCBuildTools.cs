@@ -1055,7 +1055,7 @@ namespace BearBuildTool.Windows
         {
             if (!String.IsNullOrEmpty(e.Data))
             {
-                ConsoleOut +=  e.Data ;
+                ConsoleOut +=  e.Data +"\n";
             }
         }
     }
