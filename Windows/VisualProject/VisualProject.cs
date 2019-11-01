@@ -150,7 +150,7 @@ namespace BearBuildTool.Windows.VisualProject
             }
             try
             {
-                File.Copy(CurrentFilters, ProjectsFilters);
+                File.Copy(CurrentFilters, ProjectsFilters,true);
             }
             catch { Console.WriteLine("Ошибка не удалось копировать {0} в {1}", CurrentFilters, ProjectsFilters); }
         }
@@ -317,14 +317,12 @@ namespace BearBuildTool.Windows.VisualProject
                 string path = Path.GetDirectoryName(project.PathFileInfo);
                 FiltersInProject = Path.Combine(path, Name + ".vcxproj.filters");
             }
-            if (File.Exists(FileFilters)&& File.Exists(FiltersInProject) && (File.GetLastWriteTime(FiltersInProject) > File.GetLastWriteTime(FileFilters)))
+            if(File.Exists(FiltersInProject))
             {
                 ReBuildFilters(FiltersInProject);
+                return;
             }
-            else
-            { 
-                BuildNewFilters();
-            }
+            BuildNewFilters();
             
         }
         private static void GetFile(ref List<string> List, ref string Out)
