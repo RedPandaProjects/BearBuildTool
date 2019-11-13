@@ -147,12 +147,22 @@ namespace BearBuildTool.Windows.VisualProject
                 var projectFileInfo = Config.Global.ProjectsCSFile[sub_name];
                 string path = Path.GetDirectoryName(projectFileInfo);
                 ProjectsFilters = Path.Combine(path, sub_name + ".vcxproj.filters");
+
             }
             try
             {
-                File.Copy(CurrentFilters, ProjectsFilters,true);
+                File.Copy(CurrentFilters, ProjectsFilters, true);
             }
             catch { Console.WriteLine("Ошибка не удалось копировать {0} в {1}", CurrentFilters, ProjectsFilters); }
+            finally
+            {
+               /* GenerateProjectFile LocalGenerateProjectFile = new GenerateProjectFile();
+                LocalGenerateProjectFile.RegisterProject(name);
+                var project = LocalGenerateProjectFile.MapProjects[sub_name];
+                {
+                    project.
+                }*/
+            }
         }
 
         private void AddFile()
@@ -292,7 +302,8 @@ namespace BearBuildTool.Windows.VisualProject
         }
         private void ReBuildFilters(string outfile)
         {
-            Filters.Project filters = new Filters.Project();
+
+         /*   Filters.Project filters = new Filters.Project();
             filters.Load(outfile);
             var project = GenerateProjectFile.MapProjects[Name];
             {
@@ -307,7 +318,7 @@ namespace BearBuildTool.Windows.VisualProject
                         filters.itemGroup.ClIncludes[i].Include = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileFilters), filters.itemGroup.ClIncludes[i].Include));
                 }
             }
-            filters.Save(FileFilters);
+            filters.Save(FileFilters);*/
         }
         void BuildFilters()
         {
@@ -319,14 +330,59 @@ namespace BearBuildTool.Windows.VisualProject
             }
             if(File.Exists(FiltersInProject))
             {
-                ReBuildFilters(FiltersInProject);
+                CreateFilters(FiltersInProject, Name);
+                //ReBuildFilters(FiltersInProject);
                 return;
             }
             BuildNewFilters();
             
         }
+
+        private static int GetMaxPathEquals(string path1, string path2)
+        {
+            path1.Replace('/', '\\');
+            path2.Replace('/', '\\');
+
+            string[] paths1 = path1.Split('\\', '/');
+            string[] paths2 = path2.Split('\\', '/');
+
+
+            int PathCount = Math.Min(paths1.Length, paths2.Length);
+            int delta1 = paths1.Length - PathCount;
+            int delta2 = paths2.Length - PathCount;
+            int Result = 0;
+            for(int i= PathCount;i!=0;i--)
+            {
+                if(paths1[delta1 + i - 1] == paths2[delta2+i-1])
+                {
+                    Result++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return Result;
+           
+        }
         private static void GetFile(ref List<string> List, ref string Out)
         {
+            int max = 0;
+            if (List.Count > 1)
+            {
+                for (int x = 0; x < List.Count; x++)
+                {
+                    max = Math.Max(GetMaxPathEquals(List[x], Out), max);
+
+                }
+                for (int x = List.Count; x != 0; x--)
+                {
+                    if (GetMaxPathEquals(List[x - 1], Out) < max)
+                    {
+                        List.RemoveAt(x - 1);
+                    }
+                }
+            }
             switch (List.Count)
             {
                 case 0:
@@ -336,8 +392,11 @@ namespace BearBuildTool.Windows.VisualProject
                     Out = List[0];
                     break;
                 default:
+
+       
                     while (true)
                     {
+                     
                         Console.WriteLine("-------------------------------------------");
                         Console.WriteLine("Выберети файл для " + Out);
                         int d = 0;
