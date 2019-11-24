@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="BearBuildTool.cs" />
     <Compile Include="Config\Global.cs" />
+    <Compile Include="Windows\MinGWBuildTool.cs" />
     <Compile Include="Projects\Build.cs" />
     <Compile Include="Projects\Compiler.cs" />
     <Compile Include="Projects\Executable.cs" />

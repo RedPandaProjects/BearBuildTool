@@ -6,51 +6,39 @@ using System.Linq;
 using System.Text;
 using BearBuildTool.Projects;
 
-namespace BearBuildTool.Linux
+namespace BearBuildTool.Windows
 {
-    class LinuxBuildTools : Tools.BuildTools
+    class MinGWBuildTool : Tools.BuildTools
     {
         public override Tools.BuildTools Create()
         {
-            return new LinuxBuildTools();
+            return new MinGWBuildTool();
         }
         private string GCCPath = null;
         private string ArPath = null;
         private string RanlibPath = null;
-        private string Which(string name)
+        private string MinGWBinPath = null;
+        private string GetAPP(string name)
         {
-            Process proc = new Process();
-            proc.StartInfo.FileName = "/bin/sh";
-            proc.StartInfo.Arguments = String.Format("-c 'which {0}'", name);
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.CreateNoWindow = true;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.StartInfo.RedirectStandardError = true;
-
-            proc.Start();
-            proc.WaitForExit();
-
-            string path = proc.StandardOutput.ReadLine();
-
-            if (proc.ExitCode == 0 && String.IsNullOrEmpty(proc.StandardError.ReadToEnd()))
-            {
+            string path =  Path.Combine( Config.Global.MinGWPath, "bin",name+".exe");
+            if (File.Exists(path))
                 return path;
-            }
             return null;
         }
-        public LinuxBuildTools()
+        public MinGWBuildTool()
         {
-            GCCPath = Which("g++");
+            MinGWBinPath = Path.Combine(Config.Global.MinGWPath, "bin");
+            GCCPath = GetAPP("g++");
             if (GCCPath == null)
             {
                 throw new Exception("Неудалось найти g++");
             }
-            ArPath = Which("ar");
+            ArPath = GetAPP("ar");
             if (ArPath == null)
             {
                 throw new Exception("Неудалось найти ar");
             }
-            RanlibPath = Which("ranlib");
+            RanlibPath = GetAPP("ranlib");
             if (ArPath == null)
             {
                 throw new Exception("Неудалось найтzzzи ranlib");
@@ -124,18 +112,18 @@ namespace BearBuildTool.Linux
             if (createPCH)
             {
                 Arguments += "-x c++-header ";
-                Arguments += "-std=c++14 ";
+                Arguments += "-std=c++17 ";
                 Arguments += "-o \"" + pch + "\" ";
                 BuildObject( PN,LInclude, LDefines, null, null, false, source, obj, buildType);
             }
             else if (Path.GetExtension(source).ToLower() == ".cpp")
             {
                 Arguments += "-x c++ ";
-                Arguments += "-std=c++14 ";
+                Arguments += "-std=c++17 ";
                 Arguments += "-o \"" + obj + "\" ";
                 if (pch != null)
                 {
-                    Arguments += "-include  \"" + Path.Combine(Path.GetDirectoryName(pch), Path.GetFileNameWithoutExtension(pch)) + "\" ";
+                    Arguments += "-include  \"" + Path.Combine(Path.GetDirectoryName(pch), Path.GetFileNameWithoutExtension(pch)).Replace('\\', '/') + "\" ";
                 }
                 if (!Config.Global.WithoutWarning)
                 {
@@ -153,16 +141,16 @@ namespace BearBuildTool.Linux
             }
             foreach (string include in LInclude)
             {
-                Arguments += String.Format("-I\"{0}\" ", include);
+                Arguments += String.Format("-I\"{0}\" ", include.Replace('\\', '/'));
             }
-            Arguments += String.Format("\"{0}\"",source);
+            Arguments += String.Format("\"{0}\"",source.Replace('\\', '/'));
             //
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = GCCPath;
             process.StartInfo.Arguments = Arguments;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
-            process.StartInfo.WorkingDirectory = Path.GetFullPath(".");
+            process.StartInfo.WorkingDirectory = MinGWBinPath;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.Start();
@@ -203,15 +191,15 @@ namespace BearBuildTool.Linux
             // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
             foreach (string obj in objs)
             {
-                objlist.Add(string.Format("\"{0}\"", obj));
+                objlist.Add(string.Format("\"{0}\"", obj.Replace('\\', '/')));
             }
             foreach (string path in libsPath)
             {
-                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
-                Arguments += string.Format("-L\"{0}\" ", path);
+                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path.Replace('\\', '/'));
+                Arguments += string.Format("-L\"{0}\" ", path.Replace('\\', '/'));
             }
             File.WriteAllLines(outStaticLib + ".txt", objlist);
-            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
+            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib.Replace('\\', '/') + ".txt");
             foreach (string lib in libs)
             {
                 Arguments += string.Format(" -l\"{0}\" ", lib);
@@ -249,7 +237,7 @@ namespace BearBuildTool.Linux
 
             if (Config.Global.Configure!=Config.Configure.Release)
             {   
-              Arguments += "-rdynamic ";   
+          //    Arguments += "-rdynamic ";   
             }
             else
             {
@@ -262,16 +250,17 @@ namespace BearBuildTool.Linux
            // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
             foreach (string obj in objs)
             {
-                objlist.Add(string.Format("\"{0}\"", obj));
+                ;
+                objlist.Add(string.Format("\"{0}\"", obj.Replace('\\', '/')));
             }
              foreach(string path in libsPath)
             {
-                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path);
-                Arguments += string.Format("-L\"{0}\" ", path);
+                Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path.Replace('\\', '/'));
+                Arguments += string.Format("-L\"{0}\" ", path).Replace('\\', '/');
             }
            
             File.WriteAllLines(outStaticLib + ".txt", objlist);
-            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib + ".txt");
+            Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib.Replace('\\', '/') + ".txt");
 
             foreach (string lib in libs)
             {
@@ -283,7 +272,7 @@ namespace BearBuildTool.Linux
             process.StartInfo.Arguments = Arguments;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = false;
-            process.StartInfo.WorkingDirectory = Path.GetFullPath(".");
+            process.StartInfo.WorkingDirectory = MinGWBinPath;
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
             process.Start();
@@ -315,13 +304,13 @@ namespace BearBuildTool.Linux
             }
             foreach (string obj in objs)
             {
-                files.Add(String.Format("\"{0}\"", obj));
+                files.Add(String.Format("\"{0}\"", obj.Replace('\\', '/')));
             }
             File.WriteAllLines(outStaticLib + ".txt", files);
             {
 
                 string Arguments = " rc ";
-                Arguments += String.Format("-o \"{0}\" ", Path.Combine(Path.GetDirectoryName(outStaticLib), "lib" + Path.GetFileName(outStaticLib) + ".a"));
+                Arguments += String.Format("-o \"{0}\" ", Path.Combine(Path.GetDirectoryName(outStaticLib), "lib" + Path.GetFileName(outStaticLib) + ".a").Replace('\\','/'));
                 Arguments += String.Format("@\"{0}\"", outStaticLib + ".txt");
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 process.StartInfo.FileName = ArPath;
@@ -351,7 +340,7 @@ namespace BearBuildTool.Linux
             {
 
                 string Arguments = " ";
-                Arguments += String.Format("\"{0}\" ", Path.Combine(Path.GetDirectoryName(outStaticLib), "lib" + Path.GetFileName(outStaticLib) + ".a"));
+                Arguments += String.Format("\"{0}\" ", Path.Combine(Path.GetDirectoryName(outStaticLib), "lib" + Path.GetFileName(outStaticLib) + ".a")).Replace('\\', '/');
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 process.StartInfo.FileName = RanlibPath;
                 process.StartInfo.Arguments = Arguments;
@@ -382,22 +371,28 @@ namespace BearBuildTool.Linux
         {
             if(buildType==BuildType.Executable|| buildType == BuildType.ConsoleExecutable)
             {
-                libs.Add("pthread");
-                libs.Add("dl");
+                /*l0ibs.Add("pthread");
+                libs.Add("dl");*/
             }
         }
         public override void SetDefines(List<string> LDefines, string OutFile, BuildType buildType)
         {
             base.SetDefines(LDefines, OutFile, buildType);
+            LDefines.Add("GCC");
             switch (buildType)
             {
                 case BuildType.ConsoleExecutable:
+                    LDefines.Add("_CONSOLE");
                     break;
                 case BuildType.Executable:
+                    LDefines.Add("_WINDOWS");
                     break;
                 case BuildType.StaticLibrary:
+                    LDefines.Add("_LIB");
                     break;
                 case BuildType.DynamicLibrary:
+                    LDefines.Add("_USRDLL");
+                    LDefines.Add("_WINDOWS");
                     break;
             }
             switch (Config.Global.Configure)
@@ -416,16 +411,15 @@ namespace BearBuildTool.Linux
             }
             switch (Config.Global.Platform)
             {
-                case Config.Platform.Linux:
-                    LDefines.Add("LINUX");
-                    LDefines.Add("_LINUX64");
-                    LDefines.Add("X64");
-                    LDefines.Add("UNIX");
+                case Config.Platform.MinGW32:
+                    LDefines.Add("WINDOWS");
+                    LDefines.Add("WIN32");
+                    LDefines.Add("X32");
                     break;
-            }
-            if (!Config.Global.UNICODE)
-            {
-                LDefines.Add("UTF_8");
+                case Config.Platform.MinGW64:
+                    LDefines.Add("WINDOWS");
+                    LDefines.Add("X64");
+                    break;
             }
         }
     }

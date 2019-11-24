@@ -990,6 +990,7 @@ namespace BearBuildTool.Windows
         }
         public override void SetDefines(List<string> LDefines,string OutFile, BuildType buildType)
         {
+            LDefines.Add("MSVC");
             base.SetDefines(LDefines, OutFile, buildType);
             switch (buildType)
             {

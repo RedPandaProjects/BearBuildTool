@@ -18,11 +18,38 @@ namespace BearBuildTool.Windows.VisualProject
         Filters.Project XmlFilers = new Filters.Project();
         User.Project XmlUser = new User.Project();
         Vcxproj.Project XmlVcxproj = new Vcxproj.Project();
-
+        private static void GetRealPlatformAndConfiguration(ref string p,ref string c)
+        {
+            if (c == "Debug_MinGW")
+            {
+                c = "Debug";
+                if (p == "Win32")
+                    p = "MinGW32";
+                else if (p == "Win64")
+                    p = "MinGW64";
+            }
+            else if (c == "Mixed_MinGW")
+            {
+                c = "Mixed";
+                if (p == "Win32")
+                    p = "MinGW32";
+                else if (p == "Win64")
+                    p = "MinGW64";
+            }
+            else if (c == "Release_MinGW")
+            {
+                c = "WIN64";
+                if (p == "Win32")
+                    p = "MinGW32";
+                else if (p == "Win64")
+                    p = "MinGW64";
+            }
+        }
+        //this is fixed
         string[] Platfroms = { "Win32", "Win64" };
         string[] PlatfromsDefines = { "WIN32;X32;", "WIN64;X64;" };
-        string[] Configurations = { "Debug", "Mixed", "Release" };
-        string[] ConfigurationsDefines = { "DEBUG;_DEBUG;", "MIXED;DEBUG;", "NDEBUG;" };
+        string[] Configurations = { "Debug", "Mixed", "Release", "Debug_MinGW", "Mixed_MinGW", "Release_MinGW" };
+        string[] ConfigurationsDefines = { "DEBUG;_DEBUG;MSVC;", "MIXED;DEBUG;MSVC;", "NDEBUG;MSVC;", "DEBUG;_DEBUG;GCC;", "MIXED;DEBUG;GCC;", "NDEBUG;GCC;" };
         public VisualProject(string name, string generalName)
         {
             GenerateProjectFile.RegisterProject(name);
@@ -241,7 +268,7 @@ namespace BearBuildTool.Windows.VisualProject
                         propertyGroup.Default.Platform = "x64";
                     else
                         propertyGroup.Default.Platform = p;
-
+                    GetRealPlatformAndConfiguration(ref p,ref c);
                     propertyGroup.Default.OutDir = String.Format("..\\..\\..\\binaries\\{0}\\", p);
                     propertyGroup.Default.IntDir = "..\\..\\..\\binaries\\net\\";
                     propertyGroup.Default.NMakePreprocessorDefinitions = defines;
@@ -278,7 +305,9 @@ namespace BearBuildTool.Windows.VisualProject
                     else
                         propertyGroup.Platform = p;
                     propertyGroup.Configuration = c;
-                    propertyGroup.LocalDebuggerWorkingDirectory = String.Format("..\\..\\..\\binaries\\{0}", p);
+                    string _p = p, _c = c;
+                    GetRealPlatformAndConfiguration(ref _p, ref _c);
+                    propertyGroup.LocalDebuggerWorkingDirectory = String.Format("..\\..\\..\\binaries\\{0}", _p);
                     user.propertyGroups.Add(propertyGroup);
                 }
             user.Save(FileUser);

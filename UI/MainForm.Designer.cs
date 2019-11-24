@@ -34,23 +34,21 @@
             this.listBoxProject = new System.Windows.Forms.ListBox();
             this.comboBoxConfigure = new System.Windows.Forms.ComboBox();
             this.comboBoxPlatform = new System.Windows.Forms.ComboBox();
-            this.comboBoxCompiller = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.comboBoxTranslator = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.buttonGenerateProject = new System.Windows.Forms.Button();
             this.menuStrip = new System.Windows.Forms.MenuStrip();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.VSProjectManagerStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compilerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mSVCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonBuild = new System.Windows.Forms.Button();
             this.buttonRebuild = new System.Windows.Forms.Button();
             this.buttonClean = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.compilerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mSVCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.VSProjectManagerStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -82,13 +80,11 @@
             // 
             groupBox2.Controls.Add(this.comboBoxConfigure);
             groupBox2.Controls.Add(this.comboBoxPlatform);
-            groupBox2.Controls.Add(this.comboBoxCompiller);
             groupBox2.Controls.Add(this.label3);
             groupBox2.Controls.Add(this.label2);
-            groupBox2.Controls.Add(this.label1);
             groupBox2.Location = new System.Drawing.Point(211, 27);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(205, 96);
+            groupBox2.Size = new System.Drawing.Size(205, 79);
             groupBox2.TabIndex = 3;
             groupBox2.TabStop = false;
             groupBox2.Text = "Кофигурации";
@@ -101,7 +97,7 @@
             "Debug",
             "Mixed",
             "Release"});
-            this.comboBoxConfigure.Location = new System.Drawing.Point(86, 66);
+            this.comboBoxConfigure.Location = new System.Drawing.Point(86, 46);
             this.comboBoxConfigure.Name = "comboBoxConfigure";
             this.comboBoxConfigure.Size = new System.Drawing.Size(113, 21);
             this.comboBoxConfigure.TabIndex = 2;
@@ -113,26 +109,16 @@
             this.comboBoxPlatform.Items.AddRange(new object[] {
             "Win32",
             "Win64"});
-            this.comboBoxPlatform.Location = new System.Drawing.Point(74, 43);
+            this.comboBoxPlatform.Location = new System.Drawing.Point(74, 19);
             this.comboBoxPlatform.Name = "comboBoxPlatform";
             this.comboBoxPlatform.Size = new System.Drawing.Size(125, 21);
             this.comboBoxPlatform.TabIndex = 1;
-            // 
-            // comboBoxCompiller
-            // 
-            this.comboBoxCompiller.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxCompiller.FormattingEnabled = true;
-            this.comboBoxCompiller.Items.AddRange(new object[] {
-            "Microsoft C/C++ Compiler"});
-            this.comboBoxCompiller.Location = new System.Drawing.Point(78, 19);
-            this.comboBoxCompiller.Name = "comboBoxCompiller";
-            this.comboBoxCompiller.Size = new System.Drawing.Size(121, 21);
-            this.comboBoxCompiller.TabIndex = 0;
+            this.comboBoxPlatform.SelectedIndexChanged += new System.EventHandler(this.comboBoxPlatform_SelectedIndexChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 69);
+            this.label3.Location = new System.Drawing.Point(4, 50);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(83, 13);
             this.label3.TabIndex = 5;
@@ -141,27 +127,19 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 46);
+            this.label2.Location = new System.Drawing.Point(4, 22);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(69, 13);
             this.label2.TabIndex = 4;
             this.label2.Text = "Платформа:";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 22);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(72, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Компилятор:";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // groupBox3
             // 
             groupBox3.Controls.Add(this.comboBoxTranslator);
             groupBox3.Controls.Add(this.label4);
             groupBox3.Controls.Add(this.buttonGenerateProject);
-            groupBox3.Location = new System.Drawing.Point(211, 187);
+            groupBox3.Location = new System.Drawing.Point(212, 170);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new System.Drawing.Size(205, 73);
             groupBox3.TabIndex = 9;
@@ -218,35 +196,12 @@
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(95, 20);
             this.toolsToolStripMenuItem.Text = "Инструменты";
             // 
-            // buttonBuild
+            // VSProjectManagerStripMenuItem
             // 
-            this.buttonBuild.Location = new System.Drawing.Point(210, 129);
-            this.buttonBuild.Name = "buttonBuild";
-            this.buttonBuild.Size = new System.Drawing.Size(125, 23);
-            this.buttonBuild.TabIndex = 6;
-            this.buttonBuild.Text = "Собрать";
-            this.buttonBuild.UseVisualStyleBackColor = true;
-            this.buttonBuild.Click += new System.EventHandler(this.buttonBuild_Click);
-            // 
-            // buttonRebuild
-            // 
-            this.buttonRebuild.Location = new System.Drawing.Point(211, 158);
-            this.buttonRebuild.Name = "buttonRebuild";
-            this.buttonRebuild.Size = new System.Drawing.Size(205, 23);
-            this.buttonRebuild.TabIndex = 4;
-            this.buttonRebuild.Text = "Пересобрать";
-            this.buttonRebuild.UseVisualStyleBackColor = true;
-            this.buttonRebuild.Click += new System.EventHandler(this.buttonRebuild_Click);
-            // 
-            // buttonClean
-            // 
-            this.buttonClean.Location = new System.Drawing.Point(340, 129);
-            this.buttonClean.Name = "buttonClean";
-            this.buttonClean.Size = new System.Drawing.Size(76, 23);
-            this.buttonClean.TabIndex = 7;
-            this.buttonClean.Text = "Очистить";
-            this.buttonClean.UseVisualStyleBackColor = true;
-            this.buttonClean.Click += new System.EventHandler(this.buttonClean_Click);
+            this.VSProjectManagerStripMenuItem.Name = "VSProjectManagerStripMenuItem";
+            this.VSProjectManagerStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.VSProjectManagerStripMenuItem.Text = "Менаджер проектов VS";
+            this.VSProjectManagerStripMenuItem.Click += new System.EventHandler(this.VSProjectManagerStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
@@ -261,22 +216,45 @@
             this.compilerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mSVCToolStripMenuItem});
             this.compilerToolStripMenuItem.Name = "compilerToolStripMenuItem";
-            this.compilerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.compilerToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.compilerToolStripMenuItem.Text = "Компилятор";
             // 
             // mSVCToolStripMenuItem
             // 
             this.mSVCToolStripMenuItem.Name = "mSVCToolStripMenuItem";
-            this.mSVCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.mSVCToolStripMenuItem.Size = new System.Drawing.Size(106, 22);
             this.mSVCToolStripMenuItem.Text = "MSVC";
             this.mSVCToolStripMenuItem.Click += new System.EventHandler(this.mSVCToolStripMenuItem_Click);
             // 
-            // VSProjectManagerStripMenuItem
+            // buttonBuild
             // 
-            this.VSProjectManagerStripMenuItem.Name = "VSProjectManagerStripMenuItem";
-            this.VSProjectManagerStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.VSProjectManagerStripMenuItem.Text = "Менаджер проектов VS";
-            this.VSProjectManagerStripMenuItem.Click += new System.EventHandler(this.VSProjectManagerStripMenuItem_Click);
+            this.buttonBuild.Location = new System.Drawing.Point(211, 112);
+            this.buttonBuild.Name = "buttonBuild";
+            this.buttonBuild.Size = new System.Drawing.Size(125, 23);
+            this.buttonBuild.TabIndex = 6;
+            this.buttonBuild.Text = "Собрать";
+            this.buttonBuild.UseVisualStyleBackColor = true;
+            this.buttonBuild.Click += new System.EventHandler(this.buttonBuild_Click);
+            // 
+            // buttonRebuild
+            // 
+            this.buttonRebuild.Location = new System.Drawing.Point(212, 141);
+            this.buttonRebuild.Name = "buttonRebuild";
+            this.buttonRebuild.Size = new System.Drawing.Size(205, 23);
+            this.buttonRebuild.TabIndex = 4;
+            this.buttonRebuild.Text = "Пересобрать";
+            this.buttonRebuild.UseVisualStyleBackColor = true;
+            this.buttonRebuild.Click += new System.EventHandler(this.buttonRebuild_Click);
+            // 
+            // buttonClean
+            // 
+            this.buttonClean.Location = new System.Drawing.Point(341, 112);
+            this.buttonClean.Name = "buttonClean";
+            this.buttonClean.Size = new System.Drawing.Size(76, 23);
+            this.buttonClean.TabIndex = 7;
+            this.buttonClean.Text = "Очистить";
+            this.buttonClean.UseVisualStyleBackColor = true;
+            this.buttonClean.Click += new System.EventHandler(this.buttonClean_Click);
             // 
             // MainForm
             // 
@@ -312,12 +290,10 @@
 
         private System.Windows.Forms.ListBox listBoxProject;
         private System.Windows.Forms.MenuStrip menuStrip;
-        private System.Windows.Forms.ComboBox comboBoxCompiller;
         private System.Windows.Forms.ComboBox comboBoxPlatform;
         private System.Windows.Forms.ComboBox comboBoxConfigure;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonBuild;
         private System.Windows.Forms.Button buttonRebuild;
         private System.Windows.Forms.Button buttonClean;

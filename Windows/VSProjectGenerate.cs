@@ -31,10 +31,10 @@ namespace BearBuildTool.Windows
             {
                 VisualProject.VisualProject visualProject = new VisualProject.VisualProject(i,name);
                 visualProject.Build();
-
-               /* VSProjectFile projectFile = new VSProjectFile(i,name);
-                projectFile.Write();
-                Guids.Add(projectFile.Guid);*/
+                Guids.Add(visualProject.Guid);
+                /* VSProjectFile projectFile = new VSProjectFile(i,name);
+                 projectFile.Write();
+               */
                 SlnLineList.Add(String.Format("Project(\"{0}\")=\"{1}\",\"{2}\",\"{3}\"", SlnGUID, i, visualProject.FileVcxproj, visualProject.Guid.ToString("B")));
                 SlnLineList.Add("EndProject");
             }
@@ -47,6 +47,12 @@ namespace BearBuildTool.Windows
             SlnLineList.Add("\t\tMixed|x86 = Mixed|x86");
             SlnLineList.Add("\t\tRelease|x64 = Release|x64");
             SlnLineList.Add("\t\tRelease|x86 = Release|x86");
+            SlnLineList.Add("\t\tDebug|MinGW64 = Debug|MinGW64");
+            SlnLineList.Add("\t\tDebug|MinGW32 = Debug|MinGW32");
+            SlnLineList.Add("\t\tMixed|MinGW64 = Mixed|MinGW64");
+            SlnLineList.Add("\t\tMixed|MinGW32 = Mixed|MinGW32");
+            SlnLineList.Add("\t\tRelease|MinGW64 = Release|MinGW64");
+            SlnLineList.Add("\t\tRelease|MinGW32 = Release|MinGW32");
             SlnLineList.Add("\tEndGlobalSection");
             SlnLineList.Add("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution");
             foreach (Guid i in Guids)
@@ -63,6 +69,19 @@ namespace BearBuildTool.Windows
                 SlnLineList.Add(String.Format("\t\t{0}.Release|x64.Build.0 = Release|x64", i.ToString("B")));
                 SlnLineList.Add(String.Format("\t\t{0}.Release|x86.ActiveCfg = Release|Win32", i.ToString("B")));
                 SlnLineList.Add(String.Format("\t\t{0}.Release|x86.Build.0 = Release|Win32", i.ToString("B")));
+
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.ActiveCfg = Debug_MinGW|x64", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.Build.0 = Debug_MinGW|x64", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.ActiveCfg = Debug_MinGW|Win32", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.Build.0 = Debug_MinGW|Win32", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.ActiveCfg = Mixed_MinGW|x64", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.Build.0 = Mixed_MinGW|x64", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.ActiveCfg = Mixed_MinGW|Win32", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.Build.0 = Mixed_MinGW|Win32", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.ActiveCfg = Release_MinGW|x64", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.Build.0 = Release_MinGW|x64", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.ActiveCfg = Release_MinGW|Win32", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.Build.0 = Release_MinGW|Win32", i.ToString("B")));
             }
             SlnLineList.Add("\tEndGlobalSection");
             SlnLineList.Add("EndGlobal");

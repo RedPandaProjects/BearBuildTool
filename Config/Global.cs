@@ -18,6 +18,8 @@ namespace BearBuildTool.Config
     {
         Win32,
         Win64,
+        MinGW32,
+        MinGW64,
         Linux,
     }
     public class Global
@@ -44,15 +46,34 @@ namespace BearBuildTool.Config
         public static bool WithoutWarning = false;
         public static bool UNICODE = true;
 
-        public static int CountThreads = 8;
+        public static int CountThreads = 1;
 
-        public static bool Clean { get; internal set; }
-        public static bool Rebuild { get; internal set; }
+        public static bool Clean = false;
+        public static bool Rebuild = false;
+        public static string MinGWPath = "C:/MinGW";
 
         public static bool SetPlatform(string str)
         {
             str=str.ToLower();
-            if(str  ==    "win32")
+            if ( str == "mingw32")
+            {
+                ObjectExtension = ".o";
+                ExecutableExtension = ".exe";
+                StaticLibraryExtension = ".a";
+                DynamicLibraryExtension = ".dll";
+                PCHExtension = ".gch";
+                Platform = Platform.MinGW32 ;
+            }
+            else if (str == "mingw64")
+            {
+                ObjectExtension = ".o";
+                ExecutableExtension = ".exe";
+                StaticLibraryExtension = ".a";
+                DynamicLibraryExtension = ".dll";
+                PCHExtension = ".gch";
+                Platform = Platform.MinGW64 ;
+            }
+            else if(str  ==    "win32")
             {
                 ObjectExtension = ".obj";
                 ExecutableExtension = ".exe";
@@ -109,6 +130,7 @@ namespace BearBuildTool.Config
         public static string Windows10SDK = String.Empty;
         public static bool Windows10SDKUsing = true;
         private static int VersionConfig = 1;
+        public static bool IsWindows=true;
         public static void SaveConfig()
         {
             string name = Path.Combine(IntermediatePath, "config.bin");
