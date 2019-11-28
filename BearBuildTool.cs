@@ -161,6 +161,19 @@ namespace BearBuildTool
                 Console.WriteLine(String.Format("Сборка завершена: количество {0} Время потрачено {1}", Config.Global.CountBuild,time.ToString()));
             }
         }
+
+        internal static void GenerateProjectFileVC(string name)
+        {
+            Console.WriteLine("Создание проектов трансляторов для VisaulCode");
+            VCProjectGenerate projectFile = new VCProjectGenerate();
+            Config.Global.BinariesPlatformPath = Path.Combine(Config.Global.BinariesPath, Config.Global.Platform.ToString());
+            if (!Directory.Exists(Config.Global.BinariesPlatformPath))
+            {
+                Directory.CreateDirectory(Config.Global.BinariesPlatformPath);
+            }
+            projectFile.Generate(name);
+        }
+
         public static void GenerateProjectFileVS(string name)
         {
             Console.WriteLine("Создание проектов трансляторов для VisaulStudio 2017");

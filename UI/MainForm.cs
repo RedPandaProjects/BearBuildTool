@@ -147,6 +147,7 @@ namespace BearBuildTool.UI
                             BearBuildTool.GenerateProjectFileVS(name);
                             break;
                         case 1:
+                            BearBuildTool.GenerateProjectFileVC(name);
                             break;
                     }
                 }

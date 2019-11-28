@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using BearBuildTool.Projects;
+using Newtonsoft.Json;
 
 namespace BearBuildTool.VisualCode
 {
@@ -10,7 +11,7 @@ namespace BearBuildTool.VisualCode
         bool General = false;
         string Name;
         string ProjectDirectory;
-        string VCDirectory;
+        public string VCDirectory;
         GenerateProjectFile GenerateProject;
         public VCProjectFile(string name, string general_name)
         {
@@ -128,39 +129,58 @@ namespace BearBuildTool.VisualCode
             projectFile.Add("\t\t");
             projectFile.Add("\t\t}");
         }
+        void GenerateCPPConfigureMinGW(ref VCCppProperties vcCppProperties,string NameConfigurate, string Name, string[] Defines)
+        {
+            var project = GenerateProject.MapProjects[Name];
+            VCCppProperties.Configurate configurate = new VCCppProperties.Configurate();
+            List<string> list = project.Include.ToList();
+            for(int i=0;i<list.Count;i++)
+            {
+                list[i] = list[i].Replace('\\', '/');
+            }
+            configurate.includePath = list;
+
+            List<string> defines = project.Defines.ToList();
+            defines.AddRange(Defines);
+            configurate.defines = defines;
+            configurate.compilerPath = Path.Combine(Config.Global.MinGWPath, "bin", "g++.exe").Replace('\\','/');
+            configurate.name = NameConfigurate;
+            vcCppProperties.configurations.Add(configurate);
+        }
         public void Write()
         {
+            
+            string[] Platfroms = { "32", "64" };
+            string[] Configurations = { "Debug_MinGW", "Mixed_MinGW", "Release_MinGW" };
+            if (Config.Global.IsWindows)
             {
-                List<string> projectFile = new List<string>();
-                projectFile.Add("{");
-                projectFile.Add("\t\"folders\": [");
-                projectFile.Add("\t\t{");
-                projectFile.Add(String.Format("\t\t\t\"path\": \"{0}\"", GenerateProject.MapProjects[Name].ProjectPath));
-                projectFile.Add("\t\t}");
-                projectFile.Add("\t],");
-                projectFile.Add("\t\"settings\": {");
-                projectFile.Add("\t\t\"files.associations\": {");
-                projectFile.Add("\t\t\t\"iostream\": \"cpp\"");
-                projectFile.Add("\t\t}");
-                projectFile.Add("\t}");
-                projectFile.Add("}");
-                File.WriteAllLines(Path.Combine(ProjectDirectory, Name + ".code-workspace"), projectFile);
-            }
-            if(Config.Global.Platform==Config.Platform.Linux)
-            {
+                List<string> GlobalDefines = new List<string>();
+
+                GlobalDefines.AddRange(new string[] { "WINDOWS", "LIB", "_LIB" });
+                if (Config.Global.UNICODE)
                 {
-                    List<string> projectFile = new List<string>();
-                    projectFile.Add("{");
-                    projectFile.Add("\t\"configurations\": [");
-                    GenerateCPPInfoLinux("Linux-Debug", ref projectFile, new string[] { "LINUX", "_LINUX64", "X64", "DEBUG", "_DEBUG" });
-                    projectFile[projectFile.Count - 1] += ",";
-                    GenerateCPPInfoLinux("Linux-Mixed", ref projectFile, new string[] { "LINUX", "_LINUX64", "X64", "DEBUG", "MIXED" });
-                    projectFile[projectFile.Count - 1] += ",";
-                    GenerateCPPInfoLinux("Linux-Release", ref projectFile, new string[] { "LINUX", "_LINUX64", "X64", "NDEBUG" });
-                    projectFile.Add("\t],");
-                    projectFile.Add("\t\"version\": 4");
-                    projectFile.Add("}");
-                    File.WriteAllLines(Path.Combine(VCDirectory, "c_cpp_properties.json"), projectFile);
+                    GlobalDefines.Add("_UNICODE;");
+                    GlobalDefines.Add("UNICODE");
+                }
+
+
+                VCCppProperties vcCppProperties = new VCCppProperties();
+
+                string[][] PlatfromsDefines = { new string[] { "WIN32","X32" }, new string[] { "WIN64", "X64" } };
+                string[][] ConfigurationsDefines = { new string[] { "DEBUG", "_DEBUG", "GCC" } , new string[] { "MIXED", "DEBUG", "GCC" }, new string[] { "NDEBUG", "GCC" } };
+                {
+                    for (int i = 0; i < Platfroms.Length; i++)
+                        for (int a = 0; a < Configurations.Length; a++)
+                        {
+
+                            List<string> LocalDefines = new List<string>();
+                            LocalDefines.AddRange(GlobalDefines);
+                            LocalDefines.AddRange(PlatfromsDefines[i]);
+                            LocalDefines.AddRange(ConfigurationsDefines[a]);
+                            GenerateCPPConfigureMinGW(ref vcCppProperties, Configurations[a] + Platfroms[i], Name, LocalDefines.ToArray());
+
+                        }
+                    File.WriteAllText(Path.Combine(VCDirectory, "c_cpp_properties.json"), JsonConvert.SerializeObject(vcCppProperties, Formatting.Indented));
                 }
                 if(General)
                 {
@@ -199,7 +219,52 @@ namespace BearBuildTool.VisualCode
 
             else
             {
-                
+                {
+                    List<string> projectFile = new List<string>();
+                    projectFile.Add("{");
+                    projectFile.Add("\t\"configurations\": [");
+                    GenerateCPPInfoLinux("Linux-Debug", ref projectFile, new string[] { "LINUX", "_LINUX64", "X64", "DEBUG", "_DEBUG" });
+                    projectFile[projectFile.Count - 1] += ",";
+                    GenerateCPPInfoLinux("Linux-Mixed", ref projectFile, new string[] { "LINUX", "_LINUX64", "X64", "DEBUG", "MIXED" });
+                    projectFile[projectFile.Count - 1] += ",";
+                    GenerateCPPInfoLinux("Linux-Release", ref projectFile, new string[] { "LINUX", "_LINUX64", "X64", "NDEBUG" });
+                    projectFile.Add("\t],");
+                    projectFile.Add("\t\"version\": 4");
+                    projectFile.Add("}");
+                    File.WriteAllLines(Path.Combine(VCDirectory, "c_cpp_properties.json"), projectFile);
+                }
+                if (General)
+                {
+                    {
+                        List<string> projectFile = new List<string>();
+                        projectFile.Add("{");
+                        projectFile.Add("\t\"version\": \"2.0.0\",");
+                        projectFile.Add("\t\"tasks\": [");
+                        GenerateTaskLinux(ref projectFile, "build debug", Name, "Debug", "Linux");
+                        projectFile[projectFile.Count - 1] += ",";
+                        GenerateTaskLinux(ref projectFile, "build mixed", Name, "Mixed", "Linux");
+                        projectFile[projectFile.Count - 1] += ",";
+                        GenerateTaskLinux(ref projectFile, "build release", Name, "Release", "Linux");
+                        projectFile.Add("\t]");
+                        projectFile.Add("}");
+                        File.WriteAllLines(Path.Combine(VCDirectory, "tasks.json"), projectFile);
+                    }
+                    {
+                        List<string> projectFile = new List<string>();
+                        projectFile.Add("{");
+                        projectFile.Add("\t\"version\": \"0.2.0\",");
+                        projectFile.Add("\t\"configurations\": [");
+                        GenerateLaunchLinux(ref projectFile, "Debug", "debug");
+                        projectFile[projectFile.Count - 1] += ",";
+                        GenerateLaunchLinux(ref projectFile, "Mixed", "mixed");
+                        projectFile[projectFile.Count - 1] += ",";
+                        GenerateLaunchLinux(ref projectFile, "Release", "");
+                        projectFile.Add("\t]");
+                        projectFile.Add("}");
+                        File.WriteAllLines(Path.Combine(VCDirectory, "launch.json"), projectFile);
+                    }
+
+                }
             }
         }
     }

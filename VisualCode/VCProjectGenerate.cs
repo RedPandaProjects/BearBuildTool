@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -13,8 +14,9 @@ namespace BearBuildTool.VisualCode
         {
          
             List<string> projects = new List<string>();
+            Projects.GenerateProjectFile generateProjectFile = new Projects.GenerateProjectFile();
             {
-                Projects.GenerateProjectFile generateProjectFile = new Projects.GenerateProjectFile();
+    
                 generateProjectFile.GetProjects(name, ref projects);
 
             }
@@ -29,11 +31,20 @@ namespace BearBuildTool.VisualCode
                 Directory.CreateDirectory(ProjectsDirectory);
             }
 
+
+            VCWorkspace vcWorkspace = new VCWorkspace();
+
+
+
             foreach (string i in projects)
             {
                 VCProjectFile projectFile = new VCProjectFile(i, name);
+
                 projectFile.Write();
+                vcWorkspace.folders.Add(new VCWorkspace.Folder(Path.GetDirectoryName( projectFile.VCDirectory).Replace("\\", "/")));
             }
+
+            File.WriteAllText(Path.Combine(VisualCodePath, name + ".code-workspace"), JsonConvert.SerializeObject(vcWorkspace, Formatting.Indented));
         }
     }
 

@@ -35,7 +35,7 @@ namespace BearBuildTool.Windows
                 /* VSProjectFile projectFile = new VSProjectFile(i,name);
                  projectFile.Write();
                */
-                SlnLineList.Add(String.Format("Project(\"{0}\")=\"{1}\",\"{2}\",\"{3}\"", SlnGUID, i, visualProject.FileVcxproj, visualProject.Guid.ToString("B")));
+                SlnLineList.Add(String.Format("Project(\"{0}\")=\"{1}\",\"{2}\",\"{3}\"", SlnGUID, i, visualProject.FileVcxproj, visualProject.Guid.ToString("B").ToUpper()));
                 SlnLineList.Add("EndProject");
             }
             SlnLineList.Add("Global");
@@ -57,31 +57,32 @@ namespace BearBuildTool.Windows
             SlnLineList.Add("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution");
             foreach (Guid i in Guids)
             {
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.ActiveCfg = Debug|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.Build.0 = Debug|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.ActiveCfg = Debug|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.Build.0 = Debug|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.ActiveCfg = Mixed|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.Build.0 = Mixed|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.ActiveCfg = Mixed|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.Build.0 = Mixed|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.ActiveCfg = Release|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.Build.0 = Release|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.ActiveCfg = Release|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.Build.0 = Release|Win32", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.ActiveCfg = Debug|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.Build.0 = Debug|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.ActiveCfg = Debug|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.Build.0 = Debug|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|MinGW64.ActiveCfg = Debug_MinGW|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|MinGW64.Build.0 = Debug_MinGW|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|MinGW32.ActiveCfg = Debug_MinGW|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Debug|MinGW32.Build.0 = Debug_MinGW|Win32", i.ToString("B").ToUpper()));
 
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.ActiveCfg = Debug_MinGW|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x64.Build.0 = Debug_MinGW|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.ActiveCfg = Debug_MinGW|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Debug|x86.Build.0 = Debug_MinGW|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.ActiveCfg = Mixed_MinGW|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.Build.0 = Mixed_MinGW|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.ActiveCfg = Mixed_MinGW|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.Build.0 = Mixed_MinGW|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.ActiveCfg = Release_MinGW|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.Build.0 = Release_MinGW|x64", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.ActiveCfg = Release_MinGW|Win32", i.ToString("B")));
-                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.Build.0 = Release_MinGW|Win32", i.ToString("B")));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.ActiveCfg = Mixed|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x64.Build.0 = Mixed|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.ActiveCfg = Mixed|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|x86.Build.0 = Mixed|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|MinGW64.ActiveCfg = Mixed_MinGW|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|MinGW64.Build.0 = Mixed_MinGW|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|MinGW32.ActiveCfg = Mixed_MinGW|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Mixed|MinGW32.Build.0 = Mixed_MinGW|Win32", i.ToString("B").ToUpper()));
+
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.ActiveCfg = Release|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x64.Build.0 = Release|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.ActiveCfg = Release|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|x86.Build.0 = Release|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|MinGW64.ActiveCfg = Release_MinGW|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|MinGW64.Build.0 = Release_MinGW|x64", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|MinGW32.ActiveCfg = Release_MinGW|Win32", i.ToString("B").ToUpper()));
+                SlnLineList.Add(String.Format("\t\t{0}.Release|MinGW32.Build.0 = Release_MinGW|Win32", i.ToString("B").ToUpper()));
             }
             SlnLineList.Add("\tEndGlobalSection");
             SlnLineList.Add("EndGlobal");
