@@ -126,7 +126,7 @@ namespace BearBuildTool
             }
             else
             {
-                if(Config.Global.Platform == Config.Platform.MinGW32|| Config.Global.Platform == Config.Platform.MinGW64)
+                if(Config.Global.Platform == Config.Platform.MinGW)
                 {
                     Config.Global.BuildTools = new Windows.MinGWBuildTool();
                 }
@@ -166,11 +166,7 @@ namespace BearBuildTool
         {
             Console.WriteLine("Создание проектов трансляторов для VisaulCode");
             VCProjectGenerate projectFile = new VCProjectGenerate();
-            Config.Global.BinariesPlatformPath = Path.Combine(Config.Global.BinariesPath, Config.Global.Platform.ToString());
-            if (!Directory.Exists(Config.Global.BinariesPlatformPath))
-            {
-                Directory.CreateDirectory(Config.Global.BinariesPlatformPath);
-            }
+          
             projectFile.Generate(name);
         }
 

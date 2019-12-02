@@ -18,8 +18,7 @@ namespace BearBuildTool.Config
     {
         Win32,
         Win64,
-        MinGW32,
-        MinGW64,
+        MinGW,
         Linux,
     }
     public class Global
@@ -55,23 +54,14 @@ namespace BearBuildTool.Config
         public static bool SetPlatform(string str)
         {
             str=str.ToLower();
-            if ( str == "mingw32")
+            if (str == "mingw")
             {
                 ObjectExtension = ".o";
                 ExecutableExtension = ".exe";
                 StaticLibraryExtension = ".a";
                 DynamicLibraryExtension = ".dll";
                 PCHExtension = ".gch";
-                Platform = Platform.MinGW32 ;
-            }
-            else if (str == "mingw64")
-            {
-                ObjectExtension = ".o";
-                ExecutableExtension = ".exe";
-                StaticLibraryExtension = ".a";
-                DynamicLibraryExtension = ".dll";
-                PCHExtension = ".gch";
-                Platform = Platform.MinGW64 ;
+                Platform = Platform.MinGW ;
             }
             else if(str  ==    "win32")
             {
@@ -129,7 +119,7 @@ namespace BearBuildTool.Config
         }
         public static string Windows10SDK = String.Empty;
         public static bool Windows10SDKUsing = true;
-        private static int VersionConfig = 1;
+        private static int VersionConfig = 2;
         public static bool IsWindows=true;
         public static void SaveConfig()
         {
@@ -141,6 +131,7 @@ namespace BearBuildTool.Config
                     writer.Write(VersionConfig);
                     writer.Write(Windows10SDK);
                     writer.Write(Windows10SDKUsing);
+                    writer.Write(MinGWPath);
                 }
             }
             catch { }
@@ -151,10 +142,17 @@ namespace BearBuildTool.Config
             try
             {
                 BinaryReader reader = new BinaryReader(File.Open(name, FileMode.Open));
-                if (VersionConfig == reader.ReadInt32())
+                int version = reader.ReadInt32();
+                if(version == 1)
                 {
                     Windows10SDK = reader.ReadString();
                     Windows10SDKUsing = reader.ReadBoolean();
+                }
+                else if (VersionConfig == version)
+                {
+                    Windows10SDK = reader.ReadString();
+                    Windows10SDKUsing = reader.ReadBoolean();
+                    MinGWPath = reader.ReadString();
                 }
             }
             catch { }

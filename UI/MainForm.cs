@@ -17,8 +17,7 @@ namespace BearBuildTool.UI
             InitializeComponent();
             if (Config.Global.IsWindows)
             {
-                comboBoxPlatform.Items.Add(Config.Platform.MinGW32.ToString());
-                comboBoxPlatform.Items.Add(Config.Platform.MinGW64.ToString());
+                comboBoxPlatform.Items.Add(Config.Platform.MinGW.ToString());
                 comboBoxPlatform.Items.Add(Config.Platform.Win32.ToString());
                 comboBoxPlatform.Items.Add(Config.Platform.Win64.ToString());
             }
@@ -162,8 +161,7 @@ namespace BearBuildTool.UI
 
         private void mSVCToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            VisualStudio.MVSC mVSC = new VisualStudio.MVSC();
-            mVSC.ShowDialog();
+           
         }
 
         private void comboBoxCompiller_SelectedIndexChanged(object sender, EventArgs e)
@@ -179,6 +177,12 @@ namespace BearBuildTool.UI
         private void label2_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void compilerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            VisualStudio.CompilersSetting mVSC = new VisualStudio.CompilersSetting();
+            mVSC.ShowDialog();
         }
     }
 }

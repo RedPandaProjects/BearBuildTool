@@ -48,7 +48,7 @@ namespace BearBuildTool.Windows
         }
         public override void BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
-            
+           
             string Arguments = " ";
             /////////////////////////
             if (buildType == BuildType.DynamicLibrary||buildType== BuildType.StaticLibrary)
@@ -59,6 +59,7 @@ namespace BearBuildTool.Windows
             Arguments += "-pipe ";
             /////////////////////////
             Arguments += "-DPLATFORM_EXCEPTIONS_DISABLED=0 ";
+
             /////////////////////////
             if (!Config.Global.WithoutWarning)
             {
@@ -109,6 +110,14 @@ namespace BearBuildTool.Windows
                     break;
             
             }
+
+
+           /* switch (Config.Global.Platform)
+            {
+                case Config.Platform.MinGW32:
+                    Arguments += "-m32 ";
+                    break;
+            }*/
             if (createPCH)
             {
                 Arguments += "-x c++-header ";
@@ -178,15 +187,20 @@ namespace BearBuildTool.Windows
 
             if (Config.Global.Configure != Config.Configure.Release)
             {
-                Arguments += "-rdynamic ";
+               // Arguments += "-rdynamic ";
             }
             else
             {
                 Arguments += "-s ";
             }
 
-      
-
+            /*switch (Config.Global.Platform)
+            {
+                case Config.Platform.MinGW32:
+                    Arguments += "-m32 ";
+                    break;
+            }
+            */
             List<string> objlist = new List<string>();
             // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
             foreach (string obj in objs)
@@ -243,8 +257,13 @@ namespace BearBuildTool.Windows
             {
                 Arguments += "-s "; 
             }
-
-           // Arguments += "-Wl,--unresolved-symbols=ignore-in-shared-libs ";
+           /* switch (Config.Global.Platform)
+            {
+                case Config.Platform.MinGW32:
+                    Arguments += "-m32 ";
+                    break;
+            }*/
+            // Arguments += "-Wl,--unresolved-symbols=ignore-in-shared-libs ";
 
             List<string> objlist = new List<string>();
            // Arguments += string.Format("-Wl,-rpath-link=\"{0}\"\" ", Path.GetDirectoryName(Executable));
@@ -379,6 +398,7 @@ namespace BearBuildTool.Windows
         {
             base.SetDefines(LDefines, OutFile, buildType);
             LDefines.Add("GCC");
+            LDefines.Add("MINGW");
             switch (buildType)
             {
                 case BuildType.ConsoleExecutable:
@@ -411,12 +431,7 @@ namespace BearBuildTool.Windows
             }
             switch (Config.Global.Platform)
             {
-                case Config.Platform.MinGW32:
-                    LDefines.Add("WINDOWS");
-                    LDefines.Add("WIN32");
-                    LDefines.Add("X32");
-                    break;
-                case Config.Platform.MinGW64:
+                case Config.Platform.MinGW:
                     LDefines.Add("WINDOWS");
                     LDefines.Add("X64");
                     break;

@@ -44,7 +44,6 @@
             this.VSProjectManagerStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compilerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mSVCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonBuild = new System.Windows.Forms.Button();
             this.buttonRebuild = new System.Windows.Forms.Button();
             this.buttonClean = new System.Windows.Forms.Button();
@@ -213,18 +212,10 @@
             // 
             // compilerToolStripMenuItem
             // 
-            this.compilerToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mSVCToolStripMenuItem});
             this.compilerToolStripMenuItem.Name = "compilerToolStripMenuItem";
-            this.compilerToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.compilerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.compilerToolStripMenuItem.Text = "Компилятор";
-            // 
-            // mSVCToolStripMenuItem
-            // 
-            this.mSVCToolStripMenuItem.Name = "mSVCToolStripMenuItem";
-            this.mSVCToolStripMenuItem.Size = new System.Drawing.Size(106, 22);
-            this.mSVCToolStripMenuItem.Text = "MSVC";
-            this.mSVCToolStripMenuItem.Click += new System.EventHandler(this.mSVCToolStripMenuItem_Click);
+            this.compilerToolStripMenuItem.Click += new System.EventHandler(this.compilerToolStripMenuItem_Click);
             // 
             // buttonBuild
             // 
@@ -305,6 +296,5 @@
         private System.Windows.Forms.ToolStripMenuItem VSProjectManagerStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem compilerToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem mSVCToolStripMenuItem;
     }
 }

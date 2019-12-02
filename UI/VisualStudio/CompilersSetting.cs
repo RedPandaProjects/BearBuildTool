@@ -10,15 +10,17 @@ using System.Windows.Forms;
 
 namespace BearBuildTool.UI.VisualStudio
 {
-    public partial class MVSC : Form
+    public partial class CompilersSetting : Form
     {
-        public MVSC()
+        public CompilersSetting()
         {
             InitializeComponent();
         }
 
         private void MVSC_Load(object sender, EventArgs e)
         {
+
+            textBoxPath.Text = Config.Global.MinGWPath;
             IEnumerable<string> vs = null;
             try
             {
@@ -47,6 +49,7 @@ namespace BearBuildTool.UI.VisualStudio
             string ver = comboBoxSDKs.SelectedItem as string;
             if (String.IsNullOrEmpty(ver)) { Close(); return; }
             Config.Global.Windows10SDK = ver;
+            Config.Global.MinGWPath = textBoxPath.Text;
             Config.Global.SaveConfig();
             Close();
         }
@@ -69,6 +72,18 @@ namespace BearBuildTool.UI.VisualStudio
             }
 
 
+        }
+
+        private void buttonEditPath_Click(object sender, EventArgs e)
+        {
+            if(folderBrowserDialogForMinGW.ShowDialog()==DialogResult.OK)
+            {
+                textBoxPath.Text = folderBrowserDialogForMinGW.SelectedPath;
+            }
+        }
+
+        private void textBoxPath_TextChanged(object sender, EventArgs e)
+        {
         }
     }
 }

@@ -59,6 +59,8 @@
     <Compile Include="BearBuildTool.cs" />
     <Compile Include="Config\Global.cs" />
     <Compile Include="VisualCode\VCCppProperties.cs" />
+    <Compile Include="VisualCode\VCLaunch.cs" />
+    <Compile Include="VisualCode\VCTasks.cs" />
     <Compile Include="VisualCode\VCWorkspace.cs" />
     <Compile Include="Windows\MinGWBuildTool.cs" />
     <Compile Include="Projects\Build.cs" />
@@ -85,11 +87,11 @@
     <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\VisualStudio\MVSC.cs">
+    <Compile Include="UI\VisualStudio\CompilersSetting.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\VisualStudio\MVSC.Designer.cs">
-      <DependentUpon>MVSC.cs</DependentUpon>
+    <Compile Include="UI\VisualStudio\CompilersSetting.Designer.cs">
+      <DependentUpon>CompilersSetting.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\VisualStudio\VSProjectManager.cs">
       <SubType>Form</SubType>
@@ -135,8 +137,8 @@
     <EmbeddedResource Include="UI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\VisualStudio\MVSC.resx">
-      <DependentUpon>MVSC.cs</DependentUpon>
+    <EmbeddedResource Include="UI\VisualStudio\CompilersSetting.resx">
+      <DependentUpon>CompilersSetting.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\VisualStudio\VSProjectManager.resx">
       <DependentUpon>VSProjectManager.cs</DependentUpon>

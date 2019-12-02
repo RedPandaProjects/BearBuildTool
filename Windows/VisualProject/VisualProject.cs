@@ -26,7 +26,7 @@ namespace BearBuildTool.Windows.VisualProject
                 if (p == "Win32")
                     p = "MinGW32";
                 else if (p == "Win64")
-                    p = "MinGW64";
+                    p = "MinGW";
             }
             else if (c == "Mixed_MinGW")
             {
@@ -34,7 +34,7 @@ namespace BearBuildTool.Windows.VisualProject
                 if (p == "Win32")
                     p = "MinGW32";
                 else if (p == "Win64")
-                    p = "MinGW64";
+                    p = "MinGW";
             }
             else if (c == "Release_MinGW")
             {
@@ -42,7 +42,7 @@ namespace BearBuildTool.Windows.VisualProject
                 if (p == "Win32")
                     p = "MinGW32";
                 else if (p == "Win64")
-                    p = "MinGW64";
+                    p = "MinGW";
             }
         }
         //this is fixed
