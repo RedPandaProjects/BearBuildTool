@@ -30,9 +30,11 @@ namespace BearBuildTool.Config
         public static string IntermediateProjectPath = null;
         public static string Project = null;
         public static string OutProjectFileName = null;
-        public static Dictionary<string,Project> ProjectsMap;
+        public static Dictionary<Platform, Dictionary<Configure, Dictionary<string, Project>>> ProjectsMap;
+        
+
         public static Dictionary<string, string> ProjectsCSFile;
-        public static Dictionary<string, Executable> ExecutableMap;
+        public static Dictionary<Platform, Dictionary<Configure, Dictionary<string, Executable>>> ExecutableMap;
         public static string ObjectExtension;
         public static string ExecutableExtension;
         public static string StaticLibraryExtension;
@@ -126,7 +128,7 @@ namespace BearBuildTool.Config
             string name = Path.Combine(IntermediatePath, "config.bin");
             try
             {
-                BinaryWriter writer = new BinaryWriter(File.Open(name, FileMode.Create));
+                BinaryWriter writer = new BinaryWriter(File.Open(name, FileMode.OpenOrCreate));
                 {
                     writer.Write(VersionConfig);
                     writer.Write(Windows10SDK);

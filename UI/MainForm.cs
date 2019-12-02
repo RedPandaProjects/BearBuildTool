@@ -17,6 +17,7 @@ namespace BearBuildTool.UI
             InitializeComponent();
             if (Config.Global.IsWindows)
             {
+                comboBoxPlatform.Items.Clear();
                 comboBoxPlatform.Items.Add(Config.Platform.MinGW.ToString());
                 comboBoxPlatform.Items.Add(Config.Platform.Win32.ToString());
                 comboBoxPlatform.Items.Add(Config.Platform.Win64.ToString());
@@ -62,6 +63,8 @@ namespace BearBuildTool.UI
                     Config.Global.Project = name;
                     SetPlatform();
                     SetConfigure();
+                    Projects.ProjectsReader.Read();
+                    Projects.ExecutableReader.Read();
                     try
                     {
                         BearBuildTool.CompileProject();

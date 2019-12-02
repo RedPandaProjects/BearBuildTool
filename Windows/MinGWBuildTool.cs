@@ -183,7 +183,7 @@ namespace BearBuildTool.Windows
         {
             string Arguments = " ";
             Arguments += "-shared ";
-            Arguments += string.Format("-o \"{0}\" ", Path.Combine(Path.GetDirectoryName(outDynamicLib), "lib" + Path.GetFileName(outDynamicLib) + ".so"));
+            Arguments += string.Format("-o \"{0}\" ", Path.Combine(Path.GetDirectoryName(outDynamicLib), "lib" + Path.GetFileName(outDynamicLib) ));
 
             if (Config.Global.Configure != Config.Configure.Release)
             {

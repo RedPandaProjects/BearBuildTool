@@ -39,7 +39,9 @@ namespace BearBuildTool.UI.VisualStudio
                         comboBoxSDKs.SelectedIndex = comboBoxSDKs.Items.Count - 1;
                     }
                 }
+                if (comboBoxSDKs.SelectedIndex == -1) comboBoxSDKs.SelectedIndex = 0;
             }
+            textBoxPath.Text = Config.Global.MinGWPath;
         }
 
         private void buttonOk_Click(object sender, EventArgs e)
