@@ -43,7 +43,14 @@ namespace BearBuildTool.Windows
             {
                 throw new Exception("Неудалось найтzzzи ranlib");
             }
+            string Paths = Environment.GetEnvironmentVariable("PATH") ?? "";
+            if (!Paths.Split(';').Any(x => String.Compare(x, MinGWBinPath, true) == 0))
+            {
 
+                if (MinGWBinPath != null) Paths = MinGWBinPath + ";"+ Paths;
+                else Paths = MinGWBinPath + ";" + Paths;
+                Environment.SetEnvironmentVariable("PATH", Paths);
+            }
             return;
         }
         public override void BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)

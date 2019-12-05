@@ -10,12 +10,14 @@ namespace BearBuildTool.Config
 {
     public enum Configure
     {
+        None,
         Debug,
         Mixed,
         Release,
     }
     public enum Platform
     {
+        None,
         Win32,
         Win64,
         MinGW,
@@ -40,8 +42,8 @@ namespace BearBuildTool.Config
         public static string StaticLibraryExtension;
         public static string DynamicLibraryExtension;
         public static string PCHExtension;
-        public static Configure Configure= Configure.Debug;
-        public static Platform Platform =Platform.Win32;
+        public static Configure Configure = Configure.None;
+        public static Platform Platform = Platform.None;
         public static BuildTools BuildTools;
         public static UInt64 CountBuild = 0;
         public static bool WithoutWarning = false;
@@ -123,6 +125,8 @@ namespace BearBuildTool.Config
         public static bool Windows10SDKUsing = true;
         private static int VersionConfig = 2;
         public static bool IsWindows=true;
+        
+
         public static void SaveConfig()
         {
             string name = Path.Combine(IntermediatePath, "config.bin");

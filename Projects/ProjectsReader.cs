@@ -12,7 +12,14 @@ namespace BearBuildTool.Projects
     {
         public static void Read()
         {
+           
             Config.Global.ProjectsMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<string, Project>>>();
+
+            if (Config.Global.Platform != Config.Platform.None && Config.Global.Configure != Config.Configure.None)
+            {
+                Read2();
+                return;
+            }
             Config.Global.Platform = Config.Platform.Win32;
             Read1();
             Config.Global.Platform = Config.Platform.Win64;
@@ -35,23 +42,32 @@ namespace BearBuildTool.Projects
             Read2();
 
         }
+        private static string[] ListFileProjects = null;
         private static void Read2()
         {
-            string[] list_path_projects = Directory.GetFiles(Config.Global.ProjectsPath, "*.project.cs", SearchOption.AllDirectories);
+            if (Config.Global.ProjectsMap == null) Config.Global.ProjectsMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<string, Project>>>();
+            if (!Config.Global.ProjectsMap.ContainsKey(Config.Global.Platform))
+                Config.Global.ProjectsMap[Config.Global.Platform] = new Dictionary<Config.Configure, Dictionary<string, Project>>();
+            if (!Config.Global.ProjectsMap[Config.Global.Platform].ContainsKey(Config.Global.Configure))
+                Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure] = new Dictionary<string, Project>();
             
-            if (list_path_projects == null || list_path_projects.Length == 0) return;
+           if(ListFileProjects == null) ListFileProjects = Directory.GetFiles(Config.Global.ProjectsPath, "*.project.cs", SearchOption.AllDirectories);
+
+            if (ListFileProjects == null || ListFileProjects.Length == 0) return;
 
             string namedll = "projects";
+            namedll = namedll + "_" + Config.Global.Platform.ToString() + "_" + Config.Global.Configure.ToString();
             namedll += ".dll";
 
-            Assembly asm = Compiler.CompilerAndLoad(list_path_projects, Path.Combine(Config.Global.IntermediatePath, namedll));
-            foreach (string file in list_path_projects)
+            Assembly asm = Compiler.CompilerAndLoad(ListFileProjects, Path.Combine(Config.Global.IntermediatePath, namedll));
+            foreach (string file in ListFileProjects)
             {
                 string name = Path.GetFileName(file);
                 name = name.Substring(0, name.Length - 11);
+                if (!Config.Global.ProjectsCSFile.ContainsKey(name))
                     Config.Global.ProjectsCSFile.Add(name, file);
                 var projects = (Project)Activator.CreateInstance(asm.GetType(name), Path.GetDirectoryName(file));
-                Config.Global.ProjectsMap[Config.Global. .Add(name, projects);
+                Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure].Add(name, projects);
                 if (projects.ProjectPath == null) projects.ProjectPath = Path.GetDirectoryName(file);
             }
            

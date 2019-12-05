@@ -35,23 +35,30 @@ namespace BearBuildTool.Projects
             Read2();
 
         }
+        private static string[] ListFileProjects = null;
         private static void Read2()
         {
-            
-            string[] list_path_projects = Directory.GetFiles(Config.Global.ProjectsPath, "*.executable.cs", SearchOption.AllDirectories);
+            if (Config.Global.ExecutableMap == null) Config.Global.ProjectsMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<string, Project>>>();
+            if (!Config.Global.ExecutableMap.ContainsKey(Config.Global.Platform))
+                Config.Global.ExecutableMap[Config.Global.Platform] = new Dictionary<Config.Configure, Dictionary<string, Executable>>();
+            if (!Config.Global.ExecutableMap[Config.Global.Platform].ContainsKey(Config.Global.Configure))
+                Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure] = new Dictionary<string, Executable>();
+            if(ListFileProjects==null) ListFileProjects = Directory.GetFiles(Config.Global.ProjectsPath, "*.executable.cs", SearchOption.AllDirectories);
             
 
             string namedll = "executabls";
+            namedll = namedll + "_" + Config.Global.Platform.ToString() + "_" + Config.Global.Configure.ToString();
             namedll += ".dll";
 
-            Assembly asm = Compiler.CompilerAndLoad(list_path_projects, Path.Combine(Config.Global.IntermediatePath, namedll));
+            Assembly asm = Compiler.CompilerAndLoad(ListFileProjects, Path.Combine(Config.Global.IntermediatePath, namedll));
             
-            foreach (string file in list_path_projects)
+            foreach (string file in ListFileProjects)
             {
                 string name = Path.GetFileName(file);
                 name = name.Substring(0, name.Length - 14);
-                if (Count == 0)
+                if (!Config.Global.ProjectsCSFile.ContainsKey(name))
                     Config.Global.ProjectsCSFile.Add(name, file);
+
                 Executable executable = Activator.CreateInstance(asm.GetType(name), Path.GetDirectoryName(file)) as Executable;
                 Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure].Add(name, executable);
                 Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure].Add(name, executable);

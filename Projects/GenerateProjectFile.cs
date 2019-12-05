@@ -41,7 +41,7 @@ namespace BearBuildTool.Projects
                 projects.Add(name);
                 MapProjectsForList.Add(name, true);
                
-                var project = Config.Global.ProjectsMap[name];
+                var project = Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][name];
 
                 foreach (string i in project.Projects.Public)
                 {
@@ -67,7 +67,7 @@ namespace BearBuildTool.Projects
                 info.PathFileInfo = Config.Global.ProjectsCSFile[name];
             
                 List<string> LIncludeFile = new List<string>();
-                var project = Config.Global.ProjectsMap[name];
+                var project = Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][name];
                 project.StartBuild();
                 info.ResourceFile = project.ResourceFile;
                 foreach (string i in project.Include.Private)
@@ -124,12 +124,12 @@ namespace BearBuildTool.Projects
 
                 foreach (string i in project.IncludeInProject.Public)
                 {
-                    info.Include.Append(Config.Global.ProjectsMap[i].Include);
+                    info.Include.Append(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][i].Include);
                     
                 };
                 foreach (string i in project.IncludeInProject.Private)
                 {
-                    info.Include.AppendInPrivate(Config.Global.ProjectsMap[i].Include);
+                    info.Include.AppendInPrivate(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][i].Include);
                 };
 
                 info.Defines.Private.Add(String.Format("{0}_EXPORTS", name.ToUpper()));

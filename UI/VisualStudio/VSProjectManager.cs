@@ -68,7 +68,7 @@ namespace BearBuildTool.UI.VisualStudio
 
         private void VSProjectManager_Load(object sender, EventArgs e)
         {
-            foreach (string name in Config.Global.ExecutableMap.Keys)
+            foreach (string name in Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure].Keys)
             {
                 comboBoxProject.Items.Add(name);
             }
