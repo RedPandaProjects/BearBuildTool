@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using BearBuildTool.Projects;
 
 namespace BearBuildTool.Linux
@@ -58,7 +59,7 @@ namespace BearBuildTool.Linux
 
             return;
         }
-        public override void BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
+        public override async Task BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
             
             string Arguments = " ";
@@ -126,7 +127,7 @@ namespace BearBuildTool.Linux
                 Arguments += "-x c++-header ";
                 Arguments += "-std=c++14 ";
                 Arguments += "-o \"" + pch + "\" ";
-                BuildObject( PN,LInclude, LDefines, null, null, false, source, obj, buildType);
+                BuildObject( PN,LInclude, LDefines, null, null, false, source, obj, buildType).Wait();
             }
             else if (Path.GetExtension(source).ToLower() == ".cpp")
             {

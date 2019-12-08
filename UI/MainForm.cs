@@ -60,6 +60,7 @@ namespace BearBuildTool.UI
                 string name = listBoxProject.SelectedItem as string;
                 if (!string.IsNullOrEmpty(name))
                 {
+                    Tools.FileSystem.Clear();
                     Config.Global.Project = name;
                     SetPlatform();
                     SetConfigure();
@@ -96,11 +97,13 @@ namespace BearBuildTool.UI
 
         private void buttonClean_Click(object sender, EventArgs e)
         {
+        
             if (listBoxProject.SelectedIndex >= 0)
             {
                 string name = listBoxProject.SelectedItem as string;
                 if (!string.IsNullOrEmpty(name))
                 {
+                    Tools.FileSystem.Clear();
                     Config.Global.Project = name;
                     SetPlatform();
                     SetConfigure();
@@ -116,6 +119,7 @@ namespace BearBuildTool.UI
                 string name = listBoxProject.SelectedItem as string;
                 if (!string.IsNullOrEmpty(name))
                 {
+                    Tools.FileSystem.Clear();
                     Config.Global.Project = name;
                     SetPlatform();
                     SetConfigure();

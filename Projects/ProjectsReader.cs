@@ -28,7 +28,9 @@ namespace BearBuildTool.Projects
             Read1();
             Config.Global.Platform = Config.Platform.Linux;
             Read1();
+            Config.Global.Platform = Config.Platform.None;
 
+            Config.Global.Configure = Config.Configure.None;
 
         }
         private static void Read1()

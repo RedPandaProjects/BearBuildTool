@@ -13,6 +13,11 @@ namespace BearBuildTool.Tools
         static Mutex MutexExist = new Mutex();
         static Dictionary<string, DateTime> mapDateTime=null;
         static Dictionary<string, bool> mapExist = null;
+        public static  void Clear()
+        {
+            mapDateTime = null;
+            mapExist = null;
+        }
         public static DateTime GetLastWriteTime(string file)
         {
             MutexDate.WaitOne();

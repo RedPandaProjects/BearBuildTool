@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace BearBuildTool.Tools
 {
     public class BuildTools
@@ -19,6 +22,7 @@ namespace BearBuildTool.Tools
         protected string BuildObjects_objs_out = null;
         protected BuildType BuildObjects_buildType = BuildType.StaticLibrary;
         protected string BuildObjects_NameProject;
+        private List<string> BuildObjects_Files;
         public virtual void BuildObjectsStart(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
         {
             BuildObjects_LInclude = LInclude;
@@ -28,9 +32,78 @@ namespace BearBuildTool.Tools
             BuildObjects_objs_out = objs_out;
             BuildObjects_buildType = buildType;
             BuildObjects_NameProject = NameProject;
+            BuildObjects_Files = new List<string>();
         }
-        public virtual void BuildObjectsEnd()
+        private void StartBuild()
         {
+
+        }
+
+
+        public virtual void BuildObjectsEnd(bool run=false)
+        {
+            if (run)
+            {
+                Task[] tasks = new Task[Config.Global.CountThreads];
+                bool e = false;
+                foreach (string file in BuildObjects_Files)
+                {
+                    while (true)
+                    {
+                        int id = -1;
+                        for (int i = 0; i < Config.Global.CountThreads; i++)
+                        {
+                            if(tasks[i]==null)
+                            {
+                                id = i; break;
+                            }
+                            if (tasks[i].IsFaulted)
+                            {
+                                e = true; id = i; break;
+                            }
+                            if (tasks[i].IsCompleted)
+                            {
+                                id = i; break;
+                            }
+                        }
+                        if (id >= 0)
+                        {
+                            Console.WriteLine(String.Format("Сборка {0}", Path.GetFileName(file)));
+                            tasks[id] = Task.Run(async () => await BuildObject(BuildObjects_NameProject, BuildObjects_LInclude, BuildObjects_LDefines, BuildObjects_pch, BuildObjects_pchH, false, file, Path.Combine(BuildObjects_objs_out, Path.GetFileNameWithoutExtension(file) + Config.Global.ObjectExtension), BuildObjects_buildType));
+
+                            break;
+                        }
+                    }
+
+
+
+
+
+                }
+                bool isend = false;
+                while(isend == false)
+                {
+                    isend = true;
+                    for (int i = 0; i < Config.Global.CountThreads; i++)
+                    {
+                        if (tasks[i] != null)
+                        {
+                            if (tasks[i].IsFaulted)
+                            {
+                                e = true;
+                            }
+                            if (!tasks[i].IsCompleted)
+                            {
+                                isend = false;
+                            }
+                        }
+                    }
+                }
+                
+                if (e)
+                    throw new Exception("Ошибка при сборке");
+
+            }
             BuildObjects_LInclude = null;
             BuildObjects_LDefines = null;
             BuildObjects_pch = null;
@@ -41,11 +114,10 @@ namespace BearBuildTool.Tools
         }
         public virtual void BuildObjectPush(string source)
         {
-            Console.WriteLine(String.Format("Сборка {0}", Path.GetFileName(source)));
-            BuildObject(BuildObjects_NameProject, BuildObjects_LInclude, BuildObjects_LDefines, BuildObjects_pch, BuildObjects_pchH, false, source, Path.Combine(BuildObjects_objs_out, Path.GetFileNameWithoutExtension(source) + Config.Global.ObjectExtension), BuildObjects_buildType);
+            BuildObjects_Files.Add(source);
         }
 
-        public virtual void BuildObject(string NameProject, List<string> LInclude, List<string> LDefines, string pch,string pchH,bool createPCH, string source, string obj,BuildType buildType)
+        public virtual async Task BuildObject(string NameProject, List<string> LInclude, List<string> LDefines, string pch,string pchH,bool createPCH, string source, string obj,BuildType buildType) 
         {
 
         }

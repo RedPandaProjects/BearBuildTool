@@ -21,8 +21,8 @@ namespace BearBuildTool.VisualCode
             public string cwd;
             public class Environment
             {
-                public string Name;
-                public string Value;
+                public string Name = null;
+                public string Value = null;
             }
             public IList<Environment> environment = new List<Environment>();
           
@@ -31,9 +31,9 @@ namespace BearBuildTool.VisualCode
             public string miDebuggerPath = null;
             public class SetupCommand
             {
-                public string description;
-                public string text;
-                public bool ignoreFailures;
+                public string description = null;
+                public string text = null;
+                public bool ignoreFailures = false;
             }
             public IList<SetupCommand> setupCommands = new List<SetupCommand>();
             public string preLaunchTask = null;

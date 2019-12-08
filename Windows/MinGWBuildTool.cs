@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using BearBuildTool.Projects;
 
 namespace BearBuildTool.Windows
@@ -55,265 +56,12 @@ namespace BearBuildTool.Windows
         }
 
 
-        List<string> SourceCPP = new List<string>();
-        List<string> SourceC = new List<string>();
-        public override void BuildObjectsEnd()
+     
+
+
+
+        public override async Task BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
-            if (SourceCPP.Count != 0)
-            {
-                string Arguments = " -E ";
-                /////////////////////////
-                if (BuildObjects_buildType == BuildType.DynamicLibrary || BuildObjects_buildType == BuildType.StaticLibrary)
-                {
-                    Arguments += "-fPIC ";
-                }
-                Arguments += " -c ";
-                Arguments += "-pipe ";
-                /////////////////////////
-                Arguments += "-DPLATFORM_EXCEPTIONS_DISABLED=0 ";
-
-                /////////////////////////
-                if (!Config.Global.WithoutWarning)
-                {
-                    Arguments += "-Wall -Werror ";
-                    Arguments += "-Wno-sign-compare ";
-                    Arguments += "-Wno-enum-compare ";
-                    Arguments += "-Wno-return-type ";
-                    Arguments += "-Wno-unused-local-typedefs ";
-                    Arguments += "-Wno-multichar ";
-                    Arguments += "-Wno-unused-but-set-variable ";
-                    Arguments += "-Wno-strict-overflow ";
-                    Arguments += "-Wno-unused-variable ";
-                    Arguments += "-Wno-unused-function ";
-                    Arguments += "-Wno-switch ";
-                    Arguments += "-Wno-unknown-pragmas ";
-
-                    Arguments += "-Wno-unused-value ";
-                }
-                else
-                {
-                    Arguments += "-W ";
-                }
-                Arguments += "-funwind-tables ";
-                Arguments += "-Wsequence-point ";
-                Arguments += "-mmmx -msse -msse2 ";
-                Arguments += "-fno-math-errno ";
-
-                Arguments += "-fno-strict-aliasing ";
-
-                switch (Config.Global.Configure)
-                {
-                    case Config.Configure.Debug:
-                        Arguments += "-g ";
-                        Arguments += "-O0 ";
-                        // Arguments += "-gline-tables-only ";
-                        Arguments += "-fno-inline ";
-                        break;
-                    case Config.Configure.Mixed:
-                        Arguments += "-g ";
-                        Arguments += "-O2 ";
-                        //  Arguments += "-gline-tables-only ";
-                        break;
-                    case Config.Configure.Release:
-                        Arguments += "-O2 ";
-                        Arguments += "-g0 ";
-                        Arguments += "-fomit-frame-pointer ";
-                        Arguments += "-fvisibility=hidden ";
-                        break;
-
-                }
-
-
-
-
-                {
-                    Arguments += "-x c++ ";
-                    Arguments += "-std=c++17 ";
-                    if (BuildObjects_pch != null)
-                    {
-                        Arguments += " -include " + Path.GetFileNameWithoutExtension(BuildObjects_pch).Replace('\\', '/');
-                    }
-                    if (!Config.Global.WithoutWarning)
-                    {
-                        Arguments += " -Wno-invalid-offsetof ";
-                    }
-                }
-
-                /* {
-                     Arguments += "-x c ";
-                 }*/
-                foreach (string define in BuildObjects_LDefines)
-                {
-                    Arguments += String.Format("-D \"{0}\" ", define);
-                }
-                foreach (string include in BuildObjects_LInclude)
-                {
-                    Arguments += String.Format("-I\"{0}\" ", include.Replace('\\', '/'));
-                }
-                List<string> objlist = new List<string>();
-                foreach (string obj in SourceCPP)
-                {
-
-                    objlist.Add(string.Format("{0}", obj.Replace('\\', '/')));
-                }
-
-                File.WriteAllLines(Path.Combine(BuildObjects_objs_out, "compile" + ".txt"), objlist);
-                Arguments += string.Format("@\"{0}\"", Path.Combine(BuildObjects_objs_out, "compile" + ".txt").Replace('\\', '/') );
-
-
-                //
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                process.StartInfo.FileName = GCCPath;
-                process.StartInfo.Arguments = Arguments;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.WorkingDirectory = BuildObjects_objs_out;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.OutputDataReceived += Process2_OutputDataReceived;
-                process.Start();
-                process.BeginOutputReadLine();
-                while (process.HasExited == false) { }
-                if (process.ExitCode != 0)
-                {
-                    throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
-                }
-        
-            }
-            if (SourceC.Count != 0)
-            {
-                string Arguments = " -time ";
-                /////////////////////////
-                if (BuildObjects_buildType == BuildType.DynamicLibrary || BuildObjects_buildType == BuildType.StaticLibrary)
-                {
-                    Arguments += "-fPIC ";
-                }
-                Arguments += " -c ";
-                Arguments += "-pipe ";
-                /////////////////////////
-                Arguments += "-DPLATFORM_EXCEPTIONS_DISABLED=0 ";
-
-                /////////////////////////
-                if (!Config.Global.WithoutWarning)
-                {
-                    Arguments += "-Wall -Werror ";
-                    Arguments += "-Wno-sign-compare ";
-                    Arguments += "-Wno-enum-compare ";
-                    Arguments += "-Wno-return-type ";
-                    Arguments += "-Wno-unused-local-typedefs ";
-                    Arguments += "-Wno-multichar ";
-                    Arguments += "-Wno-unused-but-set-variable ";
-                    Arguments += "-Wno-strict-overflow ";
-                    Arguments += "-Wno-unused-variable ";
-                    Arguments += "-Wno-unused-function ";
-                    Arguments += "-Wno-switch ";
-                    Arguments += "-Wno-unknown-pragmas ";
-
-                    Arguments += "-Wno-unused-value ";
-                }
-                else
-                {
-                    Arguments += "-W ";
-                }
-                Arguments += "-funwind-tables ";
-                Arguments += "-Wsequence-point ";
-                Arguments += "-mmmx -msse -msse2 ";
-                Arguments += "-fno-math-errno ";
-
-                Arguments += "-fno-strict-aliasing ";
-
-                switch (Config.Global.Configure)
-                {
-                    case Config.Configure.Debug:
-                        Arguments += "-g ";
-                        Arguments += "-O0 ";
-                        // Arguments += "-gline-tables-only ";
-                        Arguments += "-fno-inline ";
-                        break;
-                    case Config.Configure.Mixed:
-                        Arguments += "-g ";
-                        Arguments += "-O2 ";
-                        //  Arguments += "-gline-tables-only ";
-                        break;
-                    case Config.Configure.Release:
-                        Arguments += "-O2 ";
-                        Arguments += "-g0 ";
-                        Arguments += "-fomit-frame-pointer ";
-                        Arguments += "-fvisibility=hidden ";
-                        break;
-
-                }
-
-                {
-                     Arguments += "-x c ";
-                }
-                foreach (string define in BuildObjects_LDefines)
-                {
-                    Arguments += String.Format("-D \"{0}\" ", define);
-                }
-                foreach (string include in BuildObjects_LInclude)
-                {
-                    Arguments += String.Format("-I\"{0}\" ", include.Replace('\\', '/'));
-                }
-                List<string> objlist = new List<string>();
-                foreach (string obj in SourceC)
-                {
-
-                    objlist.Add(string.Format("{0}", obj.Replace('\\', '/')));
-                }
-
-                File.WriteAllLines(Path.Combine(BuildObjects_objs_out, "compile" + ".txt"), objlist);
-                Arguments += string.Format("@\"{0}\"", Path.Combine(BuildObjects_objs_out, "compile" + ".txt").Replace('\\', '/') );
-
-
-                //
-                System.Diagnostics.Process process = new System.Diagnostics.Process();
-                process.StartInfo.FileName = GCCPath;
-                process.StartInfo.Arguments = Arguments;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-                process.StartInfo.WorkingDirectory = BuildObjects_objs_out;
-                process.StartInfo.RedirectStandardError = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.OutputDataReceived += Process2_OutputDataReceived;
-                process.Start();
-                process.BeginOutputReadLine();
-                while (process.HasExited == false) { }
-                if (process.ExitCode != 0)
-                {
-                    throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
-                }
-
-            }
-            base.BuildObjectsEnd();
-        }
-
-        private void Process2_OutputDataReceived(object sender, DataReceivedEventArgs e)
-        {
-            if (!String.IsNullOrEmpty(e.Data)) System.Console.WriteLine(e.Data);
-        }
-
-        public override void BuildObjectPush(string source)
-        {
-            if(Path.GetExtension(source).ToLower() == ".c")
-                SourceC.Add(String.Format("\"{0}\"", source));
-            else
-                SourceCPP.Add(String.Format("\"{0}\"", source));
-
-        }
-
-        public override void BuildObjectsStart(string PN, List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
-        {
-            base.BuildObjectsStart(PN, LInclude, LDefines, pch, pchH, objs_out, buildType);
-            SourceC = new List<string>();
-            SourceCPP = new List<string>();
-        }
-
-
-
-        public override void BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
-        {
-           
             string Arguments = " ";
             /////////////////////////
             if (buildType == BuildType.DynamicLibrary||buildType== BuildType.StaticLibrary)
@@ -444,8 +192,8 @@ namespace BearBuildTool.Windows
                 System.Console.WriteLine(process.StandardError.ReadToEnd());
                 System.Console.WriteLine("-----------------------------------------------------------------");
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
-            }
-            if(createPCH) BuildObject(PN, LInclude, LDefines, pch, pchH, false, source, obj, buildType);
+            }     
+            if(createPCH) await BuildObject(PN, LInclude, LDefines, pch, pchH, false, source, obj, buildType) ;
         }
         public override void BuildDynamicLibrary(List<string> objs, List<string> libs, List<string> libsPath, string outDynamicLib, string outStaticLib)
         {

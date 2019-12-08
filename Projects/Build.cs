@@ -287,7 +287,7 @@ namespace BearBuildTool.Projects
                             Message = true;
                         }
                         Console.WriteLine(String.Format("Сборка PCH {0}", Path.GetFileName(PCHSource)));
-                        buildTools.BuildObject(name, LInclude, LDefines, PCH, PCHH, true, PCHSource, obj, buildType);
+                        buildTools.BuildObject(name, LInclude, LDefines, PCH, PCHH, true, PCHSource, obj, buildType).Wait();
                         Rebuild = true;
 
                     }
@@ -323,7 +323,7 @@ namespace BearBuildTool.Projects
                     LObj.Add(obj);
                 }
              
-                buildTools.BuildObjectsEnd();
+                buildTools.BuildObjectsEnd(true );
                 buildTools.BuildObjectsStart(name, LInclude, LDefines, null, null, LIntermediate, buildType);
                 foreach (string source in project.Sources)
                 {
@@ -349,7 +349,7 @@ namespace BearBuildTool.Projects
                     }
                     LObj.Add(obj);
                 }
-                buildTools.BuildObjectsEnd();
+                buildTools.BuildObjectsEnd(true );
                 {
                     Dictionary<string, bool> pairs = new Dictionary<string, bool>();
                     int cnt = 0;

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BearBuildTool.Windows
 {
@@ -592,7 +593,7 @@ namespace BearBuildTool.Windows
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
             }
         }
-        public override void BuildObject(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
+        public override async Task BuildObject(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
         {
 
             string Arguments = "";
@@ -713,7 +714,7 @@ namespace BearBuildTool.Windows
         }
 
         List<string> Source = new List<string>();
-        public override void BuildObjectsEnd()
+        public override void BuildObjectsEnd(bool temp)
         {
             if (Source.Count == 0) return;
             string Arguments = "";
