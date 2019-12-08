@@ -271,7 +271,7 @@ namespace BearBuildTool.Projects
                     {
                         throw new Exception(String.Format("Не найден файл {0}", project.PCHFile));
                     }
-                    PCH = Path.Combine(LIntermediate, name + Config.Global.PCHExtension);
+                    PCH = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(project.PCHFile) + Config.Global.PCHExtension);
                     PCHSource = Path.GetFullPath(project.PCHFile);
                     PCHH = project.PCHIncludeFile;
 
@@ -394,7 +394,7 @@ namespace BearBuildTool.Projects
                 else
                     LLibraries = projectInfo.LibrariesStatic.ToList();
                 LLibrariesPath.Add(Config.Global.IntermediateProjectPath);
-                if (Config.Platform.Linux == Config.Global.Platform)
+                if (Config.Platform.Linux == Config.Global.Platform|| Config.Platform.MinGW == Config.Global.Platform)
                 {
                     LLibrariesPath.Add(Config.Global.BinariesPlatformPath);
                 }
@@ -436,6 +436,19 @@ namespace BearBuildTool.Projects
                 if (project.Sources.Count != 0)
                 {
                     projectInfo.LibraryFile = GetOutStaticLibrary(name, buildType);
+                    if(Config.Platform.MinGW == Config.Global.Platform)
+                    {
+                        switch (buildType)
+                        {
+                            case BuildType.StaticLibrary:
+                                OutFileTemp = Path.Combine(Path.GetDirectoryName(OutFile), "lib" + Path.GetFileName(OutFile) );
+                                break;
+                            case BuildType.DynamicLibrary:
+                                OutFileTemp = Path.Combine(Path.GetDirectoryName(OutFile), "lib" + Path.GetFileName(OutFile) );
+                                break;
+                        }
+                    }
+                   else
                     if (Config.Platform.Linux == Config.Global.Platform)
                     {
                         switch (buildType)
@@ -451,8 +464,23 @@ namespace BearBuildTool.Projects
                     }
                     if (Config.Global.Rebuild || (Build || !FileSystem.ExistsFile(OutFileTemp)) || FileSystem.GetLastWriteTime(OutFileTemp) < dateTimeLibrary)
                     {
-
-                        Console.WriteLine(String.Format("Сборка {0}", OutFile));
+                        if (Config.Platform.MinGW == Config.Global.Platform)
+                        {
+                            Console.WriteLine(String.Format("Сборка {0}", OutFile));
+                        }
+                        else
+                        {
+                            switch(buildType)
+                            {
+                                case BuildType.Executable:
+                                    Console.WriteLine(String.Format("Сборка {0}.exe", OutFile));
+                                    break;
+                                default:
+                                    Console.WriteLine(String.Format("Сборка {0}", OutFile));
+                                    break;
+                            }
+                        
+                        }
                         Config.Global.CountBuild++;
                         switch (buildType)
                         {
@@ -510,6 +538,19 @@ namespace BearBuildTool.Projects
                 }
 
             }
+            else if (Config.Platform.MinGW == Config.Global.Platform)
+            {
+                string fullPath = Path.Combine(Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib));
+                if (!FileSystem.ExistsFile(fullPath))
+                {
+                    fullPath = Path.Combine(Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) );
+                }
+                if (FileSystem.ExistsFile(fullPath))
+                {
+                    return fullPath;
+                }
+
+            }
             else
             {
                 if (FileSystem.ExistsFile(lib))
@@ -527,6 +568,20 @@ namespace BearBuildTool.Projects
                     if (!FileSystem.ExistsFile(fullPath))
                     {
                         fullPath = Path.Combine(path, Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".so");
+                    }
+                    if (FileSystem.ExistsFile(fullPath))
+                    {
+                        return fullPath;
+                    }
+
+                    continue;
+                }
+                else if (Config.Platform.MinGW == Config.Global.Platform)
+                {
+                    string fullPath = Path.Combine(path, Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) );
+                    if (!FileSystem.ExistsFile(fullPath))
+                    {
+                        fullPath = Path.Combine(path, Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) );
                     }
                     if (FileSystem.ExistsFile(fullPath))
                     {
@@ -585,7 +640,7 @@ namespace BearBuildTool.Projects
         }
         private static string GetOutStaticLibrary(string name, BuildType buildType)
         {
-            if (Config.Global.Platform == Config.Platform.Linux)
+            if (Config.Global.Platform == Config.Platform.Linux|| Config.Global.Platform == Config.Platform.MinGW)
             {
                 string OutName = "";
                 if (name == Config.Global.Project)

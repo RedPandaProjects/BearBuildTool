@@ -133,12 +133,13 @@ namespace BearBuildTool
                 else
                 {
                     Config.Global.BuildTools = new Windows.VCBuildTools();
-          
+                    if (Config.Global.Windows10SDKUsing)
+                    {
+                        Console.WriteLine("Windows 10 SDK:{0}", VCBuildTools.GetWindows10SDKVersion(VCBuildTools.FindWindowsSDKInstallationFolder()));
+                    }
+
                 }
-                if (Config.Global.Windows10SDKUsing)
-                {
-                    Console.WriteLine("Windows 10 SDK:{0}", VCBuildTools.GetWindows10SDKVersion(VCBuildTools.FindWindowsSDKInstallationFolder()));
-                }
+              
             }
 
            

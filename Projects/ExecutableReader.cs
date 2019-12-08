@@ -13,6 +13,11 @@ namespace BearBuildTool.Projects
         public static void Read()
         {
             Config.Global.ExecutableMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<string, Executable>>>();
+            if (Config.Global.Platform != Config.Platform.None && Config.Global.Configure != Config.Configure.None)
+            {
+                Read2();
+                return;
+            }
             Config.Global.Platform = Config.Platform.Win32;
             Read1();
             Config.Global.Platform = Config.Platform.Win64;
