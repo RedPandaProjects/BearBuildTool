@@ -36,6 +36,10 @@ namespace BearBuildTool.Windows.VisualProject.Vcxproj
         /*Makefile*/
         public class SConfiguration
         {
+            public SConfiguration()
+            {
+                if (Config.Global.vs2019) PlatformToolset = "v142";
+            }
             public string Configuration = "";
             public string Platform = "";
             public string PlatformToolset = "v141";

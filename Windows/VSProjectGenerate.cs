@@ -17,9 +17,20 @@ namespace BearBuildTool.Windows
             string outFileSln = Path.Combine(Config.Global.IntermediatePath, "..", name+".sln");
             SlnLineList.Add("");
             SlnLineList.Add("Microsoft Visual Studio Solution File, Format Version 12.00");
-            SlnLineList.Add("# Visual Studio 15");
-            SlnLineList.Add("VisualStudioVersion = 15.0.28010.2036");
-            SlnLineList.Add("MinimumVisualStudioVersion = 10.0.40219.1");
+    
+            if(Config.Global.vs2019)
+            {
+                SlnLineList.Add("# Visual Studio Version 16");
+                SlnLineList.Add("VisualStudioVersion = 16.0.29519.181");
+                SlnLineList.Add("MinimumVisualStudioVersion = 10.0.40219.1");
+            }
+            else
+            {
+                SlnLineList.Add("# Visual Studio 15");
+                SlnLineList.Add("VisualStudioVersion = 15.0.28010.2036");
+                SlnLineList.Add("MinimumVisualStudioVersion = 10.0.40219.1");
+            }
+
 
             List<string> projects = new List<string>();
             {

@@ -1,5 +1,6 @@
 ﻿using BearBuildTool.Projects;
 using BearBuildTool.Tools;
+using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -62,22 +63,69 @@ namespace BearBuildTool.Windows
         }
         private string GetVC2017Path()
         {
-            string path;
-            if (FindKey("Microsoft\\VisualStudio\\SxS\\VC7", "15.0", out path) == true)
-            {
-                if (FileSystem.ExistsFile(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")) == false)
-                {
-                    throw new Exception("С++ 14.1  неустановлен.");
-                }
-                string version1 = File.ReadAllText(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")).Trim();
-                return Path.Combine(path, "Tools", "MSVC", version1);
-
-            }
-            path = GetVS2017Path();
+            
+            string path = GetVS2017Path();
             path += "VC\\";
             if (FileSystem.ExistsFile(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")) == false)
             {
                 throw new Exception("С++ 14.1  неустановлен.");
+            }
+            string version = File.ReadAllText(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")).Trim();
+            return Path.Combine(path, "Tools", "MSVC", version);
+
+        }
+        private string GetVS2019Path()
+        {
+            try
+            {
+                SetupConfiguration setupConfiguration = new SetupConfiguration();
+
+                ISetupInstance[] iSetupInstance = new ISetupInstance[1];
+
+                IEnumSetupInstances iEnumSetupInstances = setupConfiguration.EnumAllInstances();
+                while (true)
+                {
+
+                    {
+                        int test;
+                        iEnumSetupInstances.Next(1, iSetupInstance, out test);
+                        if (test == 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    ISetupInstance2 iSetupInstance2 = (ISetupInstance2)iSetupInstance[0];
+                    if ((iSetupInstance2.GetState() & InstanceState.Local) == InstanceState.Local)
+                    {
+                        string InstallationVersion = iSetupInstance2.GetInstallationVersion();
+                        if(!string.IsNullOrEmpty( InstallationVersion))
+                        {
+                            string vs= InstallationVersion.Remove(InstallationVersion.IndexOf('.'));
+                            if(vs=="16")
+                            {
+                                return iSetupInstance2.GetInstallationPath();
+                            }
+                        }
+                      
+
+
+                    }
+                }
+            }
+            catch
+            {
+            }
+            throw new Exception("Visual Studio 2019 неустановлена.");
+            return null;
+        }
+        private string GetVC2019Path()
+        {
+
+            string path = Path.Combine(GetVS2019Path(), "VC");
+            if (FileSystem.ExistsFile(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")) == false)
+            {
+                throw new Exception("С++ 14.2  неустановлен.");
             }
             string version = File.ReadAllText(Path.Combine(path, "Auxiliary", "Build", "Microsoft.VCToolsVersion.default.txt")).Trim();
             return Path.Combine(path, "Tools", "MSVC", version);
@@ -304,7 +352,12 @@ namespace BearBuildTool.Windows
         }
         public VCBuildTools()
         {
-            string VCPath = GetVC2017Path();
+
+            string VCPath = null;
+            if (Config.Global.vs2019)
+                VCPath = GetVC2019Path();
+            else
+                VCPath = GetVC2017Path();
             string UniversalCRTDir;
             string VerisonCRTDir;
             string WindowsSDKDir;
@@ -672,6 +725,7 @@ namespace BearBuildTool.Windows
                     break;
             };
             Arguments += "/MP ";
+            Arguments += "/std:c++17 ";
             Arguments += "/analyze- ";
             Arguments += "/Zc:inline ";
             Arguments += String.Format("\"{0}\" ", source);
@@ -685,8 +739,10 @@ namespace BearBuildTool.Windows
             }
             Arguments += String.Format("/Fo\"{0}\" ", obj);
 
-           
-            Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(Path.GetDirectoryName(obj), "vc141.pdb"));
+           if(Config.Global.vs2019)
+                Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(Path.GetDirectoryName(obj), "vc142.pdb"));
+            else
+                Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(Path.GetDirectoryName(obj), "vc141.pdb"));
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             process.StartInfo.FileName = CCompiler;
             process.StartInfo.Arguments = Arguments;
@@ -785,6 +841,7 @@ namespace BearBuildTool.Windows
 
                     break;
             };
+            Arguments += "/std:c++17 ";
             Arguments += "/MP ";
             Arguments += "/analyze- ";
             Arguments += "/Zc:inline ";
@@ -805,8 +862,10 @@ namespace BearBuildTool.Windows
             }
             //  Arguments += String.Format("/Fo\"{0}\" ", obj);
 
-            
-            Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(BuildObjects_objs_out, "vc141.pdb"));
+            if (Config.Global.vs2019)
+                Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(BuildObjects_objs_out, "vc142.pdb"));
+            else
+                Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(BuildObjects_objs_out, "vc141.pdb"));
             Process process = new Process();
             process.StartInfo.FileName = CCompiler;
             process.StartInfo.Arguments = Arguments;
