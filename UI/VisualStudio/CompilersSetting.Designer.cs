@@ -34,9 +34,9 @@
             this.checkBoxWindowsSDK8 = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.textBoxPath = new System.Windows.Forms.TextBox();
             this.buttonEditPath = new System.Windows.Forms.Button();
+            this.textBoxPath = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.folderBrowserDialogForMinGW = new System.Windows.Forms.FolderBrowserDialog();
             label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
@@ -104,24 +104,7 @@
             this.groupBox2.Size = new System.Drawing.Size(232, 75);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "MinGW";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 20);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(34, 13);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Путь:";
-            // 
-            // textBoxPath
-            // 
-            this.textBoxPath.Location = new System.Drawing.Point(42, 18);
-            this.textBoxPath.Name = "textBoxPath";
-            this.textBoxPath.Size = new System.Drawing.Size(186, 20);
-            this.textBoxPath.TabIndex = 1;
-            this.textBoxPath.TextChanged += new System.EventHandler(this.textBoxPath_TextChanged);
+            this.groupBox2.Text = "MinGW-w64";
             // 
             // buttonEditPath
             // 
@@ -132,6 +115,23 @@
             this.buttonEditPath.Text = "...";
             this.buttonEditPath.UseVisualStyleBackColor = true;
             this.buttonEditPath.Click += new System.EventHandler(this.buttonEditPath_Click);
+            // 
+            // textBoxPath
+            // 
+            this.textBoxPath.Location = new System.Drawing.Point(42, 18);
+            this.textBoxPath.Name = "textBoxPath";
+            this.textBoxPath.Size = new System.Drawing.Size(186, 20);
+            this.textBoxPath.TabIndex = 1;
+            this.textBoxPath.TextChanged += new System.EventHandler(this.textBoxPath_TextChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(9, 20);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(34, 13);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Путь:";
             // 
             // CompilersSetting
             // 

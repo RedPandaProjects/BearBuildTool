@@ -359,7 +359,7 @@ namespace BearBuildTool.Windows.VisualProject
             }
             if(File.Exists(FiltersInProject))
             {
-                CreateFilters(FiltersInProject, Name);
+                CreateFilters(FiltersInProject, Name, Path.Combine(FullPath, Name + ".vcxproj.filters"));
                 //ReBuildFilters(FiltersInProject);
                 return;
             }
@@ -450,7 +450,7 @@ namespace BearBuildTool.Windows.VisualProject
 
             }
         }
-        public static void CreateFilters(string File, string Project)
+        public static void CreateFilters(string File, string Project,string Out=null)
         {
             GenerateProjectFile GenerateProjectFile = new GenerateProjectFile();
             GenerateProjectFile.RegisterProject(Project);
@@ -573,7 +573,7 @@ namespace BearBuildTool.Windows.VisualProject
                     }
                 }
             }
-            filetrs.Save(FiltersInProject);
+            filetrs.Save(Out != null? Out: FiltersInProject);
 
         }
     }
