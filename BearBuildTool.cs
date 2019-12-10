@@ -303,7 +303,7 @@ namespace BearBuildTool
         [STAThread]
         static void Main(string[] args)
         {
-
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             {
                 Config.Global.CountThreads = Environment.ProcessorCount;
             }
