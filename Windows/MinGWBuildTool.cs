@@ -387,8 +387,10 @@ namespace BearBuildTool.Windows
         }
         public override void SetLibraries(List<string> libs, BuildType buildType)
         {
-            if(buildType==BuildType.Executable|| buildType == BuildType.ConsoleExecutable)
+            if(buildType==BuildType.Executable|| buildType == BuildType.ConsoleExecutable || buildType == BuildType.DynamicLibrary)
             {
+                libs.Add("gdi32");
+                
                 /*l0ibs.Add("pthread");
                 libs.Add("dl");*/
             }

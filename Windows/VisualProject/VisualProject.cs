@@ -288,6 +288,7 @@ namespace BearBuildTool.Windows.VisualProject
             InitVcxproj();
             AddFile();
             AddPropertyGroup();
+            try { File.Delete(FileVcxproj); } catch { };
             XmlVcxproj.Save(FileVcxproj);
         }
 
@@ -310,6 +311,7 @@ namespace BearBuildTool.Windows.VisualProject
                     propertyGroup.LocalDebuggerWorkingDirectory = String.Format("..\\..\\..\\binaries\\{0}", _p);
                     user.propertyGroups.Add(propertyGroup);
                 }
+            try { File.Delete(FileUser); } catch { };
             user.Save(FileUser);
         }
       
@@ -327,6 +329,7 @@ namespace BearBuildTool.Windows.VisualProject
             {
                 filters.itemGroup.AppendClInclude(ji, "include");
             }
+            try { File.Delete(FileFilters); } catch { };
             filters.Save(FileFilters);
         }
         private void ReBuildFilters(string outfile)

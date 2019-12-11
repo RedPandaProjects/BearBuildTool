@@ -1071,6 +1071,7 @@ namespace BearBuildTool.Windows
             switch (Config.Global.Configure)
             {
                 case Config.Configure.Debug:
+                    LDefines.Add("_HAS_ITERATOR_DEBUGGING=0");
                     LDefines.Add("_DEBUG");
                     LDefines.Add("DEBUG");
                     break;
