@@ -423,8 +423,8 @@ namespace BearBuildTool.Windows
             string Paths = Environment.GetEnvironmentVariable("PATH") ?? "";
             if (!Paths.Split(';').Any(x => String.Compare(x, VCToolPath, true) == 0))
             {
-   
-                if (VCPlatformPath != null) Paths = VCToolPath + ";" + VCPlatformPath+";"+ Paths;
+
+                if (VCPlatformPath != null) Paths = VCToolPath + ";" + VCPlatformPath + ";" + Paths;
                 else Paths = VCToolPath + ";" + Paths;
                 Environment.SetEnvironmentVariable("PATH", Paths);
             }
@@ -537,12 +537,19 @@ namespace BearBuildTool.Windows
 
             if (Config.Global.Platform == Config.Platform.Win64)
             {
-                ResourceBuilder =  Path.Combine(WindowsSDKDirExtension, "bin","x64","rc.exe");
+                if (Config.Global.Windows10SDKUsing)
+                    ResourceBuilder = Path.Combine(WindowsSDKDirExtension, "bin", Windows10SDKVersion,"x64", "rc.exe");
+                else
+                    ResourceBuilder = Path.Combine(WindowsSDKDirExtension, "bin", "x64", "rc.exe");
+
             }
-          
+
             else
             {
-                ResourceBuilder = Path.Combine(WindowsSDKDirExtension, "bin", "x86", "rc.exe");
+                if (Config.Global.Windows10SDKUsing)
+                    ResourceBuilder = Path.Combine(WindowsSDKDirExtension,  "bin", Windows10SDKVersion, "x86", "rc.exe");
+                else
+                    ResourceBuilder = Path.Combine(WindowsSDKDirExtension, "bin", "x86", "rc.exe");
             }
 
         }

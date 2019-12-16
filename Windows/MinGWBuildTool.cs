@@ -97,9 +97,9 @@ namespace BearBuildTool.Windows
             }
             Arguments += "-funwind-tables ";             
             Arguments += "-Wsequence-point ";
-            Arguments += "-mmmx -msse -msse2 ";
-            Arguments += "-fno-math-errno ";          
-                       
+            Arguments += "-mmmx -msse -msee2 ";
+            Arguments += "-fno-math-errno ";
+            Arguments += "-ffast-math -mfpmath=see -mavx ";
             Arguments += "-fno-strict-aliasing ";
           
             switch (Config.Global.Configure)

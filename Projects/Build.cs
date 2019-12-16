@@ -127,6 +127,7 @@ namespace BearBuildTool.Projects
             vs.Add(name);
             if (!ProjectsInfo.ContainsKey(name))
             {
+                if (Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure].ContainsKey(name) == false) throw new Exception("Не зарегестрирован проект:" + name);
                 var project = Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][name];
                 project.StartBuild();
                 foreach (string projectName in project.Projects.Public)

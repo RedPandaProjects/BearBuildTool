@@ -303,22 +303,25 @@ namespace BearBuildTool
         [STAThread]
         static void Main(string[] args)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            {
-                Config.Global.CountThreads = Environment.ProcessorCount;
-            }
-            if (args.Length == 0) { RunMainForm(); Config.Global.SaveConfig(); return; }
-
 
             int i = 0;
             for (; i < args.Length; i++)
             {
-                CallAction(args[i], args, i+1);
+                CallAction(args[i], args, i + 1);
                 if (!SetOption(args[i]))
                 {
                     break;
                 }
             }
+
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            {
+                Config.Global.CountThreads = Environment.ProcessorCount;
+            }
+            if (args.Length == i) { RunMainForm(); Config.Global.SaveConfig(); return; }
+
+
+
         
             Config.Global.Project = args[i + 0];
             if (!Config.Global.SetConfigure(args[i + 1]) || !Config.Global.SetPlatform(args[i + 2]))
