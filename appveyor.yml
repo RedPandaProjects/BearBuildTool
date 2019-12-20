@@ -1,44 +1,30 @@
-os: Visual Studio 2017
-version: '{build}'
-skip_tags: true
-
+version: 1.0.{build}
 configuration:
 - Debug
 - Release
-
-platform:
-- Any CPU
-
-matrix:
-  allow_failures:
-    - platform: Any CPU
-      configuration: Debug
-    - platform: Any CPU
-      configuration: Release
-
-
+platform: Any CPU
 build:
   project: BearBuildTool.sln
-  parallel: true
+  publish_nuget: true
+  publish_nuget_symbols: true
+  use_snupkg_format: true
+  include_nuget_references: true
   verbosity: minimal
-
-test: off
-
 after_build:
 - cmd: pack_build.cmd
-
 artifacts:
-- path: temp/Release.7z
-  name: Release.7z
-
+- path: temp/release.7z
+  name: release.7z
 deploy:
 - provider: GitHub
-  tag: $(appveyor_build_version)
-  release: BearBuildTool (build $(appveyor_build_version))
-  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
+  tag: test
+  release: test
+  description: test
   auth_token:
     secure: Rg/4it4SOJP02wVZf3z/fZ0Mo2++MIL64NfRnYOHKuQaW3aEQSB2i7arLNzX4Q3k
-  artifact:
-    Release.7z
+  artifact: release.7z
   draft: true
-  force_update: true
+  prerelease: false
+  on:
+    configuration: Release
+    #branch: release
