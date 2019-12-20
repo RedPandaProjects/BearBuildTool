@@ -28,7 +28,7 @@ after_build:
 - cmd: pack_build.cmd
 
 artifacts:
-- path: res/Release.7z
+- path: temp/Release.7z
   name: Release.7z
 
 deploy:
