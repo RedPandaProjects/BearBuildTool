@@ -9,7 +9,7 @@ BearBuildTool is a cross platforms system of the automatic build  designed minim
 
 ### Platforms
 
-|Platform|Configurations|Support|
+|OS|Platform|Support|
 |---|---|---|
 |Windows|Win32(MSVC)|Full|
 |Windows|Win64(MSVC)|Full|
