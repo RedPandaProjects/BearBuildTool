@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "BearBuildTool."
-#define MyAppVersion "1.0.100"
+#define MyAppVersion "1.0.101"
 #define MyAppPublisher "TheBearProject, Inc."
 #define MyAppURL "https://twitter.com/isobolevskiy/"
 #define MyAppExeName "BearBuildTool.exe"
