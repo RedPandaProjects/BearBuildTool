@@ -25,7 +25,7 @@ build:
 test: off
 
 after_build:
-- cmd: pack_build.cmd
+- cmd: pack_build.bat
 
 artifacts:
 - path: res/Release.7z
