@@ -7,7 +7,7 @@ BearBuildTool is a cross platforms system of the automatic build  designed minim
 |---|---|---|
 |DotNET|Debug / Release (Any)|[![Build status](https://ci.appveyor.com/api/projects/status/9xtrftfykypvmotv?svg=true)](https://ci.appveyor.com/project/BearIvan/bearbuildtool)|
 
-### Supported Compillers
+### Platforms
 
 |Platform|Configurations|Support|
 |---|---|---|
@@ -16,7 +16,7 @@ BearBuildTool is a cross platforms system of the automatic build  designed minim
 |Windows|MinGWw-64|Full|
 |Linux|g++|in the development|
 
-### Configurations of the building 
+### Configurations 
 |Configurations|Info|
 |---|---|
 |Debug|Without optimized and full debug info|
