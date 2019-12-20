@@ -1,4 +1,4 @@
-if %CONFIGURATION%==Release if %PLATFORM%==Any CPU goto :RUN
+if %CONFIGURATION%==Release if "%PLATFORM%"=="Any CPU" goto :RUN
 goto :EXIT
 :RUN
 md temp
