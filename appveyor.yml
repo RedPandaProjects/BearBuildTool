@@ -27,4 +27,3 @@ deploy:
   prerelease: false
   on:
     configuration: Release
-    branch: release
