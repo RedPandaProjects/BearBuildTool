@@ -37,7 +37,7 @@ deploy:
   release: BearBuildTool (build $(appveyor_build_version))
   description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
-    secure: 66f48990f93155534a8b6308e24e15e7e461ef12
+    secure: b1a459254b75c272b6c5ffb02935da21319f5d63
   artifact:
     Release.7z
   draft: true
