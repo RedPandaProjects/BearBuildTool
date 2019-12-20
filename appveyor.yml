@@ -7,13 +7,13 @@ configuration:
 - Release
 
 platform:
-- Any
+- Any CPU
 
 matrix:
   allow_failures:
-    - platform: Any
+    - platform: Any CPU
       configuration: Debug
-    - platform: Any
+    - platform: Any CPU
       configuration: Release
 
 
