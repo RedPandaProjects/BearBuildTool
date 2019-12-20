@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 /// <summary>
 /// test 2
 /// </summary>
@@ -36,15 +37,34 @@ namespace BearBuildTool
         }
         static void Initialize()
         {
-            Config.Global.IntermediatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", Config.Global.IntermediatePath);
+            
             Config.Global.LoadConfig();
+            if(String.IsNullOrEmpty( Config.Global.BasePath)||!Directory.Exists(Config.Global.BasePath))
+            {
+                using (var fbd = new FolderBrowserDialog())
+                {
+                    DialogResult result = fbd.ShowDialog();
+
+                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                    {
+                        Config.Global.BasePath = fbd.SelectedPath;
+                        Config.Global.SaveConfig();
+                    }
+                    else
+                    {
+                        Application.Exit();
+                    }
+                }
+            }
+         
+            Config.Global.IntermediatePath = Path.Combine(Config.Global.BasePath, Config.Global.IntermediatePath);
             if (!Directory.Exists(Config.Global.IntermediatePath))
             {
                 Directory.CreateDirectory(Config.Global.IntermediatePath);
             }
             Config.Global.IntermediatePath = Path.GetFullPath(Config.Global.IntermediatePath);
 
-            Config.Global.BinariesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", Config.Global.BinariesPath);
+            Config.Global.BinariesPath = Path.Combine(Config.Global.BasePath, Config.Global.BinariesPath);
 
             if (!Directory.Exists(Config.Global.BinariesPath))
             {
@@ -52,7 +72,7 @@ namespace BearBuildTool
             }
             Config.Global.BinariesPath = Path.GetFullPath(Config.Global.BinariesPath);
 
-            Config.Global.ProjectsPath = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", Config.Global.ProjectsPath));
+            Config.Global.ProjectsPath = Path.GetFullPath(Path.Combine(Config.Global.BasePath, Config.Global.ProjectsPath));
 
             Config.Global.ProjectsCSFile = new Dictionary<string, string>();
 
@@ -246,16 +266,16 @@ namespace BearBuildTool
           if (arg == "-cleanall")
             {
                 Console.WriteLine("Полная чистка");
-                Config.Global.IntermediatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", Config.Global.IntermediatePath);
+                Config.Global.IntermediatePath = Path.Combine(Config.Global.BasePath, Config.Global.IntermediatePath);
 
                 if (Directory.Exists(Config.Global.IntermediatePath))
                 {
                     Config.Global.IntermediatePath = Path.GetFullPath(Config.Global.IntermediatePath);
                     Directory.Delete(Config.Global.IntermediatePath);
                 }
-                if (FileSystem.ExistsFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Bear.sln")))
+                if (FileSystem.ExistsFile(Path.Combine(Config.Global.BasePath, "Bear.sln")))
                 {
-                    File.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Bear.sln"));
+                    File.Delete(Path.Combine(Config.Global.BasePath, "Bear.sln"));
                 }
                 System.Environment.Exit(0);
             }

@@ -48,6 +48,7 @@
             this.buttonRebuild = new System.Windows.Forms.Button();
             this.buttonClean = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.путьКДиректорииПроектовToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -205,7 +206,8 @@
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.compilerToolStripMenuItem});
+            this.compilerToolStripMenuItem,
+            this.путьКДиректорииПроектовToolStripMenuItem});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             this.settingsToolStripMenuItem.Size = new System.Drawing.Size(79, 20);
             this.settingsToolStripMenuItem.Text = "Настройки";
@@ -213,7 +215,7 @@
             // compilerToolStripMenuItem
             // 
             this.compilerToolStripMenuItem.Name = "compilerToolStripMenuItem";
-            this.compilerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.compilerToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
             this.compilerToolStripMenuItem.Text = "Компилятор";
             this.compilerToolStripMenuItem.Click += new System.EventHandler(this.compilerToolStripMenuItem_Click);
             // 
@@ -246,6 +248,13 @@
             this.buttonClean.Text = "Очистить";
             this.buttonClean.UseVisualStyleBackColor = true;
             this.buttonClean.Click += new System.EventHandler(this.buttonClean_Click);
+            // 
+            // путьКДиректорииПроектовToolStripMenuItem
+            // 
+            this.путьКДиректорииПроектовToolStripMenuItem.Name = "путьКДиректорииПроектовToolStripMenuItem";
+            this.путьКДиректорииПроектовToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.путьКДиректорииПроектовToolStripMenuItem.Text = "Путь к директории проектов";
+            this.путьКДиректорииПроектовToolStripMenuItem.Click += new System.EventHandler(this.путьКДиректорииПроектовToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -296,5 +305,6 @@
         private System.Windows.Forms.ToolStripMenuItem VSProjectManagerStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem compilerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem путьКДиректорииПроектовToolStripMenuItem;
     }
 }

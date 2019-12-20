@@ -85,19 +85,19 @@ namespace BearBuildTool.UI
             if (String.IsNullOrEmpty(configure)) throw new Exception();
             Config.Global.SetConfigure(configure);
         }
-    
+
 
         private void SetPlatform()
         {
             if (comboBoxPlatform.SelectedIndex < 0) throw new Exception();
             string platform = comboBoxPlatform.SelectedItem as string;
-            if (String.IsNullOrEmpty(platform))  throw new Exception();
+            if (String.IsNullOrEmpty(platform)) throw new Exception();
             Config.Global.SetPlatform(platform);
         }
 
         private void buttonClean_Click(object sender, EventArgs e)
         {
-        
+
             if (listBoxProject.SelectedIndex >= 0)
             {
                 string name = listBoxProject.SelectedItem as string;
@@ -166,7 +166,7 @@ namespace BearBuildTool.UI
 
         private void mSVCToolStripMenuItem_Click(object sender, EventArgs e)
         {
-           
+
         }
 
         private void comboBoxCompiller_SelectedIndexChanged(object sender, EventArgs e)
@@ -188,6 +188,22 @@ namespace BearBuildTool.UI
         {
             VisualStudio.CompilersSetting mVSC = new VisualStudio.CompilersSetting();
             mVSC.ShowDialog();
+        }
+
+        private void путьКДиректорииПроектовToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    Config.Global.BasePath = fbd.SelectedPath;
+                    Config.Global.SaveConfig();
+                    Application.Exit();
+                }
+
+            }
         }
     }
 }

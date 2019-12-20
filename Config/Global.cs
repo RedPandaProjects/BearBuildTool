@@ -25,6 +25,7 @@ namespace BearBuildTool.Config
     }
     public class Global
     {
+        public static string BasePath = null;
         public static string ProjectsPath = "projects";
         public static string IntermediatePath = "intermediate";
         public static string BinariesPath = "binaries";
@@ -123,43 +124,58 @@ namespace BearBuildTool.Config
         }
         public static string Windows10SDK = String.Empty;
         public static bool Windows10SDKUsing = true;
-        private static int VersionConfig = 2;
+        private static int VersionConfig = 3;
         public static bool IsWindows=true;
         
 
         public static void SaveConfig()
         {
-            string name = Path.Combine(IntermediatePath, "config.bin");
+            try
+            { File.Delete("config.bin"); }
+            catch { }
             try
             {
-                BinaryWriter writer = new BinaryWriter(File.Open(name, FileMode.OpenOrCreate));
+                BinaryWriter writer = new BinaryWriter(File.Open("config.bin", FileMode.Create));
                 {
                     writer.Write(VersionConfig);
                     writer.Write(Windows10SDK);
                     writer.Write(Windows10SDKUsing);
                     writer.Write(MinGWPath);
+                    writer.Write(BasePath);
                 }
+                writer.Close();
             }
             catch { }
         }
         public static void LoadConfig()
         {
-            string name = Path.Combine(IntermediatePath, "config.bin");
             try
             {
-                BinaryReader reader = new BinaryReader(File.Open(name, FileMode.Open));
-                int version = reader.ReadInt32();
-                if(version == 1)
+                BinaryReader reader = new BinaryReader(File.Open("config.bin", FileMode.Open,FileAccess.Read));
+                try
                 {
-                    Windows10SDK = reader.ReadString();
-                    Windows10SDKUsing = reader.ReadBoolean();
+                    int version = reader.ReadInt32();
+                    if (version == 1)
+                    {
+                        Windows10SDK = reader.ReadString();
+                        Windows10SDKUsing = reader.ReadBoolean();
+                    }
+                    else if (version == 2)
+                    {
+                        Windows10SDK = reader.ReadString();
+                        Windows10SDKUsing = reader.ReadBoolean();
+                        MinGWPath = reader.ReadString();
+                    }
+                    else if (version == VersionConfig)
+                    {
+                        Windows10SDK = reader.ReadString();
+                        Windows10SDKUsing = reader.ReadBoolean();
+                        MinGWPath = reader.ReadString();
+                        BasePath = reader.ReadString();
+                    }
                 }
-                else if (VersionConfig == version)
-                {
-                    Windows10SDK = reader.ReadString();
-                    Windows10SDKUsing = reader.ReadBoolean();
-                    MinGWPath = reader.ReadString();
-                }
+                catch { }
+                reader.Close();
             }
             catch { }
         }

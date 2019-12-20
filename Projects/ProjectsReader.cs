@@ -52,7 +52,7 @@ namespace BearBuildTool.Projects
                 Config.Global.ProjectsMap[Config.Global.Platform] = new Dictionary<Config.Configure, Dictionary<string, Project>>();
             if (!Config.Global.ProjectsMap[Config.Global.Platform].ContainsKey(Config.Global.Configure))
                 Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure] = new Dictionary<string, Project>();
-            
+            if (!Directory.Exists(Config.Global.ProjectsPath)) try { Directory.CreateDirectory(Config.Global.ProjectsPath); } catch { }
            if(ListFileProjects == null) ListFileProjects = Directory.GetFiles(Config.Global.ProjectsPath, "*.project.cs", SearchOption.AllDirectories);
 
             if (ListFileProjects == null || ListFileProjects.Length == 0) return;

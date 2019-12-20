@@ -54,7 +54,7 @@ namespace BearBuildTool.Projects
             string namedll = "executabls";
             namedll = namedll + "_" + Config.Global.Platform.ToString() + "_" + Config.Global.Configure.ToString();
             namedll += ".dll";
-
+            if (ListFileProjects.Length == 0) return;
             Assembly asm = Compiler.CompilerAndLoad(ListFileProjects, Path.Combine(Config.Global.IntermediatePath, namedll));
             
             foreach (string file in ListFileProjects)
