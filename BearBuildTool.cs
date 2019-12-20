@@ -303,7 +303,9 @@ namespace BearBuildTool
         [STAThread]
         static void Main(string[] args)
         {
-
+            {
+                Config.Global.CountThreads = Environment.ProcessorCount;
+            }
             int i = 0;
             for (; i < args.Length; i++)
             {
@@ -315,9 +317,7 @@ namespace BearBuildTool
             }
 
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            {
-                Config.Global.CountThreads = Environment.ProcessorCount;
-            }
+           
             if (args.Length == i) { RunMainForm(); Config.Global.SaveConfig(); return; }
 
 

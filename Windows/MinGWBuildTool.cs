@@ -97,9 +97,9 @@ namespace BearBuildTool.Windows
             }
             Arguments += "-funwind-tables ";             
             Arguments += "-Wsequence-point ";
-            Arguments += "-mmmx -msse -msee2 ";
+            Arguments += "-mmmx -msse -msse2 ";
             Arguments += "-fno-math-errno ";
-            Arguments += "-ffast-math -mfpmath=see -mavx ";
+            Arguments += "-ffast-math -mfpmath=sse -mavx ";
             Arguments += "-fno-strict-aliasing ";
           
             switch (Config.Global.Configure)
@@ -145,7 +145,7 @@ namespace BearBuildTool.Windows
                 Arguments += "-o \"" + obj + "\" ";
                 if (pch != null)
                 {
-                    Arguments += " -include "  +  Path.GetFileNameWithoutExtension(pch).Replace('\\', '/') ;
+                    Arguments += " -include "  +  Path.GetFileNameWithoutExtension(pch).Replace('\\', '/') +" ";
                 }
                 if (!Config.Global.WithoutWarning)
                 {
@@ -312,6 +312,7 @@ namespace BearBuildTool.Windows
         }
         public override void BuildStaticLibrary(List<string> objs, List<string> libs, List<string> libsPath, string outStaticLib)
         {
+            if (libs.Count!=0) throw new Exception();
             List<string> files = new List<string>();
             foreach (string lib in libs)
             {
