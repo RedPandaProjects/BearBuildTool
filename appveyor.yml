@@ -17,14 +17,14 @@ artifacts:
   name: release.7z
 deploy:
 - provider: GitHub
-  tag: test
-  release: test
-  description: test
+  tag: $(appveyor_build_version)
+  release: BearBuildTool (build $(appveyor_build_version))
+  description: $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: Rg/4it4SOJP02wVZf3z/fZ0Mo2++MIL64NfRnYOHKuQaW3aEQSB2i7arLNzX4Q3k
   artifact: release.7z
-  draft: true
+  draft: false
   prerelease: false
   on:
     configuration: Release
-    #branch: release
+    branch: release
