@@ -22,3 +22,10 @@ BearBuildTool is a cross platforms system of the automatic build  designed minim
 |Debug|Without optimized and full debug info|
 |Mixed|O2 and debug info|
 |Release|O3 and minimum debug info|
+
+### Supported Editors 
+|OS|Editor|
+|---|---|
+|Windows|Visual Studio 2019|
+|Windows|Visual Studio Code|
+|Linux|Visual Studio Code|
