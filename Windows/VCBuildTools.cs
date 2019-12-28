@@ -731,6 +731,7 @@ namespace BearBuildTool.Windows
 
                     break;
             };
+            if(Config.Global.CountBuild!=1)
             Arguments += "/MP ";
             Arguments += "/std:c++17 ";
             Arguments += "/analyze- ";
@@ -868,7 +869,7 @@ namespace BearBuildTool.Windows
                 Arguments += String.Format("/I\"{0}\" ", include);
             }
             //  Arguments += String.Format("/Fo\"{0}\" ", obj);
-
+             
             if (Config.Global.vs2019)
                 Arguments += String.Format("/Fd\"{0}\" ", Path.Combine(BuildObjects_objs_out, "vc142.pdb"));
             else

@@ -12,7 +12,7 @@ namespace BearBuildTool.Tools
 
         public bool CheakSource(ref List<string> LInclude, string LIntermediate, string file, ref DateTime dateTime)
         {
-            Includes = LInclude;
+            Includes = new List<string> ( LInclude);
             string listFile = Path.Combine(LIntermediate, Path.GetFileName(file) + ".txt");
             return CheaklcudeInfo(file, listFile, ref dateTime);
         }

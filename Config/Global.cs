@@ -131,11 +131,11 @@ namespace BearBuildTool.Config
         public static void SaveConfig()
         {
             try
-            { File.Delete("config.bin"); }
+            { File.Delete(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.bin")); }
             catch { }
             try
             {
-                BinaryWriter writer = new BinaryWriter(File.Open("config.bin", FileMode.Create));
+                BinaryWriter writer = new BinaryWriter(File.Open(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.bin"), FileMode.Create));
                 {
                     writer.Write(VersionConfig);
                     writer.Write(Windows10SDK);
@@ -151,7 +151,7 @@ namespace BearBuildTool.Config
         {
             try
             {
-                BinaryReader reader = new BinaryReader(File.Open("config.bin", FileMode.Open,FileAccess.Read));
+                BinaryReader reader = new BinaryReader(File.Open(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.bin"), FileMode.Open,FileAccess.Read));
                 try
                 {
                     int version = reader.ReadInt32();

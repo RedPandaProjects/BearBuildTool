@@ -274,9 +274,9 @@ namespace BearBuildTool.Windows.VisualProject
                     propertyGroup.Default.NMakePreprocessorDefinitions = defines;
                     propertyGroup.Default.NMakeIncludeSearchPath = SInclude;
                     propertyGroup.Default.NMakeOutput = String.Format("..\\..\\..\\binaries\\{0}\\{1}_{2}.exe", p, GeneralName, c.ToLower());
-                    propertyGroup.Default.NMakeBuildCommandLine = String.Format("..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} {0} {2} {1}", GeneralName, p, c, command);
-                    propertyGroup.Default.NMakeReBuildCommandLine = String.Format("..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -rebuild {0} {2} {1}", GeneralName, p, c, command);
-                    propertyGroup.Default.NMakeCleanCommandLine = String.Format("..\\..\\..\\binaries\\net\\BearBuildTool.exe {3} -clean {0} {2} {1}", GeneralName, p, c, command);
+                    propertyGroup.Default.NMakeBuildCommandLine = String.Format("{4} {3} {0} {2} {1}", GeneralName, p, c, command, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName));
+                    propertyGroup.Default.NMakeReBuildCommandLine = String.Format("{4} {3} -rebuild {0} {2} {1}", GeneralName, p, c, command, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName));
+                    propertyGroup.Default.NMakeCleanCommandLine = String.Format("{4} {3} -clean {0} {2} {1}", GeneralName, p, c, command, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName));
                     XmlVcxproj.propertyGroups.Add(propertyGroup);
                 }
 
