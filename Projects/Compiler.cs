@@ -28,7 +28,9 @@ namespace BearBuildTool.Projects
                 listFiles.ClearFiles();
                 listFiles.Files.AddRange(source);
                 listFiles.Write();
-                return Compile(source, out_name);
+                var result = Compile(source, out_name);
+                Assemblys.Add(out_name, result);
+                return result;
             }
             else
             {
