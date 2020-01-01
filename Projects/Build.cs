@@ -246,13 +246,49 @@ namespace BearBuildTool.Projects
                 bool Rebuild = false;
                 bool Build = false;
                 bool Message = false;
+                bool RebuildFull = false;
                 buildTools.SetDefines(LDefines, GetOutFile(name, buildType), buildType);
+                {
+                    string NameDefines = Path.Combine(LIntermediate, "defines.txt");
+                    if(File.Exists(NameDefines))
+                    {
+                        List<string> ListDefines = new List<string>(File.ReadAllLines(NameDefines));
+                        if(ListDefines.Count == LDefines.Count)
+                        {
+                            ListDefines.Sort();
+                            LDefines.Sort();
+                            for (int i=0;i< LDefines.Count;i++)
+                            {
+                                if(LDefines[i] != ListDefines[i])
+                                {
+                                    RebuildFull = true;
+                                    File.WriteAllLines(NameDefines, LDefines);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            RebuildFull = true;
+                            File.WriteAllLines(NameDefines, LDefines);
+                        }
+                    }
+                    else
+                    {
+                        RebuildFull = true;
+                        File.WriteAllLines(NameDefines, LDefines);
+                    }
+                    
+
+                }
+
+       
                 DateTime dateTimeLibrary = FileSystem.GetLastWriteTime(Config.Global.ProjectsCSFile[name]);
 
                 if (!String.IsNullOrEmpty(project.ResourceFile))
                 {
                     string obj = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(project.ResourceFile) + Config.Global.ObjectExtension);
-                    if (Config.Global.Rebuild || !FileSystem.ExistsFile(obj) || FileSystem.GetLastWriteTime(project.ResourceFile) > FileSystem.GetLastWriteTime(obj))
+                    if (Config.Global.Rebuild|| RebuildFull || !FileSystem.ExistsFile(obj) || FileSystem.GetLastWriteTime(project.ResourceFile) > FileSystem.GetLastWriteTime(obj))
                     {
                         if (Message == false)
                         {
@@ -279,7 +315,7 @@ namespace BearBuildTool.Projects
                     string obj = Path.Combine(LIntermediate, Path.GetFileNameWithoutExtension(PCHSource) + Config.Global.ObjectExtension);
                     DateTime dateTime = DateTime.MinValue;
                     bool reCreate = sourceFile.CheakSource(ref LInclude, LIntermediate, PCHSource, ref dateTime);
-                    if (Config.Global.Rebuild || !FileSystem.ExistsFile(PCH) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj) || dateTime > FileSystem.GetLastWriteTime(PCH) || dateTimeLibrary > FileSystem.GetLastWriteTime(PCH))
+                    if (Config.Global.Rebuild|| RebuildFull || !FileSystem.ExistsFile(PCH) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj) || dateTime > FileSystem.GetLastWriteTime(PCH) || dateTimeLibrary > FileSystem.GetLastWriteTime(PCH))
                     {
 
                         if ( Message == false)
@@ -308,7 +344,7 @@ namespace BearBuildTool.Projects
                         DateTime dateTime = DateTime.MinValue;
                         bool reCreate = sourceFile.CheakSource(ref LInclude, LIntermediate, source, ref dateTime);
                         if (dateTimeLibrary < dateTime) dateTimeLibrary = dateTime;
-                        if (Config.Global.Rebuild || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
+                        if (Config.Global.Rebuild || RebuildFull || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
                         {
 
                             if ( Message == false)
@@ -337,7 +373,7 @@ namespace BearBuildTool.Projects
                         DateTime dateTime = DateTime.MinValue;
                         bool reCreate = sourceFile.CheakSource(ref LInclude, LIntermediate, source, ref dateTime);
                         if (dateTimeLibrary < dateTime) dateTimeLibrary = dateTime;
-                        if (Config.Global.Rebuild || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
+                        if (Config.Global.Rebuild|| RebuildFull || (Rebuild && !C) || !FileSystem.ExistsFile(obj) || reCreate || dateTime > FileSystem.GetLastWriteTime(obj))
                         {
                             if (Message == false)
                             {

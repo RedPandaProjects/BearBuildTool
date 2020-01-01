@@ -25,6 +25,7 @@ namespace BearBuildTool.Config
     }
     public class Global
     {
+        public static bool DevVersion = true;
         public static string BasePath = null;
         public static string ProjectsPath = "projects";
         public static string IntermediatePath = "intermediate";
@@ -124,7 +125,7 @@ namespace BearBuildTool.Config
         }
         public static string Windows10SDK = String.Empty;
         public static bool Windows10SDKUsing = true;
-        private static int VersionConfig = 3;
+        private static int VersionConfig = 4;
         public static bool IsWindows=true;
         
 
@@ -142,6 +143,7 @@ namespace BearBuildTool.Config
                     writer.Write(Windows10SDKUsing);
                     writer.Write(MinGWPath);
                     writer.Write(BasePath);
+                    writer.Write(DevVersion);
                 }
                 writer.Close();
             }
@@ -166,12 +168,20 @@ namespace BearBuildTool.Config
                         Windows10SDKUsing = reader.ReadBoolean();
                         MinGWPath = reader.ReadString();
                     }
-                    else if (version == VersionConfig)
+                    else if (version == 3)
                     {
                         Windows10SDK = reader.ReadString();
                         Windows10SDKUsing = reader.ReadBoolean();
                         MinGWPath = reader.ReadString();
                         BasePath = reader.ReadString();
+                    }
+                    else  if (version == VersionConfig)
+                    {
+                        Windows10SDK = reader.ReadString();
+                        Windows10SDKUsing = reader.ReadBoolean();
+                        MinGWPath = reader.ReadString();
+                        BasePath = reader.ReadString();
+                        DevVersion = reader.ReadBoolean();
                     }
                 }
                 catch { }

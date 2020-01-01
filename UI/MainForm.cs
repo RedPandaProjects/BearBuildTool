@@ -42,6 +42,7 @@ namespace BearBuildTool.UI
             comboBoxConfigure.SelectedIndex = 0;
             comboBoxTranslator.SelectedIndex = 0;
             InitializeList();
+            checkBoxDevVersion.Checked = Config.Global.DevVersion;
         }
 
         private void InitializeList()
@@ -204,6 +205,12 @@ namespace BearBuildTool.UI
                 }
 
             }
+        }
+
+        private void checkBoxDevVersion_CheckedChanged(object sender, EventArgs e)
+        {
+            Config.Global.DevVersion = checkBoxDevVersion.Checked;
+            Config.Global.SaveConfig();
         }
     }
 }

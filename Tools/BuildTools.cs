@@ -157,6 +157,7 @@ namespace BearBuildTool.Tools
                 LDefines.Add("UNICODE");
             LDefines.Add(String.Format("MAIN_PROJECT_NAME=\"{0}\"", Config.Global.Project));
             LDefines.Add(String.Format("PROJECT_OUT=\"{0}\"",Path.GetFileName( ProjectOutName)));
+            if (Config.Global.DevVersion) LDefines.Add("DEVELOPER_VERSION");
         }
 
         public virtual void SetLibraries(List<string> libs, BuildType buildType)

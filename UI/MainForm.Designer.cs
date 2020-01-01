@@ -44,11 +44,12 @@
             this.VSProjectManagerStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compilerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.путьКДиректорииПроектовToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buttonBuild = new System.Windows.Forms.Button();
             this.buttonRebuild = new System.Windows.Forms.Button();
             this.buttonClean = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.путьКДиректорииПроектовToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkBoxDevVersion = new System.Windows.Forms.CheckBox();
             groupBox1 = new System.Windows.Forms.GroupBox();
             groupBox2 = new System.Windows.Forms.GroupBox();
             groupBox3 = new System.Windows.Forms.GroupBox();
@@ -78,13 +79,14 @@
             // 
             // groupBox2
             // 
+            groupBox2.Controls.Add(this.checkBoxDevVersion);
             groupBox2.Controls.Add(this.comboBoxConfigure);
             groupBox2.Controls.Add(this.comboBoxPlatform);
             groupBox2.Controls.Add(this.label3);
             groupBox2.Controls.Add(this.label2);
             groupBox2.Location = new System.Drawing.Point(211, 27);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new System.Drawing.Size(205, 79);
+            groupBox2.Size = new System.Drawing.Size(205, 97);
             groupBox2.TabIndex = 3;
             groupBox2.TabStop = false;
             groupBox2.Text = "Кофигурации";
@@ -139,7 +141,7 @@
             groupBox3.Controls.Add(this.comboBoxTranslator);
             groupBox3.Controls.Add(this.label4);
             groupBox3.Controls.Add(this.buttonGenerateProject);
-            groupBox3.Location = new System.Drawing.Point(212, 170);
+            groupBox3.Location = new System.Drawing.Point(212, 188);
             groupBox3.Name = "groupBox3";
             groupBox3.Size = new System.Drawing.Size(205, 73);
             groupBox3.TabIndex = 9;
@@ -219,9 +221,16 @@
             this.compilerToolStripMenuItem.Text = "Компилятор";
             this.compilerToolStripMenuItem.Click += new System.EventHandler(this.compilerToolStripMenuItem_Click);
             // 
+            // путьКДиректорииПроектовToolStripMenuItem
+            // 
+            this.путьКДиректорииПроектовToolStripMenuItem.Name = "путьКДиректорииПроектовToolStripMenuItem";
+            this.путьКДиректорииПроектовToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this.путьКДиректорииПроектовToolStripMenuItem.Text = "Путь к директории проектов";
+            this.путьКДиректорииПроектовToolStripMenuItem.Click += new System.EventHandler(this.путьКДиректорииПроектовToolStripMenuItem_Click);
+            // 
             // buttonBuild
             // 
-            this.buttonBuild.Location = new System.Drawing.Point(211, 112);
+            this.buttonBuild.Location = new System.Drawing.Point(211, 130);
             this.buttonBuild.Name = "buttonBuild";
             this.buttonBuild.Size = new System.Drawing.Size(125, 23);
             this.buttonBuild.TabIndex = 6;
@@ -231,7 +240,7 @@
             // 
             // buttonRebuild
             // 
-            this.buttonRebuild.Location = new System.Drawing.Point(212, 141);
+            this.buttonRebuild.Location = new System.Drawing.Point(212, 159);
             this.buttonRebuild.Name = "buttonRebuild";
             this.buttonRebuild.Size = new System.Drawing.Size(205, 23);
             this.buttonRebuild.TabIndex = 4;
@@ -241,7 +250,7 @@
             // 
             // buttonClean
             // 
-            this.buttonClean.Location = new System.Drawing.Point(341, 112);
+            this.buttonClean.Location = new System.Drawing.Point(341, 130);
             this.buttonClean.Name = "buttonClean";
             this.buttonClean.Size = new System.Drawing.Size(76, 23);
             this.buttonClean.TabIndex = 7;
@@ -249,12 +258,16 @@
             this.buttonClean.UseVisualStyleBackColor = true;
             this.buttonClean.Click += new System.EventHandler(this.buttonClean_Click);
             // 
-            // путьКДиректорииПроектовToolStripMenuItem
+            // checkBoxDevVersion
             // 
-            this.путьКДиректорииПроектовToolStripMenuItem.Name = "путьКДиректорииПроектовToolStripMenuItem";
-            this.путьКДиректорииПроектовToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
-            this.путьКДиректорииПроектовToolStripMenuItem.Text = "Путь к директории проектов";
-            this.путьКДиректорииПроектовToolStripMenuItem.Click += new System.EventHandler(this.путьКДиректорииПроектовToolStripMenuItem_Click);
+            this.checkBoxDevVersion.AutoSize = true;
+            this.checkBoxDevVersion.Location = new System.Drawing.Point(7, 74);
+            this.checkBoxDevVersion.Name = "checkBoxDevVersion";
+            this.checkBoxDevVersion.Size = new System.Drawing.Size(137, 17);
+            this.checkBoxDevVersion.TabIndex = 6;
+            this.checkBoxDevVersion.Text = "Версия разрабодчика";
+            this.checkBoxDevVersion.UseVisualStyleBackColor = true;
+            this.checkBoxDevVersion.CheckedChanged += new System.EventHandler(this.checkBoxDevVersion_CheckedChanged);
             // 
             // MainForm
             // 
@@ -306,5 +319,6 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem compilerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem путьКДиректорииПроектовToolStripMenuItem;
+        private System.Windows.Forms.CheckBox checkBoxDevVersion;
     }
 }
