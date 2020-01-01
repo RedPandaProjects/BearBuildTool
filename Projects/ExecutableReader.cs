@@ -61,7 +61,6 @@ namespace BearBuildTool.Projects
             if (!Config.Global.ExecutableMap.ContainsKey(Config.Global.Platform))
                 Config.Global.ExecutableMap[Config.Global.Platform] = new Dictionary<Config.Configure, Dictionary<bool, Dictionary<string, Executable>>>();
             if (!Config.Global.ExecutableMap[Config.Global.Platform].ContainsKey(Config.Global.Configure))
-                Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure] = new Dictionary<string, Executable>();
                 Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure] = new Dictionary<bool, Dictionary<string, Executable>>();
             if (!Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure].ContainsKey(DevVersion))
                 Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure][DevVersion] = new Dictionary<string, Executable>();
