@@ -34,11 +34,11 @@ namespace BearBuildTool.Config
         public static string IntermediateProjectPath = null;
         public static string Project = null;
         public static string OutProjectFileName = null;
-        public static Dictionary<Platform, Dictionary<Configure, Dictionary<string, Project>>> ProjectsMap;
+        public static Dictionary<Platform, Dictionary<Configure, Dictionary<bool, Dictionary<string, Project>>>> ProjectsMap;
         public static bool vs2019 = true;
 
         public static Dictionary<string, string> ProjectsCSFile;
-        public static Dictionary<Platform, Dictionary<Configure, Dictionary<string, Executable>>> ExecutableMap;
+        public static Dictionary<Platform, Dictionary<Configure, Dictionary<bool, Dictionary<string, Executable>>>> ExecutableMap;
         public static string ObjectExtension;
         public static string ExecutableExtension;
         public static string StaticLibraryExtension;

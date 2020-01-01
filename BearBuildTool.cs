@@ -81,7 +81,7 @@ namespace BearBuildTool
         }
         public static void CleanProject()
         {
-            if (Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure].ContainsKey(Config.Global.Project) == false)
+            if (Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion].ContainsKey(Config.Global.Project) == false)
             {
                 throw new Exception(String.Format("Приложение {0} не существует!!", Config.Global.Project));
             }
@@ -107,7 +107,7 @@ namespace BearBuildTool
         }
         public static void CompileProject()
         {
-            if (Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure].ContainsKey(Config.Global.Project) == false)
+            if (Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion].ContainsKey(Config.Global.Project) == false)
             {
                 throw new Exception(String.Format("Приложение {0} не существует!!", Config.Global.Project));
             }

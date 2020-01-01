@@ -47,7 +47,7 @@ namespace BearBuildTool.UI
 
         private void InitializeList()
         {
-            foreach (string name in Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure].Keys)
+            foreach (string name in Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion].Keys)
             {
                 listBoxProject.Items.Add(name);
             }

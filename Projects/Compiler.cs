@@ -12,8 +12,12 @@ namespace BearBuildTool.Projects
 {
     class Compiler
     {
+        private static Dictionary<string, Assembly> Assemblys = null;
         public static Assembly CompilerAndLoad(string[] source, string out_name)
         {
+            if(Assemblys == null)
+                Assemblys = new Dictionary<string, Assembly>();
+            if (Assemblys.ContainsKey(out_name)) return Assemblys[out_name];
             if (source == null || source.Length == 0)
             {
                 throw new Exception("База проектов пуста!!!");
@@ -28,7 +32,9 @@ namespace BearBuildTool.Projects
             }
             else
             {
-                return  Assembly.LoadFrom(out_name);
+                var result =  Assembly.LoadFrom(out_name);
+                Assemblys.Add(out_name, result);
+                return result;
             }
         }
         private static Assembly Compile(string[] source, string out_name)

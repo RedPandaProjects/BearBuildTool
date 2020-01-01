@@ -103,7 +103,7 @@ namespace BearBuildTool.Projects
                     List<string> vs = MakeListBuild(name);
                     for (int i = vs.Count - 1; i >= 0; i--)
                     {
-                        StartBuildProject(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][vs[i]], vs[i], GetBuildType(vs[i]));
+                        StartBuildProject(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion][vs[i]], vs[i], GetBuildType(vs[i]));
                     }
                 }
             }
@@ -127,8 +127,8 @@ namespace BearBuildTool.Projects
             vs.Add(name);
             if (!ProjectsInfo.ContainsKey(name))
             {
-                if (Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure].ContainsKey(name) == false) throw new Exception("Не зарегестрирован проект:" + name);
-                var project = Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][name];
+                if (Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion].ContainsKey(name) == false) throw new Exception("Не зарегестрирован проект:" + name);
+                var project = Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion][name];
                 project.StartBuild();
                 foreach (string projectName in project.Projects.Public)
                 {
@@ -149,7 +149,7 @@ namespace BearBuildTool.Projects
                 for (int i= vs.Count-1;i>=0;i--)
                 {
    
-                    StartBuildProject(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][vs[i]], vs[i], GetBuildType(vs[i]));
+                    StartBuildProject(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion][vs[i]], vs[i], GetBuildType(vs[i]));
                 }
                 for (int i = vs.Count - 1; i >= 0; i--)
                 {
@@ -203,11 +203,11 @@ namespace BearBuildTool.Projects
             } 
             foreach (string projectName in project.IncludeInProject.Public)
             {
-                projectInfo.Include.Append(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][projectName].Include);
+                projectInfo.Include.Append(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion][projectName].Include);
             }
             foreach (string projectName in project.IncludeInProject.Private)
             {
-                projectInfo.Include.AppendInPrivate(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][projectName].Include);
+                projectInfo.Include.AppendInPrivate(Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion][projectName].Include);
             }
 
             if (project.IncludeAutonomousProjects.Count != 0) IncludeAutonomousProjects.AddRange(project.IncludeAutonomousProjects);
@@ -555,8 +555,8 @@ namespace BearBuildTool.Projects
        
         BuildType GetBuildType(string name)
         {
-            if (Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure].ContainsKey(name))
-                return Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure][name].Console ? BuildType.ConsoleExecutable : BuildType.Executable;
+            if (Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion].ContainsKey(name))
+                return Config.Global.ExecutableMap[Config.Global.Platform][Config.Global.Configure][Config.Global.DevVersion][name].Console ? BuildType.ConsoleExecutable : BuildType.Executable;
                 return BuildType.DynamicLibrary;
         
         }

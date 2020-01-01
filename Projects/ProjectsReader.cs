@@ -12,55 +12,67 @@ namespace BearBuildTool.Projects
     {
         public static void Read()
         {
-           
-            Config.Global.ProjectsMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<string, Project>>>();
 
+            Config.Global.ProjectsMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<bool, Dictionary<string, Project>>>>();
             if (Config.Global.Platform != Config.Platform.None && Config.Global.Configure != Config.Configure.None)
             {
-                Read2();
+                Read3(Config.Global.DevVersion);
                 return;
             }
-            Config.Global.Platform = Config.Platform.Win32;
             Read1();
-            Config.Global.Platform = Config.Platform.Win64;
-            Read1();
-            Config.Global.Platform = Config.Platform.MinGW;
-            Read1();
-            Config.Global.Platform = Config.Platform.Linux;
-            Read1();
-            Config.Global.Platform = Config.Platform.None;
-
-            Config.Global.Configure = Config.Configure.None;
 
         }
         private static void Read1()
         {
+           
+        
+            Config.Global.Platform = Config.Platform.Win32;
+            Read2();
+            Config.Global.Platform = Config.Platform.Win64;
+            Read2();
+            Config.Global.Platform = Config.Platform.MinGW;
+            Read2();
+            Config.Global.Platform = Config.Platform.Linux;
+            Read2();
+
+            Config.Global.Platform = Config.Platform.None;
+            Config.Global.Configure = Config.Configure.None;
+
+        }
+        private static void Read2()
+        {
 
             Config.Global.Configure = Config.Configure.Debug;
-            Read2();
+            Read3(true);
             Config.Global.Configure = Config.Configure.Mixed;
-            Read2();
+            Read3(true);
             Config.Global.Configure = Config.Configure.Release;
-            Read2();
+            Read3(true);
+            Config.Global.Configure = Config.Configure.Debug;
+            Read3(false);
+            Config.Global.Configure = Config.Configure.Mixed;
+            Read3(false);
+            Config.Global.Configure = Config.Configure.Release;
+            Read3(false);
 
         }
         private static string[] ListFileProjects = null;
-        private static void Read2()
+        private static void Read3(bool DevVersion)
         {
-            if (Config.Global.ProjectsMap == null) Config.Global.ProjectsMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<string, Project>>>();
+            if (Config.Global.ProjectsMap == null) Config.Global.ProjectsMap = new Dictionary<Config.Platform, Dictionary<Config.Configure, Dictionary<bool, Dictionary<string, Project>>>>();
             if (!Config.Global.ProjectsMap.ContainsKey(Config.Global.Platform))
-                Config.Global.ProjectsMap[Config.Global.Platform] = new Dictionary<Config.Configure, Dictionary<string, Project>>();
+                Config.Global.ProjectsMap[Config.Global.Platform] = new Dictionary<Config.Configure, Dictionary<bool, Dictionary<string, Project>>>();
             if (!Config.Global.ProjectsMap[Config.Global.Platform].ContainsKey(Config.Global.Configure))
-                Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure] = new Dictionary<string, Project>();
+                Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure] = new Dictionary<bool, Dictionary<string, Project>>();
+            if (!Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure].ContainsKey(DevVersion))
+                Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][DevVersion] = new Dictionary<string, Project>();
+
             if (!Directory.Exists(Config.Global.ProjectsPath)) try { Directory.CreateDirectory(Config.Global.ProjectsPath); } catch { }
            if(ListFileProjects == null) ListFileProjects = Directory.GetFiles(Config.Global.ProjectsPath, "*.project.cs", SearchOption.AllDirectories);
 
             if (ListFileProjects == null || ListFileProjects.Length == 0) return;
 
-            string namedll = "projects";
-            namedll = namedll + "_" + Config.Global.Platform.ToString() + "_" + Config.Global.Configure.ToString();
-            namedll += ".dll";
-
+            string namedll = "projects.dll";
             Assembly asm = Compiler.CompilerAndLoad(ListFileProjects, Path.Combine(Config.Global.IntermediatePath, namedll));
             foreach (string file in ListFileProjects)
             {
@@ -69,7 +81,7 @@ namespace BearBuildTool.Projects
                 if (!Config.Global.ProjectsCSFile.ContainsKey(name))
                     Config.Global.ProjectsCSFile.Add(name, file);
                 var projects = (Project)Activator.CreateInstance(asm.GetType(name), Path.GetDirectoryName(file));
-                Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure].Add(name, projects);
+                Config.Global.ProjectsMap[Config.Global.Platform][Config.Global.Configure][DevVersion].Add(name, projects);
                 if (projects.ProjectPath == null) projects.ProjectPath = Path.GetDirectoryName(file);
             }
            
