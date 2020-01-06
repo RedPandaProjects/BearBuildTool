@@ -132,7 +132,7 @@ namespace BearBuildTool.Projects
                     info.Include.AppendInPrivate(Config.Global.ProjectsMap[Config.Platform.Win32][Config.Configure.Debug][Config.Global.DevVersion][i].Include);
                 };
 
-                info.Defines.Private.Add(String.Format("{0}_EXPORTS", name.ToUpper()));
+                Tools.BuildTools.SetGlobalDefines(info.Defines.Private, name.ToUpper(), info.PathFileInfo.IndexOf(".project.cs") != -1 ? BuildType.StaticLibrary : BuildType.Executable);
                 if (source_code)
                 {
                     info.SourceFile.AddRange(project.Sources);

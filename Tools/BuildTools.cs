@@ -137,7 +137,11 @@ namespace BearBuildTool.Tools
         {
 
         }
-        public virtual void SetDefines(List<string> LDefines,string ProjectOutName, BuildType buildType)
+        public virtual void SetDefines(List<string> LDefines, string ProjectOutName, BuildType buildType)
+        {
+            SetGlobalDefines(LDefines, ProjectOutName, buildType);
+        }
+        public static void SetGlobalDefines(List<string> LDefines,string ProjectOutName, BuildType buildType)
         {
             switch (buildType)
             {
