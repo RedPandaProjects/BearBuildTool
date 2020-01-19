@@ -54,6 +54,7 @@ namespace BearBuildTool.Projects
         public string PCHFile = null;
         public string PCHIncludeFile = null;
         public bool OnlyAsStatic = false;
+        public bool Warning = true;
         public string ProjectPath = null;
         public string ResourceFile = null;
         public Project()

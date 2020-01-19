@@ -60,7 +60,7 @@ namespace BearBuildTool.Windows
 
 
 
-        public override async Task BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
+        public override async Task BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType, bool warning)
         {
             string Arguments = " ";
             /////////////////////////
@@ -74,7 +74,7 @@ namespace BearBuildTool.Windows
             Arguments += "-DPLATFORM_EXCEPTIONS_DISABLED=0 ";
 
             /////////////////////////
-            if (!Config.Global.WithoutWarning)
+            if (!Config.Global.WithoutWarning && warning)
             {
                 Arguments += "-Wall -Werror ";
                 Arguments += "-Wno-sign-compare ";
@@ -93,7 +93,7 @@ namespace BearBuildTool.Windows
             }
             else
             {
-                Arguments += "-W ";
+                Arguments += "-w ";
             }
             Arguments += "-funwind-tables ";             
             Arguments += "-Wsequence-point ";
@@ -193,7 +193,7 @@ namespace BearBuildTool.Windows
                 System.Console.WriteLine("-----------------------------------------------------------------");
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
             }     
-            if(createPCH) await BuildObject(PN, LInclude, LDefines, pch, pchH, false, source, obj, buildType) ;
+            if(createPCH) await BuildObject(PN, LInclude, LDefines, pch, pchH, false, source, obj, buildType,warning) ;
         }
         public override void BuildDynamicLibrary(List<string> objs, List<string> libs, List<string> libsPath, string outDynamicLib, string outStaticLib)
         {
@@ -210,9 +210,29 @@ namespace BearBuildTool.Windows
             }
             
             List<string> objlist = new List<string>();
+
+           
             foreach (string obj in objs)
             {
+              
                 objlist.Add(string.Format("\"{0}\"", obj.Replace('\\', '/')));
+            }
+            
+            foreach (string lib in libs)
+            {
+                if (Path.GetExtension(lib).ToLower() == ".lib")
+                {
+                    string path_lib = Build.GetLib(lib, ref libsPath,true);
+                    if (path_lib == null)
+                    {
+                        System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
+                        System.Console.WriteLine(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                        System.Console.WriteLine("-----------------------------------------------------------------");
+                        throw new Exception(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                    }
+                    objlist.Add(string.Format("\"{0}\"", path_lib.Replace('\\', '/')));
+                }
+
             }
             foreach (string path in libsPath)
             {
@@ -223,7 +243,10 @@ namespace BearBuildTool.Windows
             Arguments += string.Format(" -Wl,@\"{0}\"", outStaticLib.Replace('\\', '/') + ".txt");
             foreach (string lib in libs)
             {
-                Arguments += string.Format(" -l\"{0}\" ",Path.GetFileNameWithoutExtension( lib));
+                if (Path.GetExtension(lib).ToLower() != ".lib")
+                {
+                    Arguments += string.Format(" -l\"{0}\" ", Path.GetFileNameWithoutExtension(lib));
+                }
 
             }
             System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -271,7 +294,23 @@ namespace BearBuildTool.Windows
                 ;
                 objlist.Add(string.Format("\"{0}\"", obj.Replace('\\', '/')));
             }
-             foreach(string path in libsPath)
+            foreach (string lib in libs)
+            {
+                if (Path.GetExtension(lib).ToLower() == ".lib")
+                {
+                    string path_lib = Build.GetLib(lib, ref libsPath, true);
+                    if (path_lib == null)
+                    {
+                        System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
+                        System.Console.WriteLine(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                        System.Console.WriteLine("-----------------------------------------------------------------");
+                        throw new Exception(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                    }
+                    objlist.Add(string.Format("\"{0}\"", path_lib.Replace('\\', '/')));
+                }
+
+            }
+            foreach (string path in libsPath)
             {
                 Arguments += string.Format("-Wl,-rpath=\"{0}\" ", path.Replace('\\', '/'));
                 Arguments += string.Format("-L\"{0}\" ", path).Replace('\\', '/');
@@ -282,7 +321,10 @@ namespace BearBuildTool.Windows
 
             foreach (string lib in libs)
             {
-                Arguments += string.Format(" -l\"{0}\" ",Path.GetFileNameWithoutExtension( lib));
+                if (Path.GetExtension(lib).ToLower() != ".lib")
+                {
+                    Arguments += string.Format(" -l\"{0}\" ", Path.GetFileNameWithoutExtension(lib));
+                }
             }
 
             System.Diagnostics.Process process = new System.Diagnostics.Process();
@@ -317,7 +359,13 @@ namespace BearBuildTool.Windows
             foreach (string lib in libs)
             {
                 string name = Build.GetLib(lib, ref libsPath);
-                if (name==null) throw new Exception(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                if (name == null)
+                {
+                    System.Console.WriteLine("-------------------------ОТЧЁТ ОБ ОШИБКАХ-------------------------");
+                    System.Console.WriteLine(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                    System.Console.WriteLine("-----------------------------------------------------------------");
+                    throw new Exception(String.Format("Не найден файл {0}", Path.GetFileName(lib)));
+                }
                 files.Add(String.Format("\"{0}\"", name));
 
             }
@@ -391,7 +439,10 @@ namespace BearBuildTool.Windows
             if(buildType==BuildType.Executable|| buildType == BuildType.ConsoleExecutable || buildType == BuildType.DynamicLibrary)
             {
                 libs.Add("gdi32");
-                
+                libs.Add("Ws2_32");
+                libs.Add("Ole32");
+                libs.Add("winmm");
+                libs.Add("vfw32");
                 /*l0ibs.Add("pthread");
                 libs.Add("dl");*/
             }

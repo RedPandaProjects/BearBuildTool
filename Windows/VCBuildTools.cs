@@ -625,7 +625,10 @@ namespace BearBuildTool.Windows
             }
             foreach (string lib in libs)
             {
-                listObject.Add(String.Format("\"{0}\"", lib));
+                if (String.IsNullOrEmpty(Path.GetExtension(lib)))
+                    listObject.Add(String.Format("\"{0}.lib\"", lib));
+                else
+                    listObject.Add(String.Format("\"{0}\"", lib));
             }
             File.WriteAllLines(outStaticLib + ".txt", listObject);
             Arguments += "@" + outStaticLib + ".txt" + " ";
@@ -653,7 +656,7 @@ namespace BearBuildTool.Windows
                 throw new Exception(String.Format("Ошибка компиляции {0}", process.ExitCode));
             }
         }
-        public override async Task BuildObject(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
+        public override async Task BuildObject(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType, bool warning)
         {
 
             string Arguments = "";
@@ -671,7 +674,7 @@ namespace BearBuildTool.Windows
                 Arguments += String.Format("/Fp\"{0}\" ", pch);
             }
             Arguments += "/GS ";
-            if (!Config.Global.WithoutWarning)
+            if (!Config.Global.WithoutWarning&&warning)
             {
                 Arguments += "/W4 ";
                 Arguments += "/WX ";
@@ -789,7 +792,7 @@ namespace BearBuildTool.Windows
                 Arguments += String.Format("/Fp\"{0}\" ", BuildObjects_pch);
             }
             Arguments += "/GS ";
-            if (!Config.Global.WithoutWarning)
+            if (!Config.Global.WithoutWarning&&BuildObjects_Warning)
             {
                 Arguments += "/W4 ";
                 Arguments += "/WX ";
@@ -901,9 +904,9 @@ namespace BearBuildTool.Windows
            
         }
 
-        public override void BuildObjectsStart(string PN, List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
+        public override void BuildObjectsStart(string PN, List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType, bool warning)
         {
-            base.BuildObjectsStart(PN,LInclude, LDefines, pch, pchH, objs_out, buildType);
+            base.BuildObjectsStart(PN,LInclude, LDefines, pch, pchH, objs_out, buildType, warning);
             Source = new List<string>();
         }
 
@@ -956,7 +959,10 @@ namespace BearBuildTool.Windows
             }
             foreach (string lib in libs)
             {
-                listObject.Add(String.Format("\"{0}\"", lib));
+                if(String.IsNullOrEmpty( Path.GetExtension(lib)))
+                    listObject.Add(String.Format("\"{0}.lib\"", lib));
+                else
+                    listObject.Add(String.Format("\"{0}\"", lib));
             }
             File.WriteAllLines(outStaticLib + ".txt", listObject);
             Arguments += "@" + outStaticLib + ".txt" + " ";
@@ -1026,7 +1032,10 @@ namespace BearBuildTool.Windows
             }
             foreach (string lib in libs)
             {
-                listObject.Add(String.Format("\"{0}\"", lib));
+                if (String.IsNullOrEmpty(Path.GetExtension(lib)))
+                    listObject.Add(String.Format("\"{0}.lib\"", lib));
+                else
+                    listObject.Add(String.Format("\"{0}\"", lib));
             }
             File.WriteAllLines(outStaticLib + ".txt", listObject);
             Arguments += "@" + outStaticLib + ".txt" + " ";
@@ -1120,6 +1129,9 @@ namespace BearBuildTool.Windows
             libs.Add("uuid.lib");
             libs.Add("odbc32.lib");
             libs.Add("odbccp32.lib");
+            libs.Add("Ws2_32.lib");
+            libs.Add("winmm.lib");
+            libs.Add("vfw32.lib");
         }
         private void Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {

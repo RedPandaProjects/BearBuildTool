@@ -23,7 +23,8 @@ namespace BearBuildTool.Tools
         protected BuildType BuildObjects_buildType = BuildType.StaticLibrary;
         protected string BuildObjects_NameProject;
         private List<string> BuildObjects_Files;
-        public virtual void BuildObjectsStart(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType)
+        protected bool BuildObjects_Warning = false;
+        public virtual void BuildObjectsStart(string NameProject,List<string> LInclude, List<string> LDefines, string pch, string pchH, string objs_out, BuildType buildType,bool warning)
         {
             BuildObjects_LInclude = LInclude;
             BuildObjects_LDefines = LDefines;
@@ -32,6 +33,7 @@ namespace BearBuildTool.Tools
             BuildObjects_objs_out = objs_out;
             BuildObjects_buildType = buildType;
             BuildObjects_NameProject = NameProject;
+            BuildObjects_Warning = warning;
             BuildObjects_Files = new List<string>();
         }
         private void StartBuild()
@@ -69,7 +71,7 @@ namespace BearBuildTool.Tools
                         if (id >= 0)
                         {
                             Console.WriteLine(String.Format("Сборка {0}", Path.GetFileName(file)));
-                            tasks[id] = Task.Run(async () => await BuildObject(BuildObjects_NameProject, BuildObjects_LInclude, BuildObjects_LDefines, BuildObjects_pch, BuildObjects_pchH, false, file, Path.Combine(BuildObjects_objs_out, Path.GetFileNameWithoutExtension(file) + Config.Global.ObjectExtension), BuildObjects_buildType));
+                            tasks[id] = Task.Run(async () => await BuildObject(BuildObjects_NameProject, BuildObjects_LInclude, BuildObjects_LDefines, BuildObjects_pch, BuildObjects_pchH, false, file, Path.Combine(BuildObjects_objs_out, Path.GetFileNameWithoutExtension(file) + Config.Global.ObjectExtension), BuildObjects_buildType, BuildObjects_Warning));
 
                             break;
                         }
@@ -117,7 +119,7 @@ namespace BearBuildTool.Tools
             BuildObjects_Files.Add(source);
         }
 
-        public virtual async Task BuildObject(string NameProject, List<string> LInclude, List<string> LDefines, string pch,string pchH,bool createPCH, string source, string obj,BuildType buildType) 
+        public virtual async Task BuildObject(string NameProject, List<string> LInclude, List<string> LDefines, string pch,string pchH,bool createPCH, string source, string obj,BuildType buildType,bool warning) 
         {
 
         }

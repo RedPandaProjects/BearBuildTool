@@ -31,14 +31,18 @@ namespace BearBuildTool.Projects
             LibrariesPath = new ProjectListObject();
             LibrariesStatic = new ProjectListObject();
         }
-        public void Append(ProjectInfo projectInfo, bool lib=true, bool static_lib = false)
+        public void Append(ProjectInfo projectInfo, bool static_lib = false)
         {
             Include.Append(projectInfo.Include);
             Defines.Append(projectInfo.Defines);
-            if (lib)
+            if (static_lib)
+            {
+                LibrariesPath.AppendAll(projectInfo.LibrariesPath);
+                LibrariesStatic.AppendAll(projectInfo.LibrariesStatic);
+            }
+            else
             {
                 LibrariesPath.Append(projectInfo.LibrariesPath);
-                if(static_lib)
                 LibrariesStatic.Append(projectInfo.LibrariesStatic);
             }
         }
@@ -46,9 +50,17 @@ namespace BearBuildTool.Projects
         {
             Include.AppendInPrivate(projectInfo.Include);
             Defines.AppendInPrivate(projectInfo.Defines);
-            LibrariesPath.AppendInPrivate(projectInfo.LibrariesPath);
             if(static_lib)
-            LibrariesStatic.AppendInPrivate(projectInfo.LibrariesStatic);
+            {
+                LibrariesPath.Private.AddRange(projectInfo.LibrariesPath.ToList());
+                LibrariesStatic.Private.AddRange(projectInfo.LibrariesStatic.ToList());
+            }
+            else
+            {
+                LibrariesPath.AppendInPrivate(projectInfo.LibrariesPath);
+                LibrariesStatic.AppendInPrivate(projectInfo.LibrariesStatic);
+            }
+
         }
         public string LibraryFile;
     };
@@ -194,11 +206,11 @@ namespace BearBuildTool.Projects
             {
                 foreach (string projectName in project.Projects.Public)
                 {
-                    projectInfo.Append(ProjectsInfo[projectName]);
+                    projectInfo.Append(ProjectsInfo[projectName], ProjectsInfo[projectName].buildType== BuildType.StaticLibrary);
                 }
                 foreach (string projectName in project.Projects.Private)
                 {
-                    projectInfo.AppendInPrivate(ProjectsInfo[projectName]);
+                    projectInfo.AppendInPrivate(ProjectsInfo[projectName], ProjectsInfo[projectName].buildType == BuildType.StaticLibrary);
                 }
             } 
             foreach (string projectName in project.IncludeInProject.Public)
@@ -324,14 +336,14 @@ namespace BearBuildTool.Projects
                             Message = true;
                         }
                         Console.WriteLine(String.Format("Сборка PCH {0}", Path.GetFileName(PCHSource)));
-                        buildTools.BuildObject(name, LInclude, LDefines, PCH, PCHH, true, PCHSource, obj, buildType).Wait();
+                        buildTools.BuildObject(name, LInclude, LDefines, PCH, PCHH, true, PCHSource, obj, buildType, project.Warning).Wait();
                         Rebuild = true;
 
                     }
                     LObj.Add(obj);
                 }
             
-                buildTools.BuildObjectsStart(name, LInclude, LDefines, PCH, PCHH, LIntermediate, buildType);
+                buildTools.BuildObjectsStart(name, LInclude, LDefines, PCH, PCHH, LIntermediate, buildType, project.Warning);
              
                 foreach (string source in project.Sources)
                 {
@@ -361,7 +373,7 @@ namespace BearBuildTool.Projects
                 }
              
                 buildTools.BuildObjectsEnd(true );
-                buildTools.BuildObjectsStart(name, LInclude, LDefines, null, null, LIntermediate, buildType);
+                buildTools.BuildObjectsStart(name, LInclude, LDefines, null, null, LIntermediate, buildType, project.Warning);
                 foreach (string source in project.Sources)
                 {
                     bool C = source.Substring(source.Length - 2, 2).ToLower() == ".c";
@@ -427,7 +439,7 @@ namespace BearBuildTool.Projects
                 }
                 List<string> LLibraries = null;
                 if (buildType == BuildType.StaticLibrary)
-                    LLibraries = new List<string>(projectInfo.LibrariesStatic.Private);
+                    LLibraries = new List<string>();
                 else
                     LLibraries = projectInfo.LibrariesStatic.ToList();
                 LLibrariesPath.Add(Config.Global.IntermediateProjectPath);
@@ -560,9 +572,9 @@ namespace BearBuildTool.Projects
                 return BuildType.DynamicLibrary;
         
         }
-        public static string GetLib(string lib, ref List<string> paths)
+        public static string GetLib(string lib, ref List<string> paths,bool msvc_lib=false)
         {
-            if (Config.Platform.Linux == Config.Global.Platform)
+            if (Config.Platform.Linux == Config.Global.Platform&&!msvc_lib)
             {
                 string fullPath = Path.Combine( Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".a");
                 if (!FileSystem.ExistsFile(fullPath))
@@ -575,7 +587,7 @@ namespace BearBuildTool.Projects
                 }
 
             }
-            else if (Config.Platform.MinGW == Config.Global.Platform)
+            else if (Config.Platform.MinGW == Config.Global.Platform && !msvc_lib)
             {
                 string fullPath = Path.Combine(Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib));
                 if (!FileSystem.ExistsFile(fullPath))
@@ -599,7 +611,7 @@ namespace BearBuildTool.Projects
             foreach (string path in paths)
             {
 
-                if (Config.Platform.Linux == Config.Global.Platform)
+                if (Config.Platform.Linux == Config.Global.Platform && !msvc_lib)
                 {
                    string fullPath = Path.Combine(path, Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) + ".a");
                     if (!FileSystem.ExistsFile(fullPath))
@@ -613,7 +625,7 @@ namespace BearBuildTool.Projects
 
                     continue;
                 }
-                else if (Config.Platform.MinGW == Config.Global.Platform)
+                else if (Config.Platform.MinGW == Config.Global.Platform && !msvc_lib)
                 {
                     string fullPath = Path.Combine(path, Path.GetDirectoryName(lib), "lib" + Path.GetFileName(lib) );
                     if (!FileSystem.ExistsFile(fullPath))

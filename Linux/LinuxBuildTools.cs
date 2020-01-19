@@ -59,7 +59,7 @@ namespace BearBuildTool.Linux
 
             return;
         }
-        public override async Task BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType)
+        public override async Task BuildObject(string PN,List<string> LInclude, List<string> LDefines, string pch, string pchH, bool createPCH, string source, string obj, BuildType buildType,bool warning)
         {
             
             string Arguments = " ";
@@ -127,7 +127,7 @@ namespace BearBuildTool.Linux
                 Arguments += "-x c++-header ";
                 Arguments += "-std=c++14 ";
                 Arguments += "-o \"" + pch + "\" ";
-                BuildObject( PN,LInclude, LDefines, null, null, false, source, obj, buildType).Wait();
+                BuildObject( PN,LInclude, LDefines, null, null, false, source, obj, buildType, warning).Wait();
             }
             else if (Path.GetExtension(source).ToLower() == ".cpp")
             {
