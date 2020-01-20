@@ -140,6 +140,7 @@ namespace BearBuildTool.Windows
             }
             else if (Path.GetExtension(source).ToLower() == ".cpp")
             {
+                Arguments += "-Wa,-mbig-obj ";
                 Arguments += "-x c++ ";
                 Arguments += "-std=c++17 ";
                 Arguments += "-o \"" + obj + "\" ";
