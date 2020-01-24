@@ -480,6 +480,8 @@ namespace BearBuildTool.Projects
                         }
                     }
                 }
+                LLibraries.Clear();
+                LLibraries.AddRange(LibPairs.Keys);
                 string OutFile = GetOutFile(name, buildType);
                 string OutFileTemp = OutFile;
                 if (project.Sources.Count != 0)
@@ -685,7 +687,7 @@ namespace BearBuildTool.Projects
         }
         private static string GetOutStaticLibrary( string name)
         {
-            return Path.Combine(Config.Global.IntermediateProjectPath, name + Config.Global.StaticLibraryExtension);
+                return Path.Combine(Config.Global.IntermediateProjectPath, name + Config.Global.StaticLibraryExtension);
         }
         private static string GetOutStaticLibrary(string name, BuildType buildType)
         {
