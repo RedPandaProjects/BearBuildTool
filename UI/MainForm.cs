@@ -18,9 +18,12 @@ namespace BearBuildTool.UI
             if (Config.Global.IsWindows)
             {
                 comboBoxPlatform.Items.Clear();
-                comboBoxPlatform.Items.Add(Config.Platform.MinGW.ToString());
-                comboBoxPlatform.Items.Add(Config.Platform.Win32.ToString());
+                comboBoxPlatform.Items.Add(Config.Platform.Clang.ToString());
                 comboBoxPlatform.Items.Add(Config.Platform.Win64.ToString());
+                comboBoxPlatform.Items.Add(Config.Platform.Win32.ToString());
+                comboBoxPlatform.Items.Add(Config.Platform.MinGW.ToString());
+               
+               
             }
             else
             {

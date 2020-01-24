@@ -150,6 +150,10 @@ namespace BearBuildTool
                 {
                     Config.Global.BuildTools = new Windows.MinGWBuildTool();
                 }
+                else if (Config.Global.Platform == Config.Platform.Clang)
+                {
+                    Config.Global.BuildTools = new Windows.ClangBuildTool();
+                }
                 else
                 {
                     Config.Global.BuildTools = new Windows.VCBuildTools();

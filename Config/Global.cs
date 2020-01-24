@@ -21,6 +21,7 @@ namespace BearBuildTool.Config
         Win32,
         Win64,
         MinGW,
+        Clang,
         Linux,
     }
     public class Global
@@ -55,8 +56,8 @@ namespace BearBuildTool.Config
 
         public static bool Clean = false;
         public static bool Rebuild = false;
-        public static string MinGWPath = "C:/MinGW";
-
+        public static string MinGWPath = "C:/MinGWw-64";
+        public static string ClangPath = "C:/Program Files/LLVM";
         public static bool SetPlatform(string str)
         {
             str=str.ToLower();
@@ -64,7 +65,7 @@ namespace BearBuildTool.Config
             {
                 ObjectExtension = ".o";
                 ExecutableExtension = ".exe";
-                StaticLibraryExtension = ".a";
+                StaticLibraryExtension = ".lib";
                 DynamicLibraryExtension = ".dll";
                 PCHExtension = ".gch";
                 Platform = Platform.MinGW ;
@@ -86,6 +87,15 @@ namespace BearBuildTool.Config
                 DynamicLibraryExtension = ".dll";
                 PCHExtension = ".pch";
                 Platform = Platform.Win64;
+            }
+            else if (str == "clang")
+            {
+                ObjectExtension = ".o";
+                ExecutableExtension = ".exe";
+                StaticLibraryExtension = ".lib";
+                DynamicLibraryExtension = ".dll";
+                PCHExtension = ".gch";
+                Platform = Platform.Clang;
             }
             else if(str=="linux")
             {

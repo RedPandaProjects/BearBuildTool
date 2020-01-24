@@ -24,8 +24,9 @@ namespace BearBuildTool.Projects
         }
         private static void Read1()
         {
-           
-        
+
+            Config.Global.Platform = Config.Platform.Clang;
+            Read2();
             Config.Global.Platform = Config.Platform.Win32;
             Read2();
             Config.Global.Platform = Config.Platform.Win64;

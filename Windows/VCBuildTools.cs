@@ -131,7 +131,7 @@ namespace BearBuildTool.Windows
             return Path.Combine(path, "Tools", "MSVC", version);
 
         }
-        private void FindUniversalCRT(out string UniversalCRTDir, out string UniversalCRTVersion)
+        public static void FindUniversalCRT(out string UniversalCRTDir, out string UniversalCRTVersion)
         {
 
             string[] RootKeys =
@@ -168,7 +168,7 @@ namespace BearBuildTool.Windows
                 UniversalCRTVersion = LatestIncludeDir.Name;
             }
         }
-        private static string FindNetFxSDKExtensionInstallationFolder()
+        public static string FindNetFxSDKExtensionInstallationFolder()
         {
             string[] Versions;
             Versions = new string[] { "4.6", "4.6.1", "4.6.2" };
@@ -216,7 +216,7 @@ namespace BearBuildTool.Windows
 
             return (string)Result;
         }
-        private static string GetWindowsSDKInstallationLibFolder(string WindowsSDKDir)
+        public static string GetWindowsSDKInstallationLibFolder(string WindowsSDKDir)
         {
             if (Config.Global.Windows10SDKUsing)
             {
@@ -225,7 +225,7 @@ namespace BearBuildTool.Windows
             return "winv6.3";
         }
 
-        private static string FindWindowsSDKExtensionFolder(string WindowsSDKDir)
+        public static string FindWindowsSDKExtensionFolder(string WindowsSDKDir)
         {
             if (Config.Global.Windows10SDKUsing)
             {
@@ -255,7 +255,7 @@ namespace BearBuildTool.Windows
             return WindowsSDKDir;
         }
         public static string Windows10SDKVersion = null;
-        private static string GetWindowsSDKIncludePath(string WindowsSDKDir,string IncludePath)
+        public static string GetWindowsSDKIncludePath(string WindowsSDKDir,string IncludePath)
         {
             if (Config.Global.Windows10SDKUsing)
             {
