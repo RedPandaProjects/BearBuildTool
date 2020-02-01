@@ -35,7 +35,7 @@ namespace BearBuildTool.Windows
             List<string> projects = new List<string>();
             {
                 Projects.GenerateProjectFile generateProjectFile = new Projects.GenerateProjectFile();
-                generateProjectFile.GetProjects(name,ref projects);
+                generateProjectFile.GetProjects(name,ref projects,new Config.Platform[]{ Config.Platform.Win32, Config.Platform.Win64, Config.Platform.MinGW});
             }
             
             foreach(string i in projects)

@@ -26,7 +26,7 @@ namespace BearBuildTool.VisualCode
             GenerateProject = new GenerateProjectFile();
             GenerateProject.RegisterProject(name);
 
-            VCDirectory = Path.Combine(GenerateProject.MapProjects[Name].ProjectPath, ".vscode");
+            VCDirectory = Path.Combine(GenerateProject.ProjectPath[Name], ".vscode");
             if (!Directory.Exists(VCDirectory))
             {
                 Directory.CreateDirectory(VCDirectory);
@@ -45,19 +45,22 @@ namespace BearBuildTool.VisualCode
             task.label = "build " + configure + "_" + platform;
             vcLaunch.tasks.Add(task);
         }
-
-        void GenerateCPPConfigureMinGW(ref VCCppProperties vcCppProperties, string NameConfigurate, string Name, string[] Defines)
+        string[] Platfroms = { "MinGW" };
+        string[] Configurations = { "Debug", "Mixed", "Release" };
+        Config.Platform[] PlatfromsType = { Config.Platform.MinGW };
+        Config.Configure[] ConfigurationsType = { Config.Configure.Debug, Config.Configure.Mixed, Config.Configure.Release };
+        void GenerateCPPConfigureMinGW(ref VCCppProperties vcCppProperties, string NameConfigurate,int idp,int idc, string Name, string[] Defines)
         {
-            var project = GenerateProject.MapProjects[Name];
             VCCppProperties.Configurate configurate = new VCCppProperties.Configurate();
-            List<string> list = project.Include.ToList();
+            List<string> list = new List<string>();
+            GenerateProject.GetInclude(Name, ref list);
             for (int i = 0; i < list.Count; i++)
             {
                 list[i] = list[i].Replace('\\', '/');
             }
             configurate.includePath = list;
 
-            List<string> defines = project.Defines.ToList();
+            List<string> defines = GenerateProject.MapProjects[PlatfromsType[idp]][ConfigurationsType[idc]][Name].Defines.ToList();
             defines.AddRange(Defines);
             configurate.defines = defines;
             configurate.compilerPath = Path.Combine(Config.Global.MinGWPath, "bin", "g++.exe").Replace('\\', '/');
@@ -71,7 +74,6 @@ namespace BearBuildTool.VisualCode
 
         void GenerateLaunchMinGW(ref VCLaunch vcLaunch, string configure, string platform, string configure_exe)
         {
-            var project = GenerateProject.MapProjects[Name];
             VCLaunch.Configurate configurate = new VCLaunch.Configurate();
             configurate.name = configure + "_" + platform;
 
@@ -99,8 +101,7 @@ namespace BearBuildTool.VisualCode
         public void Write()
         {
 
-            string[] Platfroms = { "MinGW" };
-            string[] Configurations = { "Debug", "Mixed", "Release" };
+
             if (Config.Global.IsWindows)
             {
                 List<string> GlobalDefines = new List<string>();
@@ -126,7 +127,7 @@ namespace BearBuildTool.VisualCode
                             LocalDefines.AddRange(GlobalDefines);
                             LocalDefines.AddRange(PlatfromsDefines[i]);
                             LocalDefines.AddRange(ConfigurationsDefines[a]);
-                            GenerateCPPConfigureMinGW(ref vcCppProperties, Platfroms[i], Name, LocalDefines.ToArray());
+                            GenerateCPPConfigureMinGW(ref vcCppProperties, Platfroms[i],i,a, Name, LocalDefines.ToArray());
 
                         }
                     File.WriteAllText(Path.Combine(VCDirectory, "c_cpp_properties.json"), JsonConvert.SerializeObject(vcCppProperties, Formatting.Indented));

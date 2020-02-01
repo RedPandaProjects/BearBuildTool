@@ -17,7 +17,7 @@ namespace BearBuildTool.VisualCode
             Projects.GenerateProjectFile generateProjectFile = new Projects.GenerateProjectFile();
             {
     
-                generateProjectFile.GetProjects(name, ref projects);
+                generateProjectFile.GetProjects(name, ref projects, new Config.Platform[] { Config.Platform.MinGW });
 
             }
             string VisualCodePath = Path.Combine(Config.Global.IntermediatePath, "..","VisualCode");

@@ -45,11 +45,41 @@ namespace BearBuildTool.Windows.VisualProject
                     p = "MinGW";
             }
         }
+
+       
         //this is fixed
         string[] Platfroms = { "Win32", "Win64" };
         string[] PlatfromsDefines = { "WIN32;X32;", "WIN64;X64;" };
+        Config.Configure[] ConfigurationsType = { Config.Configure.Debug, Config.Configure.Mixed, Config.Configure.Release, Config.Configure.Debug, Config.Configure.Mixed, Config.Configure.Release };
         string[] Configurations = { "Debug", "Mixed", "Release", "Debug_MinGW", "Mixed_MinGW", "Release_MinGW" };
         string[] ConfigurationsDefines = { "DEBUG;_DEBUG;MSVC;", "MIXED;DEBUG;MSVC;", "NDEBUG;MSVC;", "DEBUG;_DEBUG;GCC;", "MIXED;DEBUG;GCC;", "NDEBUG;GCC;" };
+        private Config.Platform GetRealPlatformAndConfiguration(string p, string c)
+        {
+            if (c == "Debug_MinGW")
+            {
+                c = "Debug";
+                return Config.Platform.MinGW;
+            }
+            else if (c == "Mixed_MinGW")
+            {
+                c = "Mixed";
+                return Config.Platform.MinGW;
+            }
+            else if (c == "Release_MinGW")
+            {
+                c = "WIN64";
+                return Config.Platform.MinGW;
+            }
+            else if(p == Platfroms[0])
+            {
+                return Config.Platform.Win32;
+            }
+            else if (p == Platfroms[1])
+            {
+                return Config.Platform.Win32;
+            }
+            return Config.Platform.None;
+        }
         public VisualProject(string name, string generalName)
         {
             GenerateProjectFile.RegisterProject(name);
@@ -196,13 +226,18 @@ namespace BearBuildTool.Windows.VisualProject
         {
             {
                 Vcxproj.ItemGroup itemGroup = new Vcxproj.ItemGroup();
-                foreach (string p in GenerateProjectFile.MapProjects[Name].SourceFile)
+                List<string> SourceFie = new List<string>();
+                List<string> IncludeFile = new List<string>();
+
+                GenerateProjectFile.GetSource(Name, ref SourceFie);
+                GenerateProjectFile.GetIncludeFile(Name, ref IncludeFile);
+                foreach (string p in SourceFie)
                 {
                     Vcxproj.Files.ClCompile clCompile = new Vcxproj.Files.ClCompile();
                     clCompile.Include = p;
                     itemGroup.clCompiles.Add(clCompile);
                 }
-                foreach (string i in GenerateProjectFile.MapProjects[Name].IncludeFile.Keys)
+                foreach (string i in IncludeFile)
                 {
                     Vcxproj.Files.ClInclude clInclude = new Vcxproj.Files.ClInclude();
                     clInclude.Include = i;
@@ -210,7 +245,7 @@ namespace BearBuildTool.Windows.VisualProject
                 }
                 {
                     Vcxproj.Files.None none = new Vcxproj.Files.None();
-                    none.Include = GenerateProjectFile.MapProjects[Name].PathFileInfo;
+                    none.Include = GenerateProjectFile.PathFileInfo[Name];
                     itemGroup.nones.Add(none);
                 }
 
@@ -220,10 +255,10 @@ namespace BearBuildTool.Windows.VisualProject
         }
         private void AddPropertyGroup()
         {
-            var Project = GenerateProjectFile.MapProjects[Name];
             string SInclude = "";
             {
-                List<string> LInclude = Project.Include.ToList();
+                List<string> LInclude = new List<string>();
+                GenerateProjectFile.GetInclude(Name, ref LInclude);// Project.Include.ToList();
                 foreach (var ia in LInclude)
                 {
                     SInclude += ia + ";";
@@ -240,7 +275,7 @@ namespace BearBuildTool.Windows.VisualProject
                 command += "-withoutwarning ";
             }
 
-            List<string> LDefines = Project.Defines.ToList();
+      
             for (int i = 0; i < Platfroms.Length; i++)
             {
 
@@ -248,10 +283,13 @@ namespace BearBuildTool.Windows.VisualProject
 
                 for (int a = 0; a < Configurations.Length; a++)
                 {
+
+
                     string c = Configurations[a];
                     string defines = "WINDOWS;LIB;_LIB";
                     defines += PlatfromsDefines[i];
-                    defines += ConfigurationsDefines[i];
+                    defines += ConfigurationsDefines[a];
+                    List<string> LDefines = GenerateProjectFile.MapProjects[GetRealPlatformAndConfiguration(p,c)][ConfigurationsType[a]][Name].Defines.ToList();
                     if (Config.Global.UNICODE)
                     {
                         defines += "_UNICODE;";
@@ -320,12 +358,20 @@ namespace BearBuildTool.Windows.VisualProject
             Filters.Project filters = new Filters.Project();
             filters.itemGroup.AppendFilter("include");
             filters.itemGroup.AppendFilter("source");
-            var i = GenerateProjectFile.MapProjects[Name];
-            foreach (var ji in i.SourceFile)
+
+            List<string> SourceFie = new List<string>();
+            List<string> IncludeFile = new List<string>();
+
+            GenerateProjectFile.GetSource(Name, ref SourceFie);
+            GenerateProjectFile.GetIncludeFile(Name, ref IncludeFile);
+
+
+
+            foreach (var ji in SourceFie)
             {
                 filters.itemGroup.AppendClCompile(ji, "source");
             }
-            foreach (var ji in i.IncludeFile.Keys)
+            foreach (var ji in IncludeFile)
             {
                 filters.itemGroup.AppendClInclude(ji, "include");
             }
@@ -356,8 +402,7 @@ namespace BearBuildTool.Windows.VisualProject
         {
             string FiltersInProject = String.Empty;
             {
-                var project = GenerateProjectFile.MapProjects[Name];
-                string path = Path.GetDirectoryName(project.PathFileInfo);
+                string path = Path.GetDirectoryName(GenerateProjectFile.PathFileInfo[Name]);
                 FiltersInProject = Path.Combine(path, Name + ".vcxproj.filters");
             }
             if(File.Exists(FiltersInProject))
@@ -457,13 +502,22 @@ namespace BearBuildTool.Windows.VisualProject
         {
             GenerateProjectFile GenerateProjectFile = new GenerateProjectFile();
             GenerateProjectFile.RegisterProject(Project);
-            var prject = GenerateProjectFile.MapProjects[Project];
+
+            List<string> SourceFie = new List<string>();
+            List<string> IncludeFile = new List<string>();
+            List<string> ResourceFiles = new List<string>();
+
+
+            GenerateProjectFile.GetResourceFile(Project, ref ResourceFiles);
+            GenerateProjectFile.GetSource(Project, ref SourceFie);
+            GenerateProjectFile.GetIncludeFile(Project, ref IncludeFile);
+            
             Filters.Project filetrs = new Filters.Project();
             if (!filetrs.Load(File)) Console.WriteLine("Ошибка не удалось загрузить " + File);
             foreach (Filters.ClCompile i in filetrs.itemGroup.ClCompilers)
             {
                 List<string> list = new List<string>();
-                foreach (string a in prject.SourceFile)
+                foreach (string a in SourceFie)
                 {
                     if (Path.GetFileName(i.Include).ToLower() == Path.GetFileName(a).ToLower()) list.Add(a);
                 }
@@ -481,7 +535,7 @@ namespace BearBuildTool.Windows.VisualProject
             foreach (Filters.ClInclude i in filetrs.itemGroup.ClIncludes)
             {
                 List<string> list = new List<string>();
-                foreach (string a in prject.IncludeFile.Keys)
+                foreach (string a in IncludeFile)
                 {
                     if (Path.GetFileName(i.Include).ToLower() == Path.GetFileName(a).ToLower()) list.Add(a);
                 }
@@ -497,26 +551,40 @@ namespace BearBuildTool.Windows.VisualProject
             bool b1 = false, b2 = false;
             foreach (Filters.None i in filetrs.itemGroup.Nones)
             {
-                if (Path.GetFileName(i.Include).ToLower() == Path.GetFileName(prject.PathFileInfo).ToLower())
+                if (Path.GetFileName(i.Include).ToLower() == Path.GetFileName(GenerateProjectFile.PathFileInfo[Project]).ToLower())
                 {
                     List<string> list = new List<string>();
-                    list.Add(prject.PathFileInfo);
+                    list.Add(GenerateProjectFile.PathFileInfo[Project]);
                     if (b1) continue;
                     GetFile(ref list, ref i.Include);
                     b1 = true;
                 }
-                else if (Path.GetFileName(i.Include).ToLower() == Path.GetFileName(prject.ResourceFile).ToLower())
+                else
+                if(ResourceFiles.Count!=0)
                 {
-                    List<string> list = new List<string>();
-                    list.Add(prject.ResourceFile);
-                    if (b2) continue;
-                    GetFile(ref list, ref i.Include);
-                    b2 = true;
+                    foreach (string a in ResourceFiles)
+                    {
+                        if (Path.GetFileName(i.Include).ToLower() == Path.GetFileName(a).ToLower())
+                        {
+                            List<string> list = new List<string>();
+                            list.Add(a);
+                            if (b2) continue;
+                            GetFile(ref list, ref i.Include);
+                            b2 = true;
+                        }
+                        else
+                        {
+                            i.Include = " УДАЛИТЬ.УДАЛИТЬ";
+                        }
+                    }
+
                 }
                 else
                 {
                     i.Include = " УДАЛИТЬ.УДАЛИТЬ";
                 }
+              
+               
             }
             for (int i = filetrs.itemGroup.Nones.Count - 1; i >= 0; i--)
             {
@@ -527,8 +595,7 @@ namespace BearBuildTool.Windows.VisualProject
             }
             string FiltersInProject = String.Empty;
             {
-                var project = GenerateProjectFile.MapProjects[Project];
-                string path = Path.GetDirectoryName(project.PathFileInfo);
+                string path = Path.GetDirectoryName(GenerateProjectFile.PathFileInfo[Project]);
                 FiltersInProject = Path.Combine(path, Project + ".vcxproj.filters");
             }
             {
