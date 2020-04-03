@@ -1,4 +1,4 @@
-BearBuildTool ![Discord](https://img.shields.io/discord/530968529311367178?label=discord&style=plastic)
+BearBuildTool ![Discord](https://img.shields.io/discord/530968529311367178)
 ==========================
 BearBuildTool is a cross platforms system of the automatic build  designed minimization time to set up and service builds of projects.
 
